@@ -3439,7 +3439,7 @@ const AddClientModal = ({ onAdd, onClose, existingClients }) => {
           Cancel
         </Btn>
         <Btn onClick={submit} disabled={!name.trim() || exists}>
-          + Client Add Karo
+          Add Client
         </Btn>
       </div>
     </>
@@ -4297,8 +4297,40 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
           flexDirection: "column",
           gap: 0,
           animation: "scaleIn .3s cubic-bezier(.34,1.56,.64,1) both",
+          position: "relative",
         }}
       >
+        {/* Close button — only when trial not over */}
+        {!trialOver && (
+          <button
+            onClick={onUnlock}
+            style={{
+              position: "absolute",
+              top: -44,
+              right: 0,
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              color: "rgba(255,255,255,0.5)",
+              borderRadius: 99,
+              padding: "6px 14px",
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: "pointer",
+              fontFamily: "inherit",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              transition: "all .15s",
+            }}
+            onMouseEnter={(e) => (e.target.style.color = "#fff")}
+            onMouseLeave={(e) =>
+              (e.target.style.color = "rgba(255,255,255,0.5)")
+            }
+          >
+            ✕ &nbsp;Continue with free trial
+          </button>
+        )}
+
         {success ? (
           <div
             style={{
@@ -4792,7 +4824,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                     setError("");
                   }}
                   onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
-                  placeholder="Unlock code daalo..."
+                  placeholder="Enter your unlock code..."
                   style={{
                     flex: 1,
                     background: "var(--surface2)",
@@ -4911,7 +4943,7 @@ const NewMonthCelebration = ({ stats, monthName, onClose }) => {
           {monthName} Complete!
         </p>
         <p style={{ fontSize: 13, color: "var(--t3)", marginBottom: 24 }}>
-          Great month — here's what you achieved!
+          Here's a look at last month's performance.
         </p>
 
         {/* Stats */}
@@ -5069,7 +5101,7 @@ const NewMonthCelebration = ({ stats, monthName, onClose }) => {
             letterSpacing: "0.02em",
           }}
         >
-          Start New Month
+          Start Fresh Month
         </button>
       </div>
     </div>
