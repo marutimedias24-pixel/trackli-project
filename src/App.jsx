@@ -3301,21 +3301,50 @@ const useReminder = (transactions) => {
     const today = todayISO();
     const hasToday = transactions.some((t) => t.date === today);
     setShowBanner(!hasToday);
-    const lastNotif = localStorage.getItem("flt_last_notif");
-    if (lastNotif === today) return;
-    const send = () => {
-      if (Notification.permission === "granted" && !hasToday) {
-        new Notification("Trackli", {
-          body: "Log today's income and keep your tracker up to date.",
-        });
-        localStorage.setItem("flt_last_notif", today);
+
+    // Safe notification — only on desktop where supported
+    try {
+      if (typeof Notification === "undefined") return;
+      if (!("permission" in Notification)) return;
+      const lastNotif = localStorage.getItem("flt_last_notif");
+      if (lastNotif === today) return;
+
+      const send = () => {
+        try {
+          if (Notification.permission === "granted" && !hasToday) {
+            // Use ServiceWorker if available (mobile), else direct (desktop)
+            if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+              navigator.serviceWorker.ready
+                .then((reg) => {
+                  reg.showNotification("Trackli", {
+                    body: "Log today's income and keep your tracker up to date.",
+                  });
+                })
+                .catch(() => {});
+            } else {
+              new Notification("Trackli", {
+                body: "Log today's income and keep your tracker up to date.",
+              });
+            }
+            localStorage.setItem("flt_last_notif", today);
+          }
+        } catch (e) {
+          // Notification not supported — silently ignore
+        }
+      };
+
+      if (Notification.permission === "default") {
+        Notification.requestPermission()
+          .then((p) => {
+            if (p === "granted") send();
+          })
+          .catch(() => {});
+      } else {
+        send();
       }
-    };
-    if (Notification.permission === "default")
-      Notification.requestPermission().then((p) => {
-        if (p === "granted") send();
-      });
-    else send();
+    } catch (e) {
+      // Notification API not available — silently ignore
+    }
   }, [transactions]);
   return { showBanner, setShowBanner };
 };
