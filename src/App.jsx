@@ -4280,13 +4280,14 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        background: "rgba(0,0,0,0.88)",
-        backdropFilter: "blur(14px)",
+        background: "rgba(0,0,0,0.55)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
         overflowY: "auto",
         padding: "60px 16px 32px",
       }}
     >
-      {/* Close button — top right fixed, always visible when trial active */}
+      {/* Close button — fixed top right */}
       {!trialOver && (
         <button
           onClick={onUnlock}
@@ -4296,8 +4297,8 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
             right: 16,
             zIndex: 10000,
             background: "rgba(255,255,255,0.1)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            color: "rgba(255,255,255,0.7)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            color: "rgba(255,255,255,0.8)",
             borderRadius: 99,
             padding: "8px 16px",
             fontSize: 12,
@@ -4307,10 +4308,11 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
             display: "flex",
             alignItems: "center",
             gap: 6,
+            backdropFilter: "blur(10px)",
             transition: "all .15s",
           }}
           onMouseEnter={(e) =>
-            (e.currentTarget.style.background = "rgba(255,255,255,0.18)")
+            (e.currentTarget.style.background = "rgba(255,255,255,0.2)")
           }
           onMouseLeave={(e) =>
             (e.currentTarget.style.background = "rgba(255,255,255,0.1)")
@@ -4323,7 +4325,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
       <div
         style={{
           width: "100%",
-          maxWidth: 780,
+          maxWidth: 800,
           margin: "0 auto",
           display: "flex",
           flexDirection: "column",
@@ -4405,15 +4407,21 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                 style={{
                   background:
                     selPlan === "monthly"
-                      ? "var(--surface2)"
-                      : "var(--surface)",
-                  border: `2px solid ${selPlan === "monthly" ? "var(--indigo)" : "var(--cb)"}`,
+                      ? "rgba(255,255,255,0.1)"
+                      : "rgba(255,255,255,0.05)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
+                  border: `2px solid ${selPlan === "monthly" ? "rgba(99,102,241,0.6)" : "rgba(255,255,255,0.1)"}`,
                   borderRadius: 20,
                   padding: "24px 22px",
                   cursor: "pointer",
                   transition: "all .2s",
                   position: "relative",
-                  opacity: selPlan === "yearly" ? 0.75 : 1,
+                  opacity: selPlan === "yearly" ? 0.65 : 1,
+                  boxShadow:
+                    selPlan === "monthly"
+                      ? "0 8px 32px rgba(99,102,241,0.2)"
+                      : "none",
                 }}
               >
                 {/* Plan name */}
@@ -4532,9 +4540,11 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                 style={{
                   background:
                     selPlan === "yearly"
-                      ? "linear-gradient(145deg,rgba(99,102,241,0.15),rgba(34,197,94,0.08))"
-                      : "var(--surface)",
-                  border: `2px solid ${selPlan === "yearly" ? "var(--indigo)" : "var(--cb)"}`,
+                      ? "rgba(99,102,241,0.15)"
+                      : "rgba(255,255,255,0.05)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
+                  border: `2px solid ${selPlan === "yearly" ? "rgba(99,102,241,0.7)" : "rgba(255,255,255,0.1)"}`,
                   borderRadius: 20,
                   padding: "24px 22px",
                   cursor: "pointer",
@@ -4542,7 +4552,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                   position: "relative",
                   boxShadow:
                     selPlan === "yearly"
-                      ? "0 8px 32px rgba(99,102,241,0.2)"
+                      ? "0 8px 32px rgba(99,102,241,0.3)"
                       : "none",
                 }}
               >
@@ -4800,8 +4810,10 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
             {/* Unlock Code */}
             <div
               style={{
-                background: "var(--surface)",
-                border: "1px solid var(--cb)",
+                background: "rgba(255,255,255,0.06)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: 14,
                 padding: "16px 18px",
               }}
@@ -4809,7 +4821,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
               <p
                 style={{
                   fontSize: 12,
-                  color: "var(--t3)",
+                  color: "rgba(255,255,255,0.4)",
                   marginBottom: 10,
                   textAlign: "center",
                 }}
