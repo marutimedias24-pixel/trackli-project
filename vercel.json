@@ -1,0 +1,9 @@
+{
+  "routes": [
+    { "src": "/waitlist", "dest": "/waitlist.html" },
+    { "src": "/waitlist.html", "dest": "/waitlist.html" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/admin.html", "dest": "/admin.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
