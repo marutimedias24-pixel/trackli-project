@@ -4416,7 +4416,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
               >
                 Choose Your Plan
               </h2>
-              <p style={{ fontSize: 14, color: "var(--t3)" }}>
+              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)" }}>
                 Upgrade anytime. No hidden charges. Cancel anytime.
               </p>
             </div>
@@ -4434,23 +4434,21 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
               <div
                 onClick={() => setSelPlan("monthly")}
                 style={{
-                  background:
-                    selPlan === "monthly"
-                      ? "rgba(20,20,30,0.85)"
-                      : "rgba(15,15,22,0.75)",
+                  background: "rgba(15,15,25,0.92)",
                   backdropFilter: "blur(20px)",
                   WebkitBackdropFilter: "blur(20px)",
-                  border: `2px solid ${selPlan === "monthly" ? "rgba(99,102,241,0.7)" : "rgba(255,255,255,0.1)"}`,
+                  border: `2px solid ${selPlan === "monthly" ? "rgba(99,102,241,0.8)" : "rgba(255,255,255,0.12)"}`,
                   borderRadius: 20,
                   padding: "24px 22px",
                   cursor: "pointer",
                   transition: "all .2s",
                   position: "relative",
-                  opacity: selPlan === "yearly" ? 0.7 : 1,
+                  opacity: selPlan === "yearly" ? 0.75 : 1,
                   boxShadow:
                     selPlan === "monthly"
-                      ? "0 8px 32px rgba(99,102,241,0.2)"
+                      ? "0 8px 32px rgba(99,102,241,0.25)"
                       : "none",
+                  color: "#fff",
                 }}
               >
                 {/* Plan name */}
@@ -4458,7 +4456,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
-                    color: "var(--t3)",
+                    color: "rgba(255,255,255,0.5)",
                     textTransform: "uppercase",
                     letterSpacing: ".1em",
                     marginBottom: 6,
@@ -4469,7 +4467,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                 <p
                   style={{
                     fontSize: 12,
-                    color: "var(--t3)",
+                    color: "rgba(255,255,255,0.45)",
                     marginBottom: 16,
                     fontStyle: "italic",
                   }}
@@ -4486,20 +4484,22 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                   }}
                 >
                   <span
-                    style={{
-                      fontSize: 38,
-                      fontWeight: 900,
-                      color: "var(--t1)",
-                    }}
+                    style={{ fontSize: 38, fontWeight: 900, color: "#fff" }}
                   >
                     ₹59
                   </span>
-                  <span style={{ fontSize: 13, color: "var(--t3)" }}>
+                  <span
+                    style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}
+                  >
                     /month
                   </span>
                 </div>
                 <p
-                  style={{ fontSize: 11, color: "var(--t3)", marginBottom: 20 }}
+                  style={{
+                    fontSize: 11,
+                    color: "rgba(255,255,255,0.4)",
+                    marginBottom: 20,
+                  }}
                 >
                   Billed monthly
                 </p>
@@ -4523,7 +4523,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                           fontWeight: 700,
                           flexShrink: 0,
                           marginTop: 1,
-                          color: f.ok ? "var(--green)" : "var(--t3)",
+                          color: f.ok ? "#4ade80" : "rgba(255,255,255,0.3)",
                         }}
                       >
                         {f.ok ? "✔" : "✘"}
@@ -4570,7 +4570,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                   background:
                     selPlan === "yearly"
                       ? "rgba(20,20,50,0.88)"
-                      : "rgba(15,15,22,0.75)",
+                      : "rgba(15,15,25,0.92)",
                   backdropFilter: "blur(20px)",
                   WebkitBackdropFilter: "blur(20px)",
                   border: `2px solid ${selPlan === "yearly" ? "rgba(99,102,241,0.8)" : "rgba(255,255,255,0.1)"}`,
