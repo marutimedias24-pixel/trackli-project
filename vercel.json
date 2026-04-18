@@ -1,9 +1,11 @@
 {
-  "routes": [
-    { "src": "/waitlist", "dest": "/waitlist.html" },
-    { "src": "/waitlist.html", "dest": "/waitlist.html" },
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/admin.html", "dest": "/admin.html" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/waitlist", "destination": "/waitlist.html" },
+    { "source": "/waitinglist", "destination": "/waitinglist.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    {
+      "source": "/((?!waitlist|waitinglist|admin|assets|favicon).*)",
+      "destination": "/index.html"
+    }
   ]
 }
