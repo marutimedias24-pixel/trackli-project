@@ -4280,9 +4280,9 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        background: "rgba(0,0,0,0.55)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
+        background: "rgba(0,0,0,0.7)",
+        backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
         overflowY: "auto",
         padding: "60px 16px 32px",
       }}
@@ -4407,17 +4407,17 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                 style={{
                   background:
                     selPlan === "monthly"
-                      ? "rgba(255,255,255,0.1)"
-                      : "rgba(255,255,255,0.05)",
+                      ? "rgba(20,20,30,0.85)"
+                      : "rgba(15,15,22,0.75)",
                   backdropFilter: "blur(20px)",
                   WebkitBackdropFilter: "blur(20px)",
-                  border: `2px solid ${selPlan === "monthly" ? "rgba(99,102,241,0.6)" : "rgba(255,255,255,0.1)"}`,
+                  border: `2px solid ${selPlan === "monthly" ? "rgba(99,102,241,0.7)" : "rgba(255,255,255,0.1)"}`,
                   borderRadius: 20,
                   padding: "24px 22px",
                   cursor: "pointer",
                   transition: "all .2s",
                   position: "relative",
-                  opacity: selPlan === "yearly" ? 0.65 : 1,
+                  opacity: selPlan === "yearly" ? 0.7 : 1,
                   boxShadow:
                     selPlan === "monthly"
                       ? "0 8px 32px rgba(99,102,241,0.2)"
@@ -4540,11 +4540,11 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                 style={{
                   background:
                     selPlan === "yearly"
-                      ? "rgba(99,102,241,0.15)"
-                      : "rgba(255,255,255,0.05)",
+                      ? "rgba(20,20,50,0.88)"
+                      : "rgba(15,15,22,0.75)",
                   backdropFilter: "blur(20px)",
                   WebkitBackdropFilter: "blur(20px)",
-                  border: `2px solid ${selPlan === "yearly" ? "rgba(99,102,241,0.7)" : "rgba(255,255,255,0.1)"}`,
+                  border: `2px solid ${selPlan === "yearly" ? "rgba(99,102,241,0.8)" : "rgba(255,255,255,0.1)"}`,
                   borderRadius: 20,
                   padding: "24px 22px",
                   cursor: "pointer",
@@ -4552,7 +4552,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                   position: "relative",
                   boxShadow:
                     selPlan === "yearly"
-                      ? "0 8px 32px rgba(99,102,241,0.3)"
+                      ? "0 8px 32px rgba(99,102,241,0.35)"
                       : "none",
                 }}
               >
@@ -6118,18 +6118,18 @@ const InvoicePage = ({ transactions }) => {
 /* ══════════════════════════════════════════════
    MAIN APP
 ══════════════════════════════════════════════ */
-// ── Boot: inject styles immediately before React renders ──
-(() => {
+// ── Boot: inject styles safely ──
+try {
+  const d = localStorage.getItem("flt_theme");
+  const dark = d ? d === "dark" : true;
+  injectStyles(dark);
+  updateTheme(dark);
+} catch (e) {
   try {
-    const d = localStorage.getItem("flt_theme");
-    const dark = d ? d === "dark" : true;
-    injectStyles(dark);
-    updateTheme(dark);
-  } catch (e) {
     injectStyles(true);
     updateTheme(true);
-  }
-})();
+  } catch {}
+}
 
 /* ══════════════════════════════════════════════
    RESET PASSWORD MODAL
@@ -7089,3 +7089,78 @@ export default function App() {
     </div>
   );
 }
+
+// ── ERROR BOUNDARY ──
+import { Component } from "react";
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    console.error("App crashed:", error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div
+          style={{
+            minHeight: "100vh",
+            background: "#0d0d12",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+            textAlign: "center",
+            fontFamily: "sans-serif",
+          }}
+        >
+          <div style={{ fontSize: 40, marginBottom: 16 }}>⚠️</div>
+          <p
+            style={{
+              color: "#fff",
+              fontSize: 18,
+              fontWeight: 700,
+              marginBottom: 8,
+            }}
+          >
+            Something went wrong
+          </p>
+          <p
+            style={{
+              color: "#888",
+              fontSize: 13,
+              marginBottom: 24,
+              maxWidth: 300,
+            }}
+          >
+            {this.state.error?.message || "Unknown error"}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              background: "#22c55e",
+              color: "#000",
+              border: "none",
+              borderRadius: 10,
+              padding: "12px 24px",
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Reload App
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+export { ErrorBoundary };
