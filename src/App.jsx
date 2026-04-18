@@ -4282,55 +4282,55 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
         zIndex: 9999,
         background: "rgba(0,0,0,0.88)",
         backdropFilter: "blur(14px)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "16px",
         overflowY: "auto",
+        padding: "60px 16px 32px",
       }}
     >
+      {/* Close button — top right fixed, always visible when trial active */}
+      {!trialOver && (
+        <button
+          onClick={onUnlock}
+          style={{
+            position: "fixed",
+            top: 16,
+            right: 16,
+            zIndex: 10000,
+            background: "rgba(255,255,255,0.1)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            color: "rgba(255,255,255,0.7)",
+            borderRadius: 99,
+            padding: "8px 16px",
+            fontSize: 12,
+            fontWeight: 500,
+            cursor: "pointer",
+            fontFamily: "inherit",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            transition: "all .15s",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background = "rgba(255,255,255,0.18)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background = "rgba(255,255,255,0.1)")
+          }
+        >
+          ✕ &nbsp;Continue with free trial
+        </button>
+      )}
+
       <div
         style={{
           width: "100%",
           maxWidth: 780,
+          margin: "0 auto",
           display: "flex",
           flexDirection: "column",
           gap: 0,
           animation: "scaleIn .3s cubic-bezier(.34,1.56,.64,1) both",
-          position: "relative",
         }}
       >
-        {/* Close button — only when trial not over */}
-        {!trialOver && (
-          <button
-            onClick={onUnlock}
-            style={{
-              position: "absolute",
-              top: -44,
-              right: 0,
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              color: "rgba(255,255,255,0.5)",
-              borderRadius: 99,
-              padding: "6px 14px",
-              fontSize: 12,
-              fontWeight: 500,
-              cursor: "pointer",
-              fontFamily: "inherit",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              transition: "all .15s",
-            }}
-            onMouseEnter={(e) => (e.target.style.color = "#fff")}
-            onMouseLeave={(e) =>
-              (e.target.style.color = "rgba(255,255,255,0.5)")
-            }
-          >
-            ✕ &nbsp;Continue with free trial
-          </button>
-        )}
-
         {success ? (
           <div
             style={{
@@ -4394,7 +4394,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr 1fr",
+                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
                 gap: 16,
                 marginBottom: 20,
               }}
@@ -4814,7 +4814,8 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
                   textAlign: "center",
                 }}
               >
-                You will receive your unlock code on WhatsApp after payment.
+                Already have an early access code? Enter it below to unlock
+                instantly.
               </p>
               <div style={{ display: "flex", gap: 8 }}>
                 <input
