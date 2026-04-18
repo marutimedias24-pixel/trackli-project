@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ════════════════════════════════
+         SEO BASICS
+    ════════════════════════════════ -->
+    <title>Trackli — Freelance Income Tracker for Video Editors</title>
+    <meta
+      name="description"
+      content="Track your freelance income, pending payments & clients. Generate invoices instantly. Built for Indian video editors. Free 30-day trial."
+    />
+    <meta
+      name="keywords"
+      content="freelance income tracker, video editor income, freelance tracker india, invoice generator, pending payment tracker"
+    />
+    <meta name="author" content="Trackli" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://trackli.in/" />
+
+    <!-- Open Graph (WhatsApp, Facebook preview) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://trackli.in/" />
+    <meta property="og:title" content="Trackli — Freelance Income Tracker" />
+    <meta
+      property="og:description"
+      content="Track income, clients, pending payments. Generate invoices. Free 30-day trial."
+    />
+    <meta property="og:image" content="https://trackli.in/og-image.png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Trackli — Freelance Income Tracker" />
+    <meta
+      name="twitter:description"
+      content="Track income, clients, pending payments. Generate invoices."
+    />
+    <meta name="twitter:image" content="https://trackli.in/og-image.png" />
+
+    <!-- ════════════════════════════════
+         GOOGLE ANALYTICS 4
+         STEP 1: Go to analytics.google.com
+         STEP 2: Create property → get G-XXXXXXXXXX
+         STEP 3: Replace G-XXXXXXXXXX below
+    ════════════════════════════════ -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-XXXXXXXXXX");
+
+      // Helper — call this anywhere in your app
+      window.trackEvent = function (name, params) {
+        gtag("event", name, params || {});
+      };
+    </script>
+
+    <!-- Preconnect for font performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
