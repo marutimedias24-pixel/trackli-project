@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/((?!waitlist|waitinglist|admin|assets|favicon).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
