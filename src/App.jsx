@@ -2589,152 +2589,760 @@ const DeleteConfirm = ({ tx, onConfirm, onClose }) => (
 );
 
 /* ══════════════════════════════════════════════
-   TRANSACTION ROW
+   PLAN CARD — glass morphism sub-component
 ══════════════════════════════════════════════ */
-const TxRow = ({ tx, onEdit, onDelete, onTogglePaid }) => {
-  const inc = tx.type === "income";
-  const [hov, setHov] = useState(false);
-  return (
-    <div
-      className="tx-row"
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        padding: "10px 10px",
-        borderBottom: "1px solid var(--divider)",
-      }}
-    >
+const PlanCard = ({
+  selected, onClick, name, tagline, price, period,
+  features, accent, popular, perDay, savings,
+}) => (
+  <div
+    onClick={onClick}
+    style={{
+      position: "relative",
+      flex: "1 1 280px",
+      maxWidth: 400,
+      minWidth: 240,
+      background: selected
+        ? "rgba(255,255,255,0.07)"
+        : "rgba(255,255,255,0.03)",
+      backdropFilter: "blur(24px) saturate(180%)",
+      WebkitBackdropFilter: "blur(24px) saturate(180%)",
+      border: `1.5px solid ${selected ? accent : "rgba(255,255,255,0.09)"}`,
+      borderRadius: 18,
+      padding: "26px 22px 22px",
+      cursor: "pointer",
+      transition: "all .25s cubic-bezier(.16,1,.3,1)",
+      boxShadow: selected
+        ? `0 12px 40px ${accent}35, inset 0 1px 0 rgba(255,255,255,0.05)`
+        : "0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03)",
+      transform: selected ? "translateY(-2px)" : "translateY(0)",
+    }}
+  >
+    {popular && (
       <div
         style={{
-          width: 32,
-          height: 32,
-          borderRadius: 9,
-          flexShrink: 0,
-          background: inc ? "var(--greenbg)" : "var(--redbg)",
-          border: `1px solid ${inc ? "rgba(34,197,94,.15)" : "rgba(239,68,68,.15)"}`,
+          position: "absolute",
+          top: -11,
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+          color: "#fff",
+          borderRadius: 99,
+          padding: "4px 13px",
+          fontSize: 10.5,
+          fontWeight: 800,
+          letterSpacing: ".08em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          boxShadow: "0 4px 14px rgba(99,102,241,0.5)",
+        }}
+      >
+        Most Popular
+      </div>
+    )}
+
+    {/* Selection indicator */}
+    <div
+      style={{
+        position: "absolute",
+        top: 18,
+        right: 18,
+        width: 20,
+        height: 20,
+        borderRadius: "50%",
+        background: selected ? accent : "transparent",
+        border: `1.5px solid ${selected ? accent : "rgba(255,255,255,0.18)"}`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "all .2s",
+      }}
+    >
+      {selected && <Icon n="check" size={11} color="#fff" />}
+    </div>
+
+    {/* Plan name */}
+    <p
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        color: accent,
+        textTransform: "uppercase",
+        letterSpacing: ".14em",
+        marginBottom: 5,
+      }}
+    >
+      {name}
+    </p>
+    <p
+      style={{
+        fontSize: 12.5,
+        color: "rgba(255,255,255,0.48)",
+        marginBottom: 20,
+        lineHeight: 1.45,
+        paddingRight: 28,
+      }}
+    >
+      {tagline}
+    </p>
+
+    {/* Price */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "baseline",
+        gap: 6,
+        marginBottom: 6,
+      }}
+    >
+      <span
+        style={{
+          fontSize: "clamp(32px, 5vw, 40px)",
+          fontWeight: 800,
+          color: "#fff",
+          letterSpacing: "-.04em",
+          lineHeight: 1,
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        {price}
+      </span>
+      <span
+        style={{
+          fontSize: 13,
+          color: "rgba(255,255,255,0.45)",
+          fontWeight: 500,
+        }}
+      >
+        {period}
+      </span>
+    </div>
+
+    {/* Value pills */}
+    {(perDay || savings) ? (
+      <div
+        style={{
+          display: "flex",
+          gap: 6,
+          marginBottom: 20,
+          flexWrap: "wrap",
+        }}
+      >
+        {perDay && (
+          <span
+            style={{
+              background: "rgba(34,197,94,0.12)",
+              border: "1px solid rgba(34,197,94,0.28)",
+              color: "#4ade80",
+              borderRadius: 99,
+              padding: "3px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+            }}
+          >
+            {perDay}
+          </span>
+        )}
+        {savings && (
+          <span
+            style={{
+              background: "rgba(99,102,241,0.14)",
+              border: "1px solid rgba(99,102,241,0.3)",
+              color: "#a5b4fc",
+              borderRadius: 99,
+              padding: "3px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+            }}
+          >
+            {savings}
+          </span>
+        )}
+      </div>
+    ) : (
+      <div style={{ height: 20 }} />
+    )}
+
+    {/* Divider */}
+    <div
+      style={{
+        height: 1,
+        background: "rgba(255,255,255,0.08)",
+        margin: "0 0 18px",
+      }}
+    />
+
+    {/* Features */}
+    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+      {features.map((f, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 10,
+          }}
+        >
+          <div
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: "50%",
+              background: f.ok
+                ? "rgba(34,197,94,0.15)"
+                : "rgba(255,255,255,0.04)",
+              border: `1px solid ${f.ok ? "rgba(34,197,94,0.32)" : "rgba(255,255,255,0.08)"}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              marginTop: 1,
+            }}
+          >
+            <Icon
+              n={f.ok ? "check" : "close"}
+              size={9}
+              color={f.ok ? "#4ade80" : "rgba(255,255,255,0.28)"}
+            />
+          </div>
+          <span
+            style={{
+              fontSize: 12.5,
+              lineHeight: 1.45,
+              color: f.ok
+                ? "rgba(255,255,255,0.82)"
+                : "rgba(255,255,255,0.3)",
+              textDecoration: f.ok ? "none" : "line-through",
+            }}
+          >
+            {f.text}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+/* ══════════════════════════════════════════════
+   PAYWALL / SUBSCRIPTION — Glass Morphism
+══════════════════════════════════════════════ */
+const Paywall = ({ daysLeft, onUnlock, user }) => {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [selPlan, setSelPlan] = useState("yearly");
+  const trialOver = daysLeft === 0;
+
+  const tryUnlock = async () => {
+    const trimmed = code.trim().toUpperCase();
+
+    if (!UNLOCK_CODES.includes(trimmed)) {
+      setError(
+        "Invalid code. You'll receive your unlock code on WhatsApp after payment.",
+      );
+      return;
+    }
+
+    const { data: codeRow } = await supabase
+      .from("unlock_codes")
+      .select("*")
+      .eq("code", trimmed)
+      .maybeSingle();
+
+    if (codeRow && codeRow.is_used && codeRow.used_by !== user?.id) {
+      setError("This code has already been used.");
+      return;
+    }
+
+    const sub = loadSub();
+    sub.unlocked = true;
+    sub.unlockedAt = new Date().toISOString();
+    saveSub(sub);
+
+    if (user?.id) {
+      const expiresAt =
+        selPlan === "yearly"
+          ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      await supabase.from("subscriptions").upsert(
+        {
+          user_id: user.id,
+          plan: selPlan,
+          status: "active",
+          unlock_code: trimmed,
+          expires_at: expiresAt,
+        },
+        { onConflict: "user_id" },
+      );
+
+      if (codeRow) {
+        await supabase
+          .from("unlock_codes")
+          .update({
+            is_used: true,
+            used_by: user.id,
+            used_at: new Date().toISOString(),
+          })
+          .eq("code", trimmed);
+      }
+    }
+
+    setSuccess(true);
+    setTimeout(() => onUnlock(), 1500);
+  };
+
+  const monthlyFeatures = [
+    { ok: true, text: "Income & expense tracking" },
+    { ok: true, text: "Clean dashboard overview" },
+    { ok: true, text: "Last 15 days history" },
+    { ok: true, text: "Basic reminders" },
+    { ok: true, text: "Standard support" },
+    { ok: false, text: "Advanced insights & analytics" },
+    { ok: false, text: "Full history access" },
+  ];
+
+  const yearlyFeatures = [
+    { ok: true, text: "Everything in Starter" },
+    { ok: true, text: "Unlimited tracking, no limits" },
+    { ok: true, text: "Full history access" },
+    { ok: true, text: "Advanced insights & analytics" },
+    { ok: true, text: "Smart reminders with custom timing" },
+    { ok: true, text: "Monthly progress reports" },
+    { ok: true, text: "Priority WhatsApp support" },
+    { ok: true, text: "Early access to new features" },
+  ];
+
+  const payLink =
+    selPlan === "yearly"
+      ? "https://rzp.io/rzp/FQ6PDFlu"
+      : "https://rzp.io/rzp/So1SE4j";
+
+  // ── SUCCESS STATE ──
+  if (success) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9999,
+          background: "rgba(0,0,0,0.75)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          padding: 20,
         }}
       >
-        <Icon
-          n={inc ? "arrowUp" : "arrowDown"}
-          size={14}
-          color={inc ? "var(--green)" : "var(--red)"}
-        />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p
+        <div
           style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: "var(--t1)",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
+            background: "rgba(255,255,255,0.06)",
+            backdropFilter: "blur(30px) saturate(180%)",
+            WebkitBackdropFilter: "blur(30px) saturate(180%)",
+            border: "1px solid rgba(34,197,94,0.25)",
+            borderRadius: 20,
+            padding: "52px 36px",
+            maxWidth: 400,
+            width: "100%",
+            textAlign: "center",
+            animation: "scaleIn .3s cubic-bezier(.34,1.56,.64,1) both",
+            boxShadow: "0 20px 60px rgba(34,197,94,0.15)",
           }}
         >
-          {tx.client}
-        </p>
-        {tx.note && (
-          <p
+          <div
             style={{
-              fontSize: 11,
-              color: "var(--t3)",
-              marginTop: 1,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {tx.note}
-          </p>
-        )}
-      </div>
-      <div
-        className="num"
-        style={{
-          fontSize: 13,
-          fontWeight: 700,
-          color: inc ? "var(--green)" : "var(--red)",
-          flexShrink: 0,
-        }}
-      >
-        {inc ? "+" : "-"}
-        {fmtINR(tx.amount)}
-      </div>
-      <div
-        style={{
-          display: "flex",
-          gap: 5,
-          flexShrink: 0,
-          opacity: hov ? 1 : 0,
-          transition: "opacity .14s",
-          pointerEvents: hov ? "auto" : "none",
-        }}
-      >
-        {inc && (
-          <button
-            onClick={() => onTogglePaid && onTogglePaid(tx.id)}
-            style={{
-              background: tx.paid ? "var(--greenbg)" : "var(--amberbg)",
-              border: `1px solid ${tx.paid ? "rgba(34,197,94,.2)" : "rgba(245,158,11,.2)"}`,
-              color: tx.paid ? "var(--green)" : "var(--amber)",
-              borderRadius: 8,
-              padding: "4px 10px",
-              fontSize: 10,
-              fontWeight: 600,
-              cursor: "pointer",
+              width: 64,
+              height: 64,
+              borderRadius: 20,
+              margin: "0 auto 20px",
+              background: "rgba(34,197,94,0.15)",
+              border: "1px solid rgba(34,197,94,0.3)",
               display: "flex",
               alignItems: "center",
-              gap: 4,
+              justifyContent: "center",
             }}
           >
-            <Icon n={tx.paid ? "check" : "clock"} size={10} />
-            {tx.paid ? "Received" : "Pending"}
-          </button>
-        )}
+            <Icon n="check" size={30} color="#4ade80" />
+          </div>
+          <h2
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: "#fff",
+              marginBottom: 8,
+              letterSpacing: "-.03em",
+            }}
+          >
+            Access Unlocked
+          </h2>
+          <p
+            style={{
+              fontSize: 14,
+              color: "rgba(255,255,255,0.6)",
+              lineHeight: 1.55,
+            }}
+          >
+            Welcome to Trackli Pro. Loading your dashboard...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        background: "rgba(0,0,0,0.72)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
+        overflowY: "auto",
+        padding: "clamp(16px, 4vw, 40px) clamp(14px, 3vw, 28px)",
+      }}
+    >
+      {/* Close button */}
+      {!trialOver && (
         <button
-          onClick={() => onEdit(tx)}
+          onClick={onUnlock}
+          aria-label="Close"
           style={{
-            background: "var(--indigobg)",
-            border: "1px solid rgba(99,102,241,.2)",
-            color: "var(--indigo)",
-            borderRadius: 8,
-            padding: "4px 8px",
-            fontSize: 10,
-            fontWeight: 600,
+            position: "fixed",
+            top: 18,
+            right: 18,
+            zIndex: 10000,
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            color: "rgba(255,255,255,0.85)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
-            gap: 3,
+            justifyContent: "center",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            transition: "all .15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.16)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
           }}
         >
-          <Icon n="edit" size={10} />
-          Edit
+          <Icon n="close" size={14} color="currentColor" />
         </button>
-        <button
-          onClick={() => onDelete(tx)}
+      )}
+
+      {/* Ambient glow */}
+      <div
+        style={{
+          position: "fixed",
+          top: "-20%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: 700,
+          height: 700,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(99,102,241,0.12), transparent 60%)",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 880,
+          margin: "0 auto",
+          position: "relative",
+          zIndex: 1,
+          animation: "scaleIn .35s cubic-bezier(.16,1,.3,1) both",
+        }}
+      >
+        {/* ── HEADER ── */}
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          {/* Status pill */}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+              background: trialOver
+                ? "rgba(239,68,68,0.12)"
+                : "rgba(245,158,11,0.12)",
+              border: `1px solid ${trialOver ? "rgba(239,68,68,0.3)" : "rgba(245,158,11,0.3)"}`,
+              borderRadius: 99,
+              padding: "6px 14px",
+              marginBottom: 20,
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+            }}
+          >
+            <Icon
+              n={trialOver ? "alert" : "clock"}
+              size={12}
+              color={trialOver ? "#f87171" : "#fbbf24"}
+            />
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: ".02em",
+                color: trialOver ? "#f87171" : "#fbbf24",
+              }}
+            >
+              {trialOver
+                ? "Free trial ended"
+                : `${daysLeft} day${daysLeft === 1 ? "" : "s"} left in trial`}
+            </span>
+          </div>
+
+          <h1
+            style={{
+              fontSize: "clamp(26px, 4.5vw, 34px)",
+              fontWeight: 800,
+              color: "#fff",
+              letterSpacing: "-.045em",
+              marginBottom: 10,
+              lineHeight: 1.15,
+            }}
+          >
+            Unlock Trackli Pro
+          </h1>
+          <p
+            style={{
+              fontSize: "clamp(13px, 2vw, 15px)",
+              color: "rgba(255,255,255,0.55)",
+              maxWidth: 500,
+              margin: "0 auto",
+              lineHeight: 1.55,
+            }}
+          >
+            Keep tracking your freelance income without limits. Cancel anytime.
+          </p>
+        </div>
+
+        {/* ── PLAN CARDS ── */}
+        <div
           style={{
-            background: "var(--redbg)",
-            border: "1px solid rgba(239,68,68,.18)",
-            color: "var(--red)",
-            borderRadius: 8,
-            padding: "4px 8px",
-            fontSize: 10,
-            fontWeight: 600,
-            cursor: "pointer",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 16,
+            marginBottom: 28,
+            justifyContent: "center",
+          }}
+        >
+          <PlanCard
+            selected={selPlan === "monthly"}
+            onClick={() => setSelPlan("monthly")}
+            name="Starter"
+            tagline="Essentials to get started"
+            price="₹59"
+            period="per month"
+            features={monthlyFeatures}
+            accent="#22c55e"
+          />
+          <PlanCard
+            selected={selPlan === "yearly"}
+            onClick={() => setSelPlan("yearly")}
+            name="Pro"
+            tagline="Everything you need, 30% off"
+            price="₹499"
+            period="per year"
+            features={yearlyFeatures}
+            accent="#6366f1"
+            popular
+            perDay="₹1.36 / day"
+            savings="Save ₹209"
+          />
+        </div>
+
+        {/* ── CTA ── */}
+        
+          href={payLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
             display: "flex",
             alignItems: "center",
-            gap: 3,
+            justifyContent: "center",
+            gap: 8,
+            width: "100%",
+            maxWidth: 440,
+            margin: "0 auto 14px",
+            background:
+              selPlan === "yearly"
+                ? "linear-gradient(135deg, #6366f1, #8b5cf6)"
+                : "linear-gradient(135deg, #16a34a, #22c55e)",
+            color: "#fff",
+            borderRadius: 13,
+            padding: "15px 24px",
+            fontSize: 15,
+            fontWeight: 700,
+            textDecoration: "none",
+            letterSpacing: ".005em",
+            boxShadow:
+              selPlan === "yearly"
+                ? "0 10px 32px rgba(99,102,241,0.45)"
+                : "0 10px 32px rgba(34,197,94,0.35)",
+            transition: "transform .15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-1px)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
           }}
         >
-          <Icon n="trash" size={10} />
-          Del
-        </button>
+          Continue to Payment
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path
+              d="M3 7h8M8 4l3 3-3 3"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </a>
+
+        <p
+          style={{
+            textAlign: "center",
+            fontSize: 11.5,
+            color: "rgba(255,255,255,0.4)",
+            marginBottom: 28,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            flexWrap: "wrap",
+          }}
+        >
+          <span>Secure payment via Razorpay</span>
+          <span style={{ color: "rgba(255,255,255,0.2)" }}>•</span>
+          <span>UPI, Cards, Net Banking</span>
+        </p>
+
+        {/* ── DIVIDER ── */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            maxWidth: 440,
+            margin: "0 auto 20px",
+          }}
+        >
+          <div
+            style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }}
+          />
+          <span
+            style={{
+              fontSize: 11,
+              color: "rgba(255,255,255,0.3)",
+              fontWeight: 600,
+              letterSpacing: ".08em",
+              textTransform: "uppercase",
+            }}
+          >
+            Or
+          </span>
+          <div
+            style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }}
+          />
+        </div>
+
+        {/* ── UNLOCK CODE ── */}
+        <div
+          style={{
+            maxWidth: 440,
+            margin: "0 auto",
+            background: "rgba(255,255,255,0.04)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 14,
+            padding: "18px 20px",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 12,
+              color: "rgba(255,255,255,0.5)",
+              marginBottom: 12,
+              textAlign: "center",
+              lineHeight: 1.5,
+            }}
+          >
+            Have an unlock code? Enter it below to activate Pro instantly.
+          </p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value);
+                setError("");
+              }}
+              onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
+              placeholder="UNLOCK-CODE"
+              style={{
+                flex: 1,
+                background: "rgba(0,0,0,0.25)",
+                border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`,
+                borderRadius: 10,
+                padding: "10px 14px",
+                color: "#fff",
+                fontSize: 13,
+                outline: "none",
+                fontFamily: "inherit",
+                letterSpacing: ".04em",
+                textTransform: "uppercase",
+              }}
+            />
+            <button
+              onClick={tryUnlock}
+              disabled={!code.trim()}
+              style={{
+                background: code.trim() ? "#fff" : "rgba(255,255,255,0.1)",
+                color: code.trim() ? "#0d0d12" : "rgba(255,255,255,0.4)",
+                border: "none",
+                borderRadius: 10,
+                padding: "10px 20px",
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: code.trim() ? "pointer" : "not-allowed",
+                whiteSpace: "nowrap",
+                fontFamily: "inherit",
+                transition: "all .15s",
+              }}
+            >
+              Unlock
+            </button>
+          </div>
+          {error && (
+            <p
+              style={{
+                fontSize: 11.5,
+                color: "#f87171",
+                marginTop: 10,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 6,
+                lineHeight: 1.45,
+              }}
+            >
+              <Icon n="alert" size={12} color="#f87171" />
+              <span style={{ flex: 1 }}>{error}</span>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
