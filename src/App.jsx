@@ -5938,12 +5938,14 @@ const Dashboard = ({
         />
       )}
 
-      {/* ── HERO ── */}
-      <DashHero transactions={transactions} goal={goal} openAdd={openAdd} />
+      {/* ── TOP: full-width ── */}
+      <TodayOverview transactions={transactions} />
+      <MonthlyGoal transactions={transactions} goal={goal} setGoal={setGoal} />
+      <StatsRow transactions={rangeFiltered} />
 
       {/* ── BODY: 2-col on desktop, 1-col on mobile/tablet ── */}
       <div className="dash-grid">
-        {/* LEFT col — date filter + transactions */}
+        {/* LEFT col — Outstanding Payments + date filter + transactions */}
         <div
           className="dash-left-col"
           style={{
@@ -5953,6 +5955,9 @@ const Dashboard = ({
             gap: 14,
           }}
         >
+          {/* Outstanding Payments — TOP of left col */}
+          <PendingSummary transactions={transactions} />
+
           {/* Date Range Filter */}
           <div className="gc" style={{ padding: "14px 16px" }}>
             <div
@@ -6127,8 +6132,7 @@ const Dashboard = ({
             />
           </div>
 
-          {/* Pending Summary — AFTER clients */}
-          <PendingSummary transactions={transactions} />
+          {/* Pending Summary removed from here — now in left col */}
         </div>
       </div>
 
