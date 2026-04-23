@@ -4204,7 +4204,234 @@ const MonthlyGoal = ({ transactions, goal, setGoal }) => {
 };
 
 /* ══════════════════════════════════════════════
-   PAYWALL / SUBSCRIPTION — 2 Plan Design
+   PLAN CARD — glass morphism sub-component
+══════════════════════════════════════════════ */
+const PlanCard = ({
+  selected,
+  onClick,
+  name,
+  tagline,
+  price,
+  period,
+  features,
+  accent,
+  popular,
+  perDay,
+  savings,
+}) => (
+  <div
+    onClick={onClick}
+    style={{
+      position: "relative",
+      flex: "1 1 280px",
+      maxWidth: 400,
+      minWidth: 240,
+      background: selected
+        ? "rgba(255,255,255,0.07)"
+        : "rgba(255,255,255,0.03)",
+      backdropFilter: "blur(24px) saturate(180%)",
+      WebkitBackdropFilter: "blur(24px) saturate(180%)",
+      border: `1.5px solid ${selected ? accent : "rgba(255,255,255,0.09)"}`,
+      borderRadius: 18,
+      padding: "26px 22px 22px",
+      cursor: "pointer",
+      transition: "all .25s cubic-bezier(.16,1,.3,1)",
+      boxShadow: selected
+        ? `0 12px 40px ${accent}35, inset 0 1px 0 rgba(255,255,255,0.05)`
+        : "0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03)",
+      transform: selected ? "translateY(-2px)" : "translateY(0)",
+    }}
+  >
+    {popular && (
+      <div
+        style={{
+          position: "absolute",
+          top: -11,
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+          color: "#fff",
+          borderRadius: 99,
+          padding: "4px 13px",
+          fontSize: 10.5,
+          fontWeight: 800,
+          letterSpacing: ".08em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          boxShadow: "0 4px 14px rgba(99,102,241,0.5)",
+        }}
+      >
+        Most Popular
+      </div>
+    )}
+
+    <div
+      style={{
+        position: "absolute",
+        top: 18,
+        right: 18,
+        width: 20,
+        height: 20,
+        borderRadius: "50%",
+        background: selected ? accent : "transparent",
+        border: `1.5px solid ${selected ? accent : "rgba(255,255,255,0.18)"}`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "all .2s",
+      }}
+    >
+      {selected && <Icon n="check" size={11} color="#fff" />}
+    </div>
+
+    <p
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        color: accent,
+        textTransform: "uppercase",
+        letterSpacing: ".14em",
+        marginBottom: 5,
+      }}
+    >
+      {name}
+    </p>
+    <p
+      style={{
+        fontSize: 12.5,
+        color: "rgba(255,255,255,0.48)",
+        marginBottom: 20,
+        lineHeight: 1.45,
+        paddingRight: 28,
+      }}
+    >
+      {tagline}
+    </p>
+
+    <div
+      style={{
+        display: "flex",
+        alignItems: "baseline",
+        gap: 6,
+        marginBottom: 6,
+      }}
+    >
+      <span
+        style={{
+          fontSize: "clamp(32px, 5vw, 40px)",
+          fontWeight: 800,
+          color: "#fff",
+          letterSpacing: "-.04em",
+          lineHeight: 1,
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        {price}
+      </span>
+      <span
+        style={{
+          fontSize: 13,
+          color: "rgba(255,255,255,0.45)",
+          fontWeight: 500,
+        }}
+      >
+        {period}
+      </span>
+    </div>
+
+    {perDay || savings ? (
+      <div
+        style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}
+      >
+        {perDay && (
+          <span
+            style={{
+              background: "rgba(34,197,94,0.12)",
+              border: "1px solid rgba(34,197,94,0.28)",
+              color: "#4ade80",
+              borderRadius: 99,
+              padding: "3px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+            }}
+          >
+            {perDay}
+          </span>
+        )}
+        {savings && (
+          <span
+            style={{
+              background: "rgba(99,102,241,0.14)",
+              border: "1px solid rgba(99,102,241,0.3)",
+              color: "#a5b4fc",
+              borderRadius: 99,
+              padding: "3px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+            }}
+          >
+            {savings}
+          </span>
+        )}
+      </div>
+    ) : (
+      <div style={{ height: 20 }} />
+    )}
+
+    <div
+      style={{
+        height: 1,
+        background: "rgba(255,255,255,0.08)",
+        margin: "0 0 18px",
+      }}
+    />
+
+    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+      {features.map((f, i) => (
+        <div
+          key={i}
+          style={{ display: "flex", alignItems: "flex-start", gap: 10 }}
+        >
+          <div
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: "50%",
+              background: f.ok
+                ? "rgba(34,197,94,0.15)"
+                : "rgba(255,255,255,0.04)",
+              border: `1px solid ${f.ok ? "rgba(34,197,94,0.32)" : "rgba(255,255,255,0.08)"}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              marginTop: 1,
+            }}
+          >
+            <Icon
+              n={f.ok ? "check" : "close"}
+              size={9}
+              color={f.ok ? "#4ade80" : "rgba(255,255,255,0.28)"}
+            />
+          </div>
+          <span
+            style={{
+              fontSize: 12.5,
+              lineHeight: 1.45,
+              color: f.ok ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.3)",
+              textDecoration: f.ok ? "none" : "line-through",
+            }}
+          >
+            {f.text}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+/* ══════════════════════════════════════════════
+   PAYWALL / SUBSCRIPTION — Glass Morphism
 ══════════════════════════════════════════════ */
 const Paywall = ({ daysLeft, onUnlock, user }) => {
   const [code, setCode] = useState("");
@@ -4215,52 +4442,42 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
 
   const tryUnlock = async () => {
     const trimmed = code.trim().toUpperCase();
-
-    // Step 1 — Code valid hai?
     if (!UNLOCK_CODES.includes(trimmed)) {
       setError(
-        "Invalid code. You will receive your unlock code on WhatsApp after payment.",
+        "Invalid code. You'll receive your unlock code on WhatsApp after payment.",
       );
       return;
     }
-
-    // Step 2 — Supabase mein check karo — code pehle se use hua hai?
     const { data: codeRow } = await supabase
       .from("unlock_codes")
       .select("*")
       .eq("code", trimmed)
       .maybeSingle();
-
     if (codeRow && codeRow.is_used && codeRow.used_by !== user?.id) {
       setError("This code has already been used.");
       return;
     }
-
-    // Step 3 — localStorage update
     const sub = loadSub();
     sub.unlocked = true;
     sub.unlockedAt = new Date().toISOString();
     saveSub(sub);
-
-    // Step 4 — Supabase mein subscription save karo
     if (user?.id) {
       const expiresAt =
         selPlan === "yearly"
           ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-
-      await supabase.from("subscriptions").upsert(
-        {
-          user_id: user.id,
-          plan: selPlan,
-          status: "active",
-          unlock_code: trimmed,
-          expires_at: expiresAt,
-        },
-        { onConflict: "user_id" },
-      );
-
-      // Step 5 — Code ko used mark karo (agar table mein hai)
+      await supabase
+        .from("subscriptions")
+        .upsert(
+          {
+            user_id: user.id,
+            plan: selPlan,
+            status: "active",
+            unlock_code: trimmed,
+            expires_at: expiresAt,
+          },
+          { onConflict: "user_id" },
+        );
       if (codeRow) {
         await supabase
           .from("unlock_codes")
@@ -4272,15 +4489,14 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
           .eq("code", trimmed);
       }
     }
-
     setSuccess(true);
     setTimeout(() => onUnlock(), 1500);
   };
 
   const monthlyFeatures = [
-    { ok: true, text: "Basic tracking (habits / expenses / goals)" },
-    { ok: true, text: "Simple dashboard (clean overview)" },
-    { ok: true, text: "Limited history (last 7–15 days)" },
+    { ok: true, text: "Income & expense tracking" },
+    { ok: true, text: "Clean dashboard overview" },
+    { ok: true, text: "Last 15 days history" },
     { ok: true, text: "Basic reminders" },
     { ok: true, text: "Standard support" },
     { ok: false, text: "Advanced insights & analytics" },
@@ -4289,19 +4505,90 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
 
   const yearlyFeatures = [
     { ok: true, text: "Everything in Starter" },
-    { ok: true, text: "Unlimited tracking (no limits)" },
-    { ok: true, text: "Full history access (all past data)" },
+    { ok: true, text: "Unlimited tracking, no limits" },
+    { ok: true, text: "Full history access" },
     { ok: true, text: "Advanced insights & analytics" },
-    { ok: true, text: "Smart reminders (custom timing)" },
-    { ok: true, text: "Goal progress reports" },
-    { ok: true, text: "Priority support" },
+    { ok: true, text: "Smart reminders with custom timing" },
+    { ok: true, text: "Monthly progress reports" },
+    { ok: true, text: "Priority WhatsApp support" },
     { ok: true, text: "Early access to new features" },
   ];
 
   const payLink =
     selPlan === "yearly"
-      ? "https://rzp.io/rzp/FQ6PDFlu" // Yearly ₹499
-      : "https://rzp.io/rzp/So1SE4j"; // Monthly ₹59
+      ? "https://rzp.io/rzp/FQ6PDFlu"
+      : "https://rzp.io/rzp/So1SE4j";
+
+  if (success) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9999,
+          background: "rgba(0,0,0,0.75)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 20,
+        }}
+      >
+        <div
+          style={{
+            background: "rgba(255,255,255,0.06)",
+            backdropFilter: "blur(30px) saturate(180%)",
+            WebkitBackdropFilter: "blur(30px) saturate(180%)",
+            border: "1px solid rgba(34,197,94,0.25)",
+            borderRadius: 20,
+            padding: "52px 36px",
+            maxWidth: 400,
+            width: "100%",
+            textAlign: "center",
+            animation: "scaleIn .3s cubic-bezier(.34,1.56,.64,1) both",
+            boxShadow: "0 20px 60px rgba(34,197,94,0.15)",
+          }}
+        >
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 20,
+              margin: "0 auto 20px",
+              background: "rgba(34,197,94,0.15)",
+              border: "1px solid rgba(34,197,94,0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Icon n="check" size={30} color="#4ade80" />
+          </div>
+          <h2
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: "#fff",
+              marginBottom: 8,
+              letterSpacing: "-.03em",
+            }}
+          >
+            Access Unlocked
+          </h2>
+          <p
+            style={{
+              fontSize: 14,
+              color: "rgba(255,255,255,0.6)",
+              lineHeight: 1.55,
+            }}
+          >
+            Welcome to Trackli Pro. Loading your dashboard...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -4309,602 +4596,338 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        background: "rgba(0,0,0,0.7)",
-        backdropFilter: "blur(6px)",
-        WebkitBackdropFilter: "blur(6px)",
+        background: "rgba(0,0,0,0.72)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
         overflowY: "auto",
-        padding: "60px 16px 32px",
+        padding: "clamp(16px, 4vw, 40px) clamp(14px, 3vw, 28px)",
       }}
     >
-      {/* Close button — fixed top right */}
       {!trialOver && (
         <button
           onClick={onUnlock}
+          aria-label="Close"
           style={{
             position: "fixed",
-            top: 16,
-            right: 16,
+            top: 18,
+            right: 18,
             zIndex: 10000,
-            background: "rgba(255,255,255,0.1)",
-            border: "1px solid rgba(255,255,255,0.2)",
-            color: "rgba(255,255,255,0.8)",
-            borderRadius: 99,
-            padding: "8px 16px",
-            fontSize: 12,
-            fontWeight: 500,
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            color: "rgba(255,255,255,0.85)",
             cursor: "pointer",
-            fontFamily: "inherit",
             display: "flex",
             alignItems: "center",
-            gap: 6,
-            backdropFilter: "blur(10px)",
+            justifyContent: "center",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
             transition: "all .15s",
           }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.background = "rgba(255,255,255,0.2)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.background = "rgba(255,255,255,0.1)")
-          }
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.16)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+          }}
         >
-          ✕ &nbsp;Continue with free trial
+          <Icon n="close" size={14} color="currentColor" />
         </button>
       )}
 
       <div
         style={{
+          position: "fixed",
+          top: "-20%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: 700,
+          height: 700,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(99,102,241,0.12), transparent 60%)",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+
+      <div
+        style={{
           width: "100%",
-          maxWidth: 800,
+          maxWidth: 880,
           margin: "0 auto",
-          display: "flex",
-          flexDirection: "column",
-          gap: 0,
-          animation: "scaleIn .3s cubic-bezier(.34,1.56,.64,1) both",
+          position: "relative",
+          zIndex: 1,
+          animation: "scaleIn .35s cubic-bezier(.16,1,.3,1) both",
         }}
       >
-        {success ? (
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div
             style={{
-              background: "var(--surface2)",
-              borderRadius: 24,
-              padding: "48px 32px",
-              textAlign: "center",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+              background: trialOver
+                ? "rgba(239,68,68,0.12)"
+                : "rgba(245,158,11,0.12)",
+              border: `1px solid ${trialOver ? "rgba(239,68,68,0.3)" : "rgba(245,158,11,0.3)"}`,
+              borderRadius: 99,
+              padding: "6px 14px",
+              marginBottom: 20,
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
             }}
           >
-            <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
-            <p
-              style={{ fontSize: 24, fontWeight: 800, color: "var(--green2)" }}
-            >
-              Access Unlocked!
-            </p>
-            <p style={{ fontSize: 14, color: "var(--t3)", marginTop: 8 }}>
-              Welcome to Trackli Pro!
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* Header */}
-            <div style={{ textAlign: "center", marginBottom: 28 }}>
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  background: "rgba(239,68,68,0.12)",
-                  border: "1px solid rgba(239,68,68,0.25)",
-                  borderRadius: 99,
-                  padding: "6px 16px",
-                  marginBottom: 16,
-                }}
-              >
-                <span
-                  style={{ fontSize: 13, color: "#f87171", fontWeight: 700 }}
-                >
-                  {trialOver
-                    ? "🔒 Free Trial Ended"
-                    : `⏳ ${daysLeft} day${daysLeft === 1 ? "" : "s"} remaining`}
-                </span>
-              </div>
-              <h2
-                style={{
-                  fontSize: 28,
-                  fontWeight: 900,
-                  color: "var(--t1)",
-                  letterSpacing: "-.04em",
-                  marginBottom: 8,
-                }}
-              >
-                Choose Your Plan
-              </h2>
-              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)" }}>
-                Upgrade anytime. No hidden charges. Cancel anytime.
-              </p>
-            </div>
-
-            {/* Plans Row */}
-            <div
+            <Icon
+              n={trialOver ? "alert" : "clock"}
+              size={12}
+              color={trialOver ? "#f87171" : "#fbbf24"}
+            />
+            <span
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                gap: 16,
-                marginBottom: 20,
-              }}
-            >
-              {/* ── MONTHLY PLAN ── */}
-              <div
-                onClick={() => setSelPlan("monthly")}
-                style={{
-                  background: "rgba(15,15,25,0.92)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                  border: `2px solid ${selPlan === "monthly" ? "rgba(99,102,241,0.8)" : "rgba(255,255,255,0.12)"}`,
-                  borderRadius: 20,
-                  padding: "24px 22px",
-                  cursor: "pointer",
-                  transition: "all .2s",
-                  position: "relative",
-                  opacity: selPlan === "yearly" ? 0.75 : 1,
-                  boxShadow:
-                    selPlan === "monthly"
-                      ? "0 8px 32px rgba(99,102,241,0.25)"
-                      : "none",
-                  color: "#fff",
-                }}
-              >
-                {/* Plan name */}
-                <p
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "rgba(255,255,255,0.5)",
-                    textTransform: "uppercase",
-                    letterSpacing: ".1em",
-                    marginBottom: 6,
-                  }}
-                >
-                  Starter Plan
-                </p>
-                <p
-                  style={{
-                    fontSize: 12,
-                    color: "rgba(255,255,255,0.45)",
-                    marginBottom: 16,
-                    fontStyle: "italic",
-                  }}
-                >
-                  "Start tracking your life, one step at a time"
-                </p>
-                {/* Price */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "baseline",
-                    gap: 3,
-                    marginBottom: 4,
-                  }}
-                >
-                  <span
-                    style={{ fontSize: 38, fontWeight: 900, color: "#fff" }}
-                  >
-                    ₹59
-                  </span>
-                  <span
-                    style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}
-                  >
-                    /month
-                  </span>
-                </div>
-                <p
-                  style={{
-                    fontSize: 11,
-                    color: "rgba(255,255,255,0.4)",
-                    marginBottom: 20,
-                  }}
-                >
-                  Billed monthly
-                </p>
-
-                {/* Features */}
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 9 }}
-                >
-                  {monthlyFeatures.map((f, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        gap: 8,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 700,
-                          flexShrink: 0,
-                          marginTop: 1,
-                          color: f.ok ? "#4ade80" : "rgba(255,255,255,0.3)",
-                        }}
-                      >
-                        {f.ok ? "✔" : "✘"}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 12,
-                          color: f.ok ? "var(--t2)" : "var(--t3)",
-                          textDecoration: f.ok ? "none" : "line-through",
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        {f.text}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Select indicator */}
-                {selPlan === "monthly" && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 16,
-                      right: 16,
-                      width: 20,
-                      height: 20,
-                      borderRadius: "50%",
-                      background: "var(--indigo)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Icon n="check" size={11} color="#fff" />
-                  </div>
-                )}
-              </div>
-
-              {/* ── YEARLY PLAN ── */}
-              <div
-                onClick={() => setSelPlan("yearly")}
-                style={{
-                  background:
-                    selPlan === "yearly"
-                      ? "rgba(20,20,50,0.88)"
-                      : "rgba(15,15,25,0.92)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                  border: `2px solid ${selPlan === "yearly" ? "rgba(99,102,241,0.8)" : "rgba(255,255,255,0.1)"}`,
-                  borderRadius: 20,
-                  padding: "24px 22px",
-                  cursor: "pointer",
-                  transition: "all .2s",
-                  position: "relative",
-                  boxShadow:
-                    selPlan === "yearly"
-                      ? "0 8px 32px rgba(99,102,241,0.35)"
-                      : "none",
-                }}
-              >
-                {/* 🔥 Most Popular badge */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: -13,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    background: "linear-gradient(135deg,var(--indigo),#8b5cf6)",
-                    color: "#fff",
-                    borderRadius: 99,
-                    padding: "4px 14px",
-                    fontSize: 11,
-                    fontWeight: 800,
-                    whiteSpace: "nowrap",
-                    boxShadow: "0 4px 14px rgba(99,102,241,0.5)",
-                  }}
-                >
-                  🔥 Most Popular
-                </div>
-
-                <p
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "var(--indigo)",
-                    textTransform: "uppercase",
-                    letterSpacing: ".1em",
-                    marginBottom: 6,
-                  }}
-                >
-                  Pro Plan
-                </p>
-                <p
-                  style={{
-                    fontSize: 12,
-                    color: "var(--t3)",
-                    marginBottom: 16,
-                    fontStyle: "italic",
-                  }}
-                >
-                  "Serious about growth? This is for you."
-                </p>
-
-                {/* Price */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "baseline",
-                    gap: 3,
-                    marginBottom: 2,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: 38,
-                      fontWeight: 900,
-                      color: "var(--indigo)",
-                    }}
-                  >
-                    ₹499
-                  </span>
-                  <span style={{ fontSize: 13, color: "var(--t3)" }}>
-                    /year
-                  </span>
-                </div>
-                {/* Per day + savings */}
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    alignItems: "center",
-                    marginBottom: 20,
-                  }}
-                >
-                  <span
-                    style={{
-                      background: "rgba(34,197,94,0.12)",
-                      border: "1px solid rgba(34,197,94,0.25)",
-                      color: "var(--green)",
-                      borderRadius: 99,
-                      padding: "2px 9px",
-                      fontSize: 11,
-                      fontWeight: 700,
-                    }}
-                  >
-                    Only ₹1.36/day
-                  </span>
-                  <span
-                    style={{
-                      background: "rgba(99,102,241,0.12)",
-                      border: "1px solid rgba(99,102,241,0.2)",
-                      color: "var(--indigo)",
-                      borderRadius: 99,
-                      padding: "2px 9px",
-                      fontSize: 11,
-                      fontWeight: 700,
-                    }}
-                  >
-                    Save ₹209
-                  </span>
-                </div>
-
-                {/* Features */}
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 9 }}
-                >
-                  {yearlyFeatures.map((f, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        gap: 8,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: "var(--green)",
-                          flexShrink: 0,
-                          marginTop: 1,
-                        }}
-                      >
-                        ✔
-                      </span>
-                      <span
-                        style={{
-                          fontSize: 12,
-                          color: "var(--t2)",
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        {f.text}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Select indicator */}
-                {selPlan === "yearly" && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 16,
-                      right: 16,
-                      width: 20,
-                      height: 20,
-                      borderRadius: "50%",
-                      background: "var(--indigo)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Icon n="check" size={11} color="#fff" />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Divider line */}
-            <p
-              style={{
-                textAlign: "center",
                 fontSize: 12,
-                color: "var(--t3)",
-                marginBottom: 16,
+                fontWeight: 700,
+                letterSpacing: ".02em",
+                color: trialOver ? "#f87171" : "#fbbf24",
               }}
             >
-              🔒 Upgrade anytime. No hidden charges.
-            </p>
+              {trialOver
+                ? "Free trial ended"
+                : `${daysLeft} day${daysLeft === 1 ? "" : "s"} left in trial`}
+            </span>
+          </div>
+          <h1
+            style={{
+              fontSize: "clamp(26px, 4.5vw, 34px)",
+              fontWeight: 800,
+              color: "#fff",
+              letterSpacing: "-.045em",
+              marginBottom: 10,
+              lineHeight: 1.15,
+            }}
+          >
+            Unlock Trackli Pro
+          </h1>
+          <p
+            style={{
+              fontSize: "clamp(13px, 2vw, 15px)",
+              color: "rgba(255,255,255,0.55)",
+              maxWidth: 500,
+              margin: "0 auto",
+              lineHeight: 1.55,
+            }}
+          >
+            Keep tracking your freelance income without limits. Cancel anytime.
+          </p>
+        </div>
 
-            {/* Payment methods */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                marginBottom: 14,
-                flexWrap: "wrap",
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 16,
+            marginBottom: 28,
+            justifyContent: "center",
+          }}
+        >
+          <PlanCard
+            selected={selPlan === "monthly"}
+            onClick={() => setSelPlan("monthly")}
+            name="Starter"
+            tagline="Essentials to get started"
+            price="₹59"
+            period="per month"
+            features={monthlyFeatures}
+            accent="#22c55e"
+          />
+          <PlanCard
+            selected={selPlan === "yearly"}
+            onClick={() => setSelPlan("yearly")}
+            name="Pro"
+            tagline="Everything you need, 30% off"
+            price="₹499"
+            period="per year"
+            features={yearlyFeatures}
+            accent="#6366f1"
+            popular
+            perDay="₹1.36 / day"
+            savings="Save ₹209"
+          />
+        </div>
+
+        <a
+          href={payLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            width: "100%",
+            maxWidth: 440,
+            margin: "0 auto 14px",
+            background:
+              selPlan === "yearly"
+                ? "linear-gradient(135deg, #6366f1, #8b5cf6)"
+                : "linear-gradient(135deg, #16a34a, #22c55e)",
+            color: "#fff",
+            borderRadius: 13,
+            padding: "15px 24px",
+            fontSize: 15,
+            fontWeight: 700,
+            textDecoration: "none",
+            letterSpacing: ".005em",
+            boxShadow:
+              selPlan === "yearly"
+                ? "0 10px 32px rgba(99,102,241,0.45)"
+                : "0 10px 32px rgba(34,197,94,0.35)",
+            transition: "transform .15s",
+          }}
+        >
+          Continue to Payment
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path
+              d="M3 7h8M8 4l3 3-3 3"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </a>
+
+        <p
+          style={{
+            textAlign: "center",
+            fontSize: 11.5,
+            color: "rgba(255,255,255,0.4)",
+            marginBottom: 28,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            flexWrap: "wrap",
+          }}
+        >
+          <span>Secure payment via Razorpay</span>
+          <span style={{ color: "rgba(255,255,255,0.2)" }}>•</span>
+          <span>UPI, Cards, Net Banking</span>
+        </p>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            maxWidth: 440,
+            margin: "0 auto 20px",
+          }}
+        >
+          <div
+            style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }}
+          />
+          <span
+            style={{
+              fontSize: 11,
+              color: "rgba(255,255,255,0.3)",
+              fontWeight: 600,
+              letterSpacing: ".08em",
+              textTransform: "uppercase",
+            }}
+          >
+            Or
+          </span>
+          <div
+            style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }}
+          />
+        </div>
+
+        <div
+          style={{
+            maxWidth: 440,
+            margin: "0 auto",
+            background: "rgba(255,255,255,0.04)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 14,
+            padding: "18px 20px",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 12,
+              color: "rgba(255,255,255,0.5)",
+              marginBottom: 12,
+              textAlign: "center",
+              lineHeight: 1.5,
+            }}
+          >
+            Have an unlock code? Enter it below to activate Pro instantly.
+          </p>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value);
+                setError("");
               }}
-            >
-              {["UPI", "GPay", "PhonePe", "Paytm", "Card"].map((m) => (
-                <span
-                  key={m}
-                  style={{
-                    background: "var(--surface)",
-                    border: "1px solid var(--cb)",
-                    borderRadius: 6,
-                    padding: "3px 10px",
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "var(--t2)",
-                  }}
-                >
-                  {m === "UPI"
-                    ? "⚡ UPI"
-                    : m === "GPay"
-                      ? "🟢 GPay"
-                      : m === "PhonePe"
-                        ? "🟣 PhonePe"
-                        : m === "Paytm"
-                          ? "🔵 Paytm"
-                          : "💳 Card"}
-                </span>
-              ))}
-            </div>
-
-            {/* CTA Button */}
-            <a
-              href={payLink}
-              target="_blank"
-              rel="noopener noreferrer"
+              onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
+              placeholder="UNLOCK-CODE"
               style={{
-                display: "block",
-                textAlign: "center",
-                background:
-                  selPlan === "yearly"
-                    ? "linear-gradient(135deg,var(--indigo),#8b5cf6)"
-                    : "linear-gradient(135deg,var(--green),#15803d)",
+                flex: 1,
+                background: "rgba(0,0,0,0.25)",
+                border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`,
+                borderRadius: 10,
+                padding: "10px 14px",
                 color: "#fff",
-                borderRadius: 14,
-                padding: "15px 0",
-                fontSize: 15,
-                fontWeight: 800,
-                marginBottom: 8,
-                textDecoration: "none",
-                boxShadow:
-                  selPlan === "yearly"
-                    ? "0 6px 24px rgba(99,102,241,0.4)"
-                    : "0 6px 24px rgba(34,197,94,0.3)",
-                transition: "all .2s",
+                fontSize: 13,
+                outline: "none",
+                fontFamily: "inherit",
+                letterSpacing: ".04em",
+                textTransform: "uppercase",
+              }}
+            />
+            <button
+              onClick={tryUnlock}
+              disabled={!code.trim()}
+              style={{
+                background: code.trim() ? "#fff" : "rgba(255,255,255,0.1)",
+                color: code.trim() ? "#0d0d12" : "rgba(255,255,255,0.4)",
+                border: "none",
+                borderRadius: 10,
+                padding: "10px 20px",
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: code.trim() ? "pointer" : "not-allowed",
+                whiteSpace: "nowrap",
+                fontFamily: "inherit",
+                transition: "all .15s",
               }}
             >
-              {selPlan === "yearly"
-                ? "🔥 Get Pro & Save ₹209 — ₹499/year"
-                : "✨ Start 7-Day Free Trial — ₹59/month"}
-            </a>
+              Unlock
+            </button>
+          </div>
+          {error && (
             <p
               style={{
-                textAlign: "center",
-                fontSize: 11,
-                color: "var(--t3)",
-                marginBottom: 14,
+                fontSize: 11.5,
+                color: "#f87171",
+                marginTop: 10,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 6,
+                lineHeight: 1.45,
               }}
             >
-              Powered by Razorpay — 100% secure payment
+              <Icon n="alert" size={12} color="#f87171" />
+              <span style={{ flex: 1 }}>{error}</span>
             </p>
-
-            {/* Unlock Code */}
-            <div
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 14,
-                padding: "16px 18px",
-              }}
-            >
-              <p
-                style={{
-                  fontSize: 12,
-                  color: "rgba(255,255,255,0.4)",
-                  marginBottom: 10,
-                  textAlign: "center",
-                }}
-              >
-                Already have an early access code? Enter it below to unlock
-                instantly.
-              </p>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  value={code}
-                  onChange={(e) => {
-                    setCode(e.target.value);
-                    setError("");
-                  }}
-                  onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
-                  placeholder="Enter your unlock code..."
-                  style={{
-                    flex: 1,
-                    background: "var(--surface2)",
-                    border: `1px solid ${error ? "var(--red)" : "var(--cb)"}`,
-                    borderRadius: 9,
-                    padding: "10px 14px",
-                    color: "var(--t1)",
-                    fontSize: 13,
-                    outline: "none",
-                    fontFamily: "inherit",
-                  }}
-                />
-                <button
-                  onClick={tryUnlock}
-                  style={{
-                    background: "var(--indigo)",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 9,
-                    padding: "10px 18px",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    whiteSpace: "nowrap",
-                    fontFamily: "inherit",
-                  }}
-                >
-                  Unlock
-                </button>
-              </div>
-              {error && (
-                <p style={{ fontSize: 11, color: "var(--red2)", marginTop: 8 }}>
-                  {error}
-                </p>
-              )}
-            </div>
-          </>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
