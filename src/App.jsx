@@ -1432,8 +1432,7 @@ const AuthScreen = ({ onLogin }) => {
       }
     } catch (e) {
       const msg = e.message || "";
-      if (msg.includes("Invalid login"))
-        setError("Invalid email or password.");
+      if (msg.includes("Invalid login")) setError("Invalid email or password.");
       else if (msg.includes("already registered"))
         setError("This email is already registered.");
       else if (msg.includes("rate limit"))
@@ -1458,43 +1457,183 @@ const AuthScreen = ({ onLogin }) => {
     >
       {/* Legal Modal */}
       {legal && (
-        <div onClick={() => setLegal(null)} style={{
-          position: "fixed", inset: 0, zIndex: 99999,
-          background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)",
-          display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
-        }}>
-          <div onClick={e => e.stopPropagation()} style={{
-            background: "var(--surface)", border: "1px solid var(--cb)",
-            borderRadius: 16, padding: "28px 28px", maxWidth: 560, width: "100%",
-            maxHeight: "80vh", overflowY: "auto",
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <div
+          onClick={() => setLegal(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 99999,
+            background: "rgba(0,0,0,0.7)",
+            backdropFilter: "blur(8px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--cb)",
+              borderRadius: 16,
+              padding: "28px 28px",
+              maxWidth: 560,
+              width: "100%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 20,
+              }}
+            >
               <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t1)" }}>
                 {legal === "privacy" ? "Privacy Policy" : "Terms of Service"}
               </h2>
-              <button onClick={() => setLegal(null)} style={{ background: "none", border: "none", color: "var(--t3)", cursor: "pointer", fontSize: 20, lineHeight: 1 }}>✕</button>
+              <button
+                onClick={() => setLegal(null)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "var(--t3)",
+                  cursor: "pointer",
+                  fontSize: 20,
+                  lineHeight: 1,
+                }}
+              >
+                ✕
+              </button>
             </div>
             {legal === "privacy" ? (
-              <div style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.8, display: "flex", flexDirection: "column", gap: 14 }}>
-                <p><strong style={{ color: "var(--t1)" }}>Last updated:</strong> {fmtFull(todayISO())}</p>
-                <p><strong style={{ color: "var(--t1)" }}>1. Information We Collect</strong><br/>We collect your email address for authentication, and financial data (income, expenses) that you voluntarily enter into the app. We do not sell your data to third parties.</p>
-                <p><strong style={{ color: "var(--t1)" }}>2. How We Use Your Data</strong><br/>Your data is used solely to provide the Trackli service — tracking your income, generating invoices, and displaying your financial dashboard.</p>
-                <p><strong style={{ color: "var(--t1)" }}>3. Data Storage</strong><br/>Your data is stored securely on Supabase servers with row-level security. Only you can access your own data.</p>
-                <p><strong style={{ color: "var(--t1)" }}>4. Payments</strong><br/>Payments are processed by Razorpay. We do not store your card or UPI details.</p>
-                <p><strong style={{ color: "var(--t1)" }}>5. Contact</strong><br/>For any privacy concerns, contact us via WhatsApp or email listed on our support page.</p>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "var(--t2)",
+                  lineHeight: 1.8,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 14,
+                }}
+              >
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>Last updated:</strong>{" "}
+                  {fmtFull(todayISO())}
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>
+                    1. Information We Collect
+                  </strong>
+                  <br />
+                  We collect your email address for authentication, and
+                  financial data (income, expenses) that you voluntarily enter
+                  into the app. We do not sell your data to third parties.
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>
+                    2. How We Use Your Data
+                  </strong>
+                  <br />
+                  Your data is used solely to provide the Trackli service —
+                  tracking your income, generating invoices, and displaying your
+                  financial dashboard.
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>
+                    3. Data Storage
+                  </strong>
+                  <br />
+                  Your data is stored securely on Supabase servers with
+                  row-level security. Only you can access your own data.
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>4. Payments</strong>
+                  <br />
+                  Payments are processed by Razorpay. We do not store your card
+                  or UPI details.
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>5. Contact</strong>
+                  <br />
+                  For any privacy concerns, contact us via WhatsApp or email
+                  listed on our support page.
+                </p>
               </div>
             ) : (
-              <div style={{ fontSize: 13, color: "var(--t2)", lineHeight: 1.8, display: "flex", flexDirection: "column", gap: 14 }}>
-                <p><strong style={{ color: "var(--t1)" }}>Last updated:</strong> {fmtFull(todayISO())}</p>
-                <p><strong style={{ color: "var(--t1)" }}>1. Acceptance</strong><br/>By using Trackli, you agree to these terms. If you do not agree, please do not use the app.</p>
-                <p><strong style={{ color: "var(--t1)" }}>2. Free Trial</strong><br/>Trackli offers a 7-day free trial. After the trial, a subscription is required to continue using the app.</p>
-                <p><strong style={{ color: "var(--t1)" }}>3. Subscriptions</strong><br/>Monthly (₹59/month) and Yearly (₹499/year) plans are available. Subscriptions can be cancelled anytime.</p>
-                <p><strong style={{ color: "var(--t1)" }}>4. Refunds</strong><br/>We offer refunds within 7 days of payment if the app is not working as described. Contact support to request a refund.</p>
-                <p><strong style={{ color: "var(--t1)" }}>5. Prohibited Use</strong><br/>You may not share your account credentials or unlock codes with others. Each subscription is for one user only.</p>
-                <p><strong style={{ color: "var(--t1)" }}>6. Limitation of Liability</strong><br/>Trackli is provided "as is". We are not liable for any financial decisions made based on data in the app.</p>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "var(--t2)",
+                  lineHeight: 1.8,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 14,
+                }}
+              >
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>Last updated:</strong>{" "}
+                  {fmtFull(todayISO())}
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>1. Acceptance</strong>
+                  <br />
+                  By using Trackli, you agree to these terms. If you do not
+                  agree, please do not use the app.
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>2. Free Trial</strong>
+                  <br />
+                  Trackli offers a 7-day free trial. After the trial, a
+                  subscription is required to continue using the app.
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>
+                    3. Subscriptions
+                  </strong>
+                  <br />
+                  Monthly (₹59/month) and Yearly (₹499/year) plans are
+                  available. Subscriptions can be cancelled anytime.
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>4. Refunds</strong>
+                  <br />
+                  We offer refunds within 7 days of payment if the app is not
+                  working as described. Contact support to request a refund.
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>
+                    5. Prohibited Use
+                  </strong>
+                  <br />
+                  You may not share your account credentials or unlock codes
+                  with others. Each subscription is for one user only.
+                </p>
+                <p>
+                  <strong style={{ color: "var(--t1)" }}>
+                    6. Limitation of Liability
+                  </strong>
+                  <br />
+                  Trackli is provided "as is". We are not liable for any
+                  financial decisions made based on data in the app.
+                </p>
               </div>
             )}
-            <button onClick={() => setLegal(null)} className="btn-i" style={{ width: "100%", padding: "11px 0", fontSize: 13, fontWeight: 600, borderRadius: 10, marginTop: 20 }}>
+            <button
+              onClick={() => setLegal(null)}
+              className="btn-i"
+              style={{
+                width: "100%",
+                padding: "11px 0",
+                fontSize: 13,
+                fontWeight: 600,
+                borderRadius: 10,
+                marginTop: 20,
+              }}
+            >
               Close
             </button>
           </div>
@@ -1951,14 +2090,32 @@ const AuthScreen = ({ onLogin }) => {
           By continuing you agree to our{" "}
           <button
             onClick={() => setLegal("privacy")}
-            style={{ color: "var(--t2)", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", fontSize: "inherit", fontFamily: "inherit", padding: 0 }}
+            style={{
+              color: "var(--t2)",
+              textDecoration: "underline",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "inherit",
+              fontFamily: "inherit",
+              padding: 0,
+            }}
           >
             Privacy Policy
           </button>
           {" & "}
           <button
             onClick={() => setLegal("terms")}
-            style={{ color: "var(--t2)", textDecoration: "underline", background: "none", border: "none", cursor: "pointer", fontSize: "inherit", fontFamily: "inherit", padding: 0 }}
+            style={{
+              color: "var(--t2)",
+              textDecoration: "underline",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "inherit",
+              fontFamily: "inherit",
+              padding: 0,
+            }}
           >
             Terms
           </button>
@@ -3157,11 +3314,13 @@ const useReminder = (transactions) => {
           if (Notification.permission === "granted" && !hasToday) {
             // Use ServiceWorker if available (mobile), else direct (desktop)
             if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-              navigator.serviceWorker.ready.then(reg => {
-                reg.showNotification("Trackli", {
-                  body: "Log today's income and keep your tracker up to date.",
-                });
-              }).catch(() => {});
+              navigator.serviceWorker.ready
+                .then((reg) => {
+                  reg.showNotification("Trackli", {
+                    body: "Log today's income and keep your tracker up to date.",
+                  });
+                })
+                .catch(() => {});
             } else {
               new Notification("Trackli", {
                 body: "Log today's income and keep your tracker up to date.",
@@ -3175,9 +3334,11 @@ const useReminder = (transactions) => {
       };
 
       if (Notification.permission === "default") {
-        Notification.requestPermission().then((p) => {
-          if (p === "granted") send();
-        }).catch(() => {});
+        Notification.requestPermission()
+          .then((p) => {
+            if (p === "granted") send();
+          })
+          .catch(() => {});
       } else {
         send();
       }
@@ -4046,8 +4207,17 @@ const MonthlyGoal = ({ transactions, goal, setGoal }) => {
    PLAN CARD — glass morphism sub-component
 ══════════════════════════════════════════════ */
 const PlanCard = ({
-  selected, onClick, name, tagline, price, period,
-  features, accent, popular, perDay, savings,
+  selected,
+  onClick,
+  name,
+  tagline,
+  price,
+  period,
+  features,
+  accent,
+  popular,
+  perDay,
+  savings,
 }) => (
   <div
     onClick={onClick}
@@ -4056,7 +4226,9 @@ const PlanCard = ({
       flex: "1 1 280px",
       maxWidth: 400,
       minWidth: 240,
-      background: selected ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.03)",
+      background: selected
+        ? "rgba(255,255,255,0.07)"
+        : "rgba(255,255,255,0.03)",
       backdropFilter: "blur(24px) saturate(180%)",
       WebkitBackdropFilter: "blur(24px) saturate(180%)",
       border: `1.5px solid ${selected ? accent : "rgba(255,255,255,0.09)"}`,
@@ -4071,58 +4243,187 @@ const PlanCard = ({
     }}
   >
     {popular && (
-      <div style={{
-        position: "absolute", top: -11, left: "50%",
-        transform: "translateX(-50%)",
-        background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-        color: "#fff", borderRadius: 99, padding: "4px 13px",
-        fontSize: 10.5, fontWeight: 800, letterSpacing: ".08em",
-        textTransform: "uppercase", whiteSpace: "nowrap",
-        boxShadow: "0 4px 14px rgba(99,102,241,0.5)",
-      }}>Most Popular</div>
+      <div
+        style={{
+          position: "absolute",
+          top: -11,
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+          color: "#fff",
+          borderRadius: 99,
+          padding: "4px 13px",
+          fontSize: 10.5,
+          fontWeight: 800,
+          letterSpacing: ".08em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          boxShadow: "0 4px 14px rgba(99,102,241,0.5)",
+        }}
+      >
+        Most Popular
+      </div>
     )}
 
-    <div style={{
-      position: "absolute", top: 18, right: 18,
-      width: 20, height: 20, borderRadius: "50%",
-      background: selected ? accent : "transparent",
-      border: `1.5px solid ${selected ? accent : "rgba(255,255,255,0.18)"}`,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      transition: "all .2s",
-    }}>
+    <div
+      style={{
+        position: "absolute",
+        top: 18,
+        right: 18,
+        width: 20,
+        height: 20,
+        borderRadius: "50%",
+        background: selected ? accent : "transparent",
+        border: `1.5px solid ${selected ? accent : "rgba(255,255,255,0.18)"}`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "all .2s",
+      }}
+    >
       {selected && <Icon n="check" size={11} color="#fff" />}
     </div>
 
-    <p style={{ fontSize: 11, fontWeight: 700, color: accent, textTransform: "uppercase", letterSpacing: ".14em", marginBottom: 5 }}>{name}</p>
-    <p style={{ fontSize: 12.5, color: "rgba(255,255,255,0.48)", marginBottom: 20, lineHeight: 1.45, paddingRight: 28 }}>{tagline}</p>
+    <p
+      style={{
+        fontSize: 11,
+        fontWeight: 700,
+        color: accent,
+        textTransform: "uppercase",
+        letterSpacing: ".14em",
+        marginBottom: 5,
+      }}
+    >
+      {name}
+    </p>
+    <p
+      style={{
+        fontSize: 12.5,
+        color: "rgba(255,255,255,0.48)",
+        marginBottom: 20,
+        lineHeight: 1.45,
+        paddingRight: 28,
+      }}
+    >
+      {tagline}
+    </p>
 
-    <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 6 }}>
-      <span style={{ fontSize: "clamp(32px, 5vw, 40px)", fontWeight: 800, color: "#fff", letterSpacing: "-.04em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{price}</span>
-      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>{period}</span>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "baseline",
+        gap: 6,
+        marginBottom: 6,
+      }}
+    >
+      <span
+        style={{
+          fontSize: "clamp(32px, 5vw, 40px)",
+          fontWeight: 800,
+          color: "#fff",
+          letterSpacing: "-.04em",
+          lineHeight: 1,
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        {price}
+      </span>
+      <span
+        style={{
+          fontSize: 13,
+          color: "rgba(255,255,255,0.45)",
+          fontWeight: 500,
+        }}
+      >
+        {period}
+      </span>
     </div>
 
-    {(perDay || savings) ? (
-      <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>
-        {perDay && <span style={{ background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.28)", color: "#4ade80", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 700 }}>{perDay}</span>}
-        {savings && <span style={{ background: "rgba(99,102,241,0.14)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 700 }}>{savings}</span>}
+    {perDay || savings ? (
+      <div
+        style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}
+      >
+        {perDay && (
+          <span
+            style={{
+              background: "rgba(34,197,94,0.12)",
+              border: "1px solid rgba(34,197,94,0.28)",
+              color: "#4ade80",
+              borderRadius: 99,
+              padding: "3px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+            }}
+          >
+            {perDay}
+          </span>
+        )}
+        {savings && (
+          <span
+            style={{
+              background: "rgba(99,102,241,0.14)",
+              border: "1px solid rgba(99,102,241,0.3)",
+              color: "#a5b4fc",
+              borderRadius: 99,
+              padding: "3px 10px",
+              fontSize: 11,
+              fontWeight: 700,
+            }}
+          >
+            {savings}
+          </span>
+        )}
       </div>
-    ) : <div style={{ height: 20 }} />}
+    ) : (
+      <div style={{ height: 20 }} />
+    )}
 
-    <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "0 0 18px" }} />
+    <div
+      style={{
+        height: 1,
+        background: "rgba(255,255,255,0.08)",
+        margin: "0 0 18px",
+      }}
+    />
 
     <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
       {features.map((f, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-          <div style={{
-            width: 16, height: 16, borderRadius: "50%",
-            background: f.ok ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.04)",
-            border: `1px solid ${f.ok ? "rgba(34,197,94,0.32)" : "rgba(255,255,255,0.08)"}`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexShrink: 0, marginTop: 1,
-          }}>
-            <Icon n={f.ok ? "check" : "close"} size={9} color={f.ok ? "#4ade80" : "rgba(255,255,255,0.28)"} />
+        <div
+          key={i}
+          style={{ display: "flex", alignItems: "flex-start", gap: 10 }}
+        >
+          <div
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: "50%",
+              background: f.ok
+                ? "rgba(34,197,94,0.15)"
+                : "rgba(255,255,255,0.04)",
+              border: `1px solid ${f.ok ? "rgba(34,197,94,0.32)" : "rgba(255,255,255,0.08)"}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              marginTop: 1,
+            }}
+          >
+            <Icon
+              n={f.ok ? "check" : "close"}
+              size={9}
+              color={f.ok ? "#4ade80" : "rgba(255,255,255,0.28)"}
+            />
           </div>
-          <span style={{ fontSize: 12.5, lineHeight: 1.45, color: f.ok ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.3)", textDecoration: f.ok ? "none" : "line-through" }}>{f.text}</span>
+          <span
+            style={{
+              fontSize: 12.5,
+              lineHeight: 1.45,
+              color: f.ok ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.3)",
+              textDecoration: f.ok ? "none" : "line-through",
+            }}
+          >
+            {f.text}
+          </span>
         </div>
       ))}
     </div>
@@ -4142,10 +4443,16 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
   const tryUnlock = async () => {
     const trimmed = code.trim().toUpperCase();
     if (!UNLOCK_CODES.includes(trimmed)) {
-      setError("Invalid code. You'll receive your unlock code on WhatsApp after payment.");
+      setError(
+        "Invalid code. You'll receive your unlock code on WhatsApp after payment.",
+      );
       return;
     }
-    const { data: codeRow } = await supabase.from("unlock_codes").select("*").eq("code", trimmed).maybeSingle();
+    const { data: codeRow } = await supabase
+      .from("unlock_codes")
+      .select("*")
+      .eq("code", trimmed)
+      .maybeSingle();
     if (codeRow && codeRow.is_used && codeRow.used_by !== user?.id) {
       setError("This code has already been used.");
       return;
@@ -4155,12 +4462,31 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
     sub.unlockedAt = new Date().toISOString();
     saveSub(sub);
     if (user?.id) {
-      const expiresAt = selPlan === "yearly"
-        ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-      await supabase.from("subscriptions").upsert({ user_id: user.id, plan: selPlan, status: "active", unlock_code: trimmed, expires_at: expiresAt }, { onConflict: "user_id" });
+      const expiresAt =
+        selPlan === "yearly"
+          ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      await supabase
+        .from("subscriptions")
+        .upsert(
+          {
+            user_id: user.id,
+            plan: selPlan,
+            status: "active",
+            unlock_code: trimmed,
+            expires_at: expiresAt,
+          },
+          { onConflict: "user_id" },
+        );
       if (codeRow) {
-        await supabase.from("unlock_codes").update({ is_used: true, used_by: user.id, used_at: new Date().toISOString() }).eq("code", trimmed);
+        await supabase
+          .from("unlock_codes")
+          .update({
+            is_used: true,
+            used_by: user.id,
+            used_at: new Date().toISOString(),
+          })
+          .eq("code", trimmed);
       }
     }
     setSuccess(true);
@@ -4188,101 +4514,415 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
     { ok: true, text: "Early access to new features" },
   ];
 
-  const payLink = selPlan === "yearly" ? "https://rzp.io/rzp/FQ6PDFlu" : "https://rzp.io/rzp/So1SE4j";
+  const payLink =
+    selPlan === "yearly"
+      ? "https://rzp.io/rzp/FQ6PDFlu"
+      : "https://rzp.io/rzp/So1SE4j";
 
   if (success) {
     return (
-      <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(30px) saturate(180%)", WebkitBackdropFilter: "blur(30px) saturate(180%)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 20, padding: "52px 36px", maxWidth: 400, width: "100%", textAlign: "center", animation: "scaleIn .3s cubic-bezier(.34,1.56,.64,1) both", boxShadow: "0 20px 60px rgba(34,197,94,0.15)" }}>
-          <div style={{ width: 64, height: 64, borderRadius: 20, margin: "0 auto 20px", background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9999,
+          background: "rgba(0,0,0,0.75)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 20,
+        }}
+      >
+        <div
+          style={{
+            background: "rgba(255,255,255,0.06)",
+            backdropFilter: "blur(30px) saturate(180%)",
+            WebkitBackdropFilter: "blur(30px) saturate(180%)",
+            border: "1px solid rgba(34,197,94,0.25)",
+            borderRadius: 20,
+            padding: "52px 36px",
+            maxWidth: 400,
+            width: "100%",
+            textAlign: "center",
+            animation: "scaleIn .3s cubic-bezier(.34,1.56,.64,1) both",
+            boxShadow: "0 20px 60px rgba(34,197,94,0.15)",
+          }}
+        >
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 20,
+              margin: "0 auto 20px",
+              background: "rgba(34,197,94,0.15)",
+              border: "1px solid rgba(34,197,94,0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Icon n="check" size={30} color="#4ade80" />
           </div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#fff", marginBottom: 8, letterSpacing: "-.03em" }}>Access Unlocked</h2>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.55 }}>Welcome to Trackli Pro. Loading your dashboard...</p>
+          <h2
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: "#fff",
+              marginBottom: 8,
+              letterSpacing: "-.03em",
+            }}
+          >
+            Access Unlocked
+          </h2>
+          <p
+            style={{
+              fontSize: 14,
+              color: "rgba(255,255,255,0.6)",
+              lineHeight: 1.55,
+            }}
+          >
+            Welcome to Trackli Pro. Loading your dashboard...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.72)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", overflowY: "auto", padding: "clamp(16px, 4vw, 40px) clamp(14px, 3vw, 28px)" }}>
-
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        background: "rgba(0,0,0,0.72)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
+        overflowY: "auto",
+        padding: "clamp(16px, 4vw, 40px) clamp(14px, 3vw, 28px)",
+      }}
+    >
       {!trialOver && (
-        <button onClick={onUnlock} aria-label="Close"
-          style={{ position: "fixed", top: 18, right: 18, zIndex: 10000, width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", transition: "all .15s" }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.16)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+        <button
+          onClick={onUnlock}
+          aria-label="Close"
+          style={{
+            position: "fixed",
+            top: 18,
+            right: 18,
+            zIndex: 10000,
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            color: "rgba(255,255,255,0.85)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            transition: "all .15s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.16)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+          }}
         >
           <Icon n="close" size={14} color="currentColor" />
         </button>
       )}
 
-      <div style={{ position: "fixed", top: "-20%", left: "50%", transform: "translateX(-50%)", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, rgba(99,102,241,0.12), transparent 60%)", pointerEvents: "none", zIndex: 0 }} />
+      <div
+        style={{
+          position: "fixed",
+          top: "-20%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: 700,
+          height: 700,
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(99,102,241,0.12), transparent 60%)",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
 
-      <div style={{ width: "100%", maxWidth: 880, margin: "0 auto", position: "relative", zIndex: 1, animation: "scaleIn .35s cubic-bezier(.16,1,.3,1) both" }}>
-
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 880,
+          margin: "0 auto",
+          position: "relative",
+          zIndex: 1,
+          animation: "scaleIn .35s cubic-bezier(.16,1,.3,1) both",
+        }}
+      >
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: trialOver ? "rgba(239,68,68,0.12)" : "rgba(245,158,11,0.12)", border: `1px solid ${trialOver ? "rgba(239,68,68,0.3)" : "rgba(245,158,11,0.3)"}`, borderRadius: 99, padding: "6px 14px", marginBottom: 20, backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}>
-            <Icon n={trialOver ? "alert" : "clock"} size={12} color={trialOver ? "#f87171" : "#fbbf24"} />
-            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: ".02em", color: trialOver ? "#f87171" : "#fbbf24" }}>
-              {trialOver ? "Free trial ended" : `${daysLeft} day${daysLeft === 1 ? "" : "s"} left in trial`}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+              background: trialOver
+                ? "rgba(239,68,68,0.12)"
+                : "rgba(245,158,11,0.12)",
+              border: `1px solid ${trialOver ? "rgba(239,68,68,0.3)" : "rgba(245,158,11,0.3)"}`,
+              borderRadius: 99,
+              padding: "6px 14px",
+              marginBottom: 20,
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+            }}
+          >
+            <Icon
+              n={trialOver ? "alert" : "clock"}
+              size={12}
+              color={trialOver ? "#f87171" : "#fbbf24"}
+            />
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: ".02em",
+                color: trialOver ? "#f87171" : "#fbbf24",
+              }}
+            >
+              {trialOver
+                ? "Free trial ended"
+                : `${daysLeft} day${daysLeft === 1 ? "" : "s"} left in trial`}
             </span>
           </div>
-          <h1 style={{ fontSize: "clamp(26px, 4.5vw, 34px)", fontWeight: 800, color: "#fff", letterSpacing: "-.045em", marginBottom: 10, lineHeight: 1.15 }}>Unlock Trackli Pro</h1>
-          <p style={{ fontSize: "clamp(13px, 2vw, 15px)", color: "rgba(255,255,255,0.55)", maxWidth: 500, margin: "0 auto", lineHeight: 1.55 }}>Keep tracking your freelance income without limits. Cancel anytime.</p>
+          <h1
+            style={{
+              fontSize: "clamp(26px, 4.5vw, 34px)",
+              fontWeight: 800,
+              color: "#fff",
+              letterSpacing: "-.045em",
+              marginBottom: 10,
+              lineHeight: 1.15,
+            }}
+          >
+            Unlock Trackli Pro
+          </h1>
+          <p
+            style={{
+              fontSize: "clamp(13px, 2vw, 15px)",
+              color: "rgba(255,255,255,0.55)",
+              maxWidth: 500,
+              margin: "0 auto",
+              lineHeight: 1.55,
+            }}
+          >
+            Keep tracking your freelance income without limits. Cancel anytime.
+          </p>
         </div>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginBottom: 28, justifyContent: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 16,
+            marginBottom: 28,
+            justifyContent: "center",
+          }}
+        >
           <PlanCard
-            selected={selPlan === "monthly"} onClick={() => setSelPlan("monthly")}
-            name="Starter" tagline="Essentials to get started"
-            price="₹59" period="per month"
-            features={monthlyFeatures} accent="#22c55e"
+            selected={selPlan === "monthly"}
+            onClick={() => setSelPlan("monthly")}
+            name="Starter"
+            tagline="Essentials to get started"
+            price="₹59"
+            period="per month"
+            features={monthlyFeatures}
+            accent="#22c55e"
           />
           <PlanCard
-            selected={selPlan === "yearly"} onClick={() => setSelPlan("yearly")}
-            name="Pro" tagline="Everything you need, 30% off"
-            price="₹499" period="per year"
-            features={yearlyFeatures} accent="#6366f1"
-            popular perDay="₹1.36 / day" savings="Save ₹209"
+            selected={selPlan === "yearly"}
+            onClick={() => setSelPlan("yearly")}
+            name="Pro"
+            tagline="Everything you need, 30% off"
+            price="₹499"
+            period="per year"
+            features={yearlyFeatures}
+            accent="#6366f1"
+            popular
+            perDay="₹1.36 / day"
+            savings="Save ₹209"
           />
         </div>
 
-        <a href={payLink} target="_blank" rel="noopener noreferrer"
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", maxWidth: 440, margin: "0 auto 14px", background: selPlan === "yearly" ? "linear-gradient(135deg, #6366f1, #8b5cf6)" : "linear-gradient(135deg, #16a34a, #22c55e)", color: "#fff", borderRadius: 13, padding: "15px 24px", fontSize: 15, fontWeight: 700, textDecoration: "none", letterSpacing: ".005em", boxShadow: selPlan === "yearly" ? "0 10px 32px rgba(99,102,241,0.45)" : "0 10px 32px rgba(34,197,94,0.35)", transition: "transform .15s" }}
+        <a
+          href={payLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            width: "100%",
+            maxWidth: 440,
+            margin: "0 auto 14px",
+            background:
+              selPlan === "yearly"
+                ? "linear-gradient(135deg, #6366f1, #8b5cf6)"
+                : "linear-gradient(135deg, #16a34a, #22c55e)",
+            color: "#fff",
+            borderRadius: 13,
+            padding: "15px 24px",
+            fontSize: 15,
+            fontWeight: 700,
+            textDecoration: "none",
+            letterSpacing: ".005em",
+            boxShadow:
+              selPlan === "yearly"
+                ? "0 10px 32px rgba(99,102,241,0.45)"
+                : "0 10px 32px rgba(34,197,94,0.35)",
+            transition: "transform .15s",
+          }}
         >
           Continue to Payment
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path
+              d="M3 7h8M8 4l3 3-3 3"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </a>
 
-        <p style={{ textAlign: "center", fontSize: 11.5, color: "rgba(255,255,255,0.4)", marginBottom: 28, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, flexWrap: "wrap" }}>
+        <p
+          style={{
+            textAlign: "center",
+            fontSize: 11.5,
+            color: "rgba(255,255,255,0.4)",
+            marginBottom: 28,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+            flexWrap: "wrap",
+          }}
+        >
           <span>Secure payment via Razorpay</span>
           <span style={{ color: "rgba(255,255,255,0.2)" }}>•</span>
           <span>UPI, Cards, Net Banking</span>
         </p>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 14, maxWidth: 440, margin: "0 auto 20px" }}>
-          <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase" }}>Or</span>
-          <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            maxWidth: 440,
+            margin: "0 auto 20px",
+          }}
+        >
+          <div
+            style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }}
+          />
+          <span
+            style={{
+              fontSize: 11,
+              color: "rgba(255,255,255,0.3)",
+              fontWeight: 600,
+              letterSpacing: ".08em",
+              textTransform: "uppercase",
+            }}
+          >
+            Or
+          </span>
+          <div
+            style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }}
+          />
         </div>
 
-        <div style={{ maxWidth: 440, margin: "0 auto", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "18px 20px" }}>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", marginBottom: 12, textAlign: "center", lineHeight: 1.5 }}>Have an unlock code? Enter it below to activate Pro instantly.</p>
+        <div
+          style={{
+            maxWidth: 440,
+            margin: "0 auto",
+            background: "rgba(255,255,255,0.04)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 14,
+            padding: "18px 20px",
+          }}
+        >
+          <p
+            style={{
+              fontSize: 12,
+              color: "rgba(255,255,255,0.5)",
+              marginBottom: 12,
+              textAlign: "center",
+              lineHeight: 1.5,
+            }}
+          >
+            Have an unlock code? Enter it below to activate Pro instantly.
+          </p>
           <div style={{ display: "flex", gap: 8 }}>
             <input
               value={code}
-              onChange={(e) => { setCode(e.target.value); setError(""); }}
+              onChange={(e) => {
+                setCode(e.target.value);
+                setError("");
+              }}
               onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
               placeholder="UNLOCK-CODE"
-              style={{ flex: 1, background: "rgba(0,0,0,0.25)", border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`, borderRadius: 10, padding: "10px 14px", color: "#fff", fontSize: 13, outline: "none", fontFamily: "inherit", letterSpacing: ".04em", textTransform: "uppercase" }}
+              style={{
+                flex: 1,
+                background: "rgba(0,0,0,0.25)",
+                border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`,
+                borderRadius: 10,
+                padding: "10px 14px",
+                color: "#fff",
+                fontSize: 13,
+                outline: "none",
+                fontFamily: "inherit",
+                letterSpacing: ".04em",
+                textTransform: "uppercase",
+              }}
             />
-            <button onClick={tryUnlock} disabled={!code.trim()}
-              style={{ background: code.trim() ? "#fff" : "rgba(255,255,255,0.1)", color: code.trim() ? "#0d0d12" : "rgba(255,255,255,0.4)", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 700, cursor: code.trim() ? "pointer" : "not-allowed", whiteSpace: "nowrap", fontFamily: "inherit", transition: "all .15s" }}
-            >Unlock</button>
+            <button
+              onClick={tryUnlock}
+              disabled={!code.trim()}
+              style={{
+                background: code.trim() ? "#fff" : "rgba(255,255,255,0.1)",
+                color: code.trim() ? "#0d0d12" : "rgba(255,255,255,0.4)",
+                border: "none",
+                borderRadius: 10,
+                padding: "10px 20px",
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: code.trim() ? "pointer" : "not-allowed",
+                whiteSpace: "nowrap",
+                fontFamily: "inherit",
+                transition: "all .15s",
+              }}
+            >
+              Unlock
+            </button>
           </div>
           {error && (
-            <p style={{ fontSize: 11.5, color: "#f87171", marginTop: 10, display: "flex", alignItems: "flex-start", gap: 6, lineHeight: 1.45 }}>
+            <p
+              style={{
+                fontSize: 11.5,
+                color: "#f87171",
+                marginTop: 10,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 6,
+                lineHeight: 1.45,
+              }}
+            >
               <Icon n="alert" size={12} color="#f87171" />
               <span style={{ flex: 1 }}>{error}</span>
             </p>
@@ -4292,7 +4932,6 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
     </div>
   );
 };
-
 
 /* ══════════════════════════════════════════════
    NEW MONTH CELEBRATION
@@ -5206,13 +5845,16 @@ const InvoicePage = ({ transactions }) => {
       .forEach((t) => {
         const [y, m] = t.date.split("-");
         const key = `${MONTHS[Number(m) - 1]} ${y}`;
-        if (!grouped[key]) grouped[key] = { total: 0, pending: 0, received: 0, videos: 0 };
+        if (!grouped[key])
+          grouped[key] = { total: 0, pending: 0, received: 0, videos: 0 };
         grouped[key].total += t.amount;
         grouped[key].videos += 1;
         if (t.paid) grouped[key].received += t.amount;
         else grouped[key].pending += t.amount;
       });
-    const groupRows = Object.entries(grouped).map(([month, g]) => `
+    const groupRows = Object.entries(grouped)
+      .map(
+        ([month, g]) => `
       <tr>
         <td style="padding:11px 16px;font-size:13px;font-weight:600;border-bottom:1px solid #f1f5f9">${month}</td>
         <td style="padding:11px 16px;font-size:13px;text-align:center;border-bottom:1px solid #f1f5f9">${g.videos}</td>
@@ -5221,7 +5863,9 @@ const InvoicePage = ({ transactions }) => {
           ${g.pending > 0 ? `<span style="background:#fef3c7;color:#b45309;padding:3px 10px;border-radius:20px;font-weight:700">Pending ${fmtINR(g.pending)}</span>` : ""}
         </td>
         <td style="padding:11px 16px;font-size:14px;font-weight:700;text-align:right;border-bottom:1px solid #f1f5f9">${fmtINR(g.total)}</td>
-      </tr>`).join("");
+      </tr>`,
+      )
+      .join("");
 
     const html = `<!DOCTYPE html>
 <html>
@@ -5533,7 +6177,10 @@ try {
   injectStyles(dark);
   updateTheme(dark);
 } catch (e) {
-  try { injectStyles(true); updateTheme(true); } catch {}
+  try {
+    injectStyles(true);
+    updateTheme(true);
+  } catch {}
 }
 
 /* ══════════════════════════════════════════════
@@ -5560,21 +6207,46 @@ const ResetPasswordModal = ({ onDone }) => {
   };
 
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 99999,
-      background: "rgba(0,0,0,0.75)", backdropFilter: "blur(12px)",
-      display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
-    }}>
-      <div className="gc pop" style={{ width: "100%", maxWidth: 420, padding: "32px 28px" }}>
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 99999,
+        background: "rgba(0,0,0,0.75)",
+        backdropFilter: "blur(12px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+      }}
+    >
+      <div
+        className="gc pop"
+        style={{ width: "100%", maxWidth: 420, padding: "32px 28px" }}
+      >
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div style={{
-            width: 52, height: 52, borderRadius: 14, margin: "0 auto 14px",
-            background: "linear-gradient(135deg,var(--indigo),var(--green))",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: 14,
+              margin: "0 auto 14px",
+              background: "linear-gradient(135deg,var(--indigo),var(--green))",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Icon n="bolt" size={22} color="#fff" />
           </div>
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--t1)", marginBottom: 6 }}>
+          <h2
+            style={{
+              fontSize: 20,
+              fontWeight: 800,
+              color: "var(--t1)",
+              marginBottom: 6,
+            }}
+          >
             Set New Password
           </h2>
           <p style={{ fontSize: 13, color: "var(--t3)" }}>
@@ -5583,10 +6255,15 @@ const ResetPasswordModal = ({ onDone }) => {
         </div>
 
         {success ? (
-          <div style={{
-            background: "var(--greenbg)", border: "1px solid rgba(34,197,94,.25)",
-            borderRadius: 12, padding: "16px 20px", textAlign: "center",
-          }}>
+          <div
+            style={{
+              background: "var(--greenbg)",
+              border: "1px solid rgba(34,197,94,.25)",
+              borderRadius: 12,
+              padding: "16px 20px",
+              textAlign: "center",
+            }}
+          >
             <p style={{ fontSize: 14, fontWeight: 700, color: "var(--green)" }}>
               Password update ho gaya! Redirect ho raha hai...
             </p>
@@ -5596,27 +6273,41 @@ const ResetPasswordModal = ({ onDone }) => {
             <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
               <span className="lbl">Naya Password</span>
               <input
-                type="password" value={pw} onChange={e => setPw(e.target.value)}
+                type="password"
+                value={pw}
+                onChange={(e) => setPw(e.target.value)}
                 placeholder="Minimum 6 characters"
-                className="inp" autoFocus
+                className="inp"
+                autoFocus
               />
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
               <span className="lbl">Password Confirm Karo</span>
               <input
-                type="password" value={pw2} onChange={e => setPw2(e.target.value)}
+                type="password"
+                value={pw2}
+                onChange={(e) => setPw2(e.target.value)}
                 placeholder="Confirm your new password"
                 className="inp"
-                onKeyDown={e => e.key === "Enter" && submit()}
+                onKeyDown={(e) => e.key === "Enter" && submit()}
               />
             </div>
             {error && (
-              <p style={{ fontSize: 12, color: "var(--red)", fontWeight: 500 }}>{error}</p>
+              <p style={{ fontSize: 12, color: "var(--red)", fontWeight: 500 }}>
+                {error}
+              </p>
             )}
             <button
-              onClick={submit} disabled={loading}
+              onClick={submit}
+              disabled={loading}
               className="btn-i"
-              style={{ padding: "11px 0", fontSize: 14, fontWeight: 700, borderRadius: 11, width: "100%" }}
+              style={{
+                padding: "11px 0",
+                fontSize: 14,
+                fontWeight: 700,
+                borderRadius: 11,
+                width: "100%",
+              }}
             >
               {loading ? "Updating..." : "Update Password"}
             </button>
@@ -5631,10 +6322,15 @@ const ResetPasswordModal = ({ onDone }) => {
    BUG REPORT PAGE
 ══════════════════════════════════════════════ */
 const BugReport = ({ user }) => {
-  const [form, setForm] = useState({ type: "bug", title: "", desc: "", steps: "" });
+  const [form, setForm] = useState({
+    type: "bug",
+    title: "",
+    desc: "",
+    steps: "",
+  });
   const [loading, setLoad] = useState(false);
   const [done, setDone] = useState(false);
-  const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const submit = async () => {
     if (!form.title.trim() || !form.desc.trim()) return;
@@ -5644,54 +6340,115 @@ const BugReport = ({ user }) => {
     window.open(waLink, "_blank");
     setLoad(false);
     setDone(true);
-    setTimeout(() => { setDone(false); setForm({ type: "bug", title: "", desc: "", steps: "" }); }, 3000);
+    setTimeout(() => {
+      setDone(false);
+      setForm({ type: "bug", title: "", desc: "", steps: "" });
+    }, 3000);
   };
 
   const types = [
-    { v: "bug",     l: "Bug — Something isn't working" },
-    { v: "ui",      l: "UI Issue — Design or layout problem" },
+    { v: "bug", l: "Bug — Something isn't working" },
+    { v: "ui", l: "UI Issue — Design or layout problem" },
     { v: "feature", l: "Feature Request — Suggest something new" },
-    { v: "other",   l: "Other — Something else" },
+    { v: "other", l: "Other — Something else" },
   ];
 
   return (
-    <div className="fu" style={{ maxWidth: 580, margin: "0 auto", padding: "8px 0 60px" }}>
-
+    <div
+      className="fu"
+      style={{ maxWidth: 580, margin: "0 auto", padding: "8px 0 60px" }}
+    >
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--t1)", letterSpacing: "-.03em", marginBottom: 6 }}>
+        <h2
+          style={{
+            fontSize: 20,
+            fontWeight: 700,
+            color: "var(--t1)",
+            letterSpacing: "-.03em",
+            marginBottom: 6,
+          }}
+        >
           Report an Issue
         </h2>
         <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.6 }}>
-          Found a bug or have feedback? Let us know and we'll get it fixed as soon as possible.
+          Found a bug or have feedback? Let us know and we'll get it fixed as
+          soon as possible.
         </p>
       </div>
 
       {done ? (
-        <div className="gc" style={{ padding: 40, textAlign: "center", borderColor: "rgba(34,197,94,.2)" }}>
-          <div style={{ width: 48, height: 48, borderRadius: 14, background: "var(--greenbg)", border: "1px solid rgba(34,197,94,.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+        <div
+          className="gc"
+          style={{
+            padding: 40,
+            textAlign: "center",
+            borderColor: "rgba(34,197,94,.2)",
+          }}
+        >
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 14,
+              background: "var(--greenbg)",
+              border: "1px solid rgba(34,197,94,.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 16px",
+            }}
+          >
             <Icon n="check" size={22} color="var(--green)" />
           </div>
-          <p style={{ fontSize: 15, fontWeight: 700, color: "var(--t1)", marginBottom: 6 }}>Report Submitted</p>
-          <p style={{ fontSize: 13, color: "var(--t3)" }}>Thank you for your feedback. We'll look into it shortly.</p>
+          <p
+            style={{
+              fontSize: 15,
+              fontWeight: 700,
+              color: "var(--t1)",
+              marginBottom: 6,
+            }}
+          >
+            Report Submitted
+          </p>
+          <p style={{ fontSize: 13, color: "var(--t3)" }}>
+            Thank you for your feedback. We'll look into it shortly.
+          </p>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-
           {/* Type selector */}
           <div className="gc" style={{ padding: 18 }}>
-            <p className="lbl" style={{ marginBottom: 12 }}>Issue Type</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {types.map(t => (
-                <button key={t.v} onClick={() => setForm(f => ({ ...f, type: t.v }))}
+            <p className="lbl" style={{ marginBottom: 12 }}>
+              Issue Type
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 8,
+              }}
+            >
+              {types.map((t) => (
+                <button
+                  key={t.v}
+                  onClick={() => setForm((f) => ({ ...f, type: t.v }))}
                   style={{
-                    background: form.type === t.v ? "var(--indigobg)" : "var(--surface2)",
+                    background:
+                      form.type === t.v ? "var(--indigobg)" : "var(--surface2)",
                     border: `1px solid ${form.type === t.v ? "rgba(99,102,241,.3)" : "var(--cb)"}`,
                     color: form.type === t.v ? "var(--indigo)" : "var(--t2)",
-                    borderRadius: 10, padding: "10px 13px", fontSize: 12, fontWeight: 500,
-                    cursor: "pointer", textAlign: "left", fontFamily: "inherit",
-                    transition: "all .15s", lineHeight: 1.4,
-                  }}>
+                    borderRadius: 10,
+                    padding: "10px 13px",
+                    fontSize: 12,
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    textAlign: "left",
+                    fontFamily: "inherit",
+                    transition: "all .15s",
+                    lineHeight: 1.4,
+                  }}
+                >
                   {t.l}
                 </button>
               ))}
@@ -5700,44 +6457,95 @@ const BugReport = ({ user }) => {
 
           {/* Title */}
           <div className="gc" style={{ padding: 18 }}>
-            <p className="lbl" style={{ marginBottom: 10 }}>Title <span style={{ color: "var(--red)" }}>*</span></p>
-            <input value={form.title} onChange={set("title")}
+            <p className="lbl" style={{ marginBottom: 10 }}>
+              Title <span style={{ color: "var(--red)" }}>*</span>
+            </p>
+            <input
+              value={form.title}
+              onChange={set("title")}
               placeholder="Brief summary of the issue"
-              className="inp" />
+              className="inp"
+            />
           </div>
 
           {/* Description */}
           <div className="gc" style={{ padding: 18 }}>
-            <p className="lbl" style={{ marginBottom: 10 }}>Description <span style={{ color: "var(--red)" }}>*</span></p>
-            <textarea value={form.desc} onChange={set("desc")}
+            <p className="lbl" style={{ marginBottom: 10 }}>
+              Description <span style={{ color: "var(--red)" }}>*</span>
+            </p>
+            <textarea
+              value={form.desc}
+              onChange={set("desc")}
               placeholder="What happened? What did you expect to happen? Include any error messages you saw."
-              className="inp" rows={4}
-              style={{ resize: "vertical", lineHeight: 1.6 }} />
+              className="inp"
+              rows={4}
+              style={{ resize: "vertical", lineHeight: 1.6 }}
+            />
           </div>
 
           {/* Steps */}
           <div className="gc" style={{ padding: 18 }}>
-            <p className="lbl" style={{ marginBottom: 6 }}>Steps to Reproduce <span style={{ color: "var(--t3)", fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>(optional)</span></p>
-            <p style={{ fontSize: 11, color: "var(--t3)", marginBottom: 10 }}>Help us reproduce the issue faster</p>
-            <textarea value={form.steps} onChange={set("steps")}
-              placeholder={"1. Go to Dashboard\n2. Click Add Income\n3. Error appears"}
-              className="inp" rows={3}
-              style={{ resize: "vertical", lineHeight: 1.6 }} />
+            <p className="lbl" style={{ marginBottom: 6 }}>
+              Steps to Reproduce{" "}
+              <span
+                style={{
+                  color: "var(--t3)",
+                  fontWeight: 400,
+                  textTransform: "none",
+                  letterSpacing: 0,
+                }}
+              >
+                (optional)
+              </span>
+            </p>
+            <p style={{ fontSize: 11, color: "var(--t3)", marginBottom: 10 }}>
+              Help us reproduce the issue faster
+            </p>
+            <textarea
+              value={form.steps}
+              onChange={set("steps")}
+              placeholder={
+                "1. Go to Dashboard\n2. Click Add Income\n3. Error appears"
+              }
+              className="inp"
+              rows={3}
+              style={{ resize: "vertical", lineHeight: 1.6 }}
+            />
           </div>
 
           {/* Footer note */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "var(--surface2)", borderRadius: 10, border: "1px solid var(--cb)" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "10px 14px",
+              background: "var(--surface2)",
+              borderRadius: 10,
+              border: "1px solid var(--cb)",
+            }}
+          >
             <Icon n="info" size={14} color="var(--t3)" />
             <p style={{ fontSize: 12, color: "var(--t3)" }}>
-              Your email <strong style={{ color: "var(--t2)" }}>{user?.email}</strong> will be included so we can follow up.
+              Your email{" "}
+              <strong style={{ color: "var(--t2)" }}>{user?.email}</strong> will
+              be included so we can follow up.
             </p>
           </div>
 
           {/* Submit */}
-          <button onClick={submit}
+          <button
+            onClick={submit}
             disabled={loading || !form.title.trim() || !form.desc.trim()}
             className="btn-i"
-            style={{ padding: "13px 0", fontSize: 14, fontWeight: 600, borderRadius: 11, width: "100%" }}>
+            style={{
+              padding: "13px 0",
+              fontSize: 14,
+              fontWeight: 600,
+              borderRadius: 11,
+              width: "100%",
+            }}
+          >
             {loading ? "Submitting..." : "Submit Report"}
           </button>
         </div>
@@ -5768,6 +6576,7 @@ export default function App() {
   const [sub, setSub] = useState(null);
   const [showPaywall, setPayw] = useState(false);
   const [showPwReset, setShowPwReset] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDark] = useState(() => {
     try {
       const s = localStorage.getItem("flt_theme");
@@ -5857,14 +6666,19 @@ export default function App() {
 
         if (subData) {
           // Supabase mein active subscription hai — unlocked!
-          const dbSub = { unlocked: true, unlockedAt: subData.started_at, plan: subData.plan };
+          const dbSub = {
+            unlocked: true,
+            unlockedAt: subData.started_at,
+            plan: subData.plan,
+          };
           setSub(dbSub);
           saveSub(dbSub); // sync to localStorage as well
         } else {
           // Supabase mein nahi — localStorage check karo (trial)
           const s = initTrial();
           setSub(s);
-          if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) <= 3) setPayw(true);
+          if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) <= 3)
+            setPayw(true);
         }
       } catch (e) {
         console.error(e);
@@ -5923,27 +6737,34 @@ export default function App() {
     await supabase.from("transactions").delete().eq("id", delTx.id);
   }, [delTx]);
 
-  const togglePaid = useCallback(async (id) => {
-    if (!user) return;
-    // Find current value
-    let newPaid = false;
-    setTx((p) => p.map((t) => {
-      if (t.id !== id) return t;
-      newPaid = !t.paid;
-      return { ...t, paid: newPaid };
-    }));
-    // Persist to Supabase
-    const { error } = await supabase
-      .from("transactions")
-      .update({ paid: newPaid })
-      .eq("id", id)
-      .eq("user_id", user.id);
-    if (error) {
-      console.error("togglePaid failed:", error.message);
-      // Revert on failure
-      setTx((p) => p.map((t) => t.id !== id ? t : { ...t, paid: !newPaid }));
-    }
-  }, [user]);
+  const togglePaid = useCallback(
+    async (id) => {
+      if (!user) return;
+      // Find current value
+      let newPaid = false;
+      setTx((p) =>
+        p.map((t) => {
+          if (t.id !== id) return t;
+          newPaid = !t.paid;
+          return { ...t, paid: newPaid };
+        }),
+      );
+      // Persist to Supabase
+      const { error } = await supabase
+        .from("transactions")
+        .update({ paid: newPaid })
+        .eq("id", id)
+        .eq("user_id", user.id);
+      if (error) {
+        console.error("togglePaid failed:", error.message);
+        // Revert on failure
+        setTx((p) =>
+          p.map((t) => (t.id !== id ? t : { ...t, paid: !newPaid })),
+        );
+      }
+    },
+    [user],
+  );
 
   const handleAddClient = useCallback(
     async (name) => {
@@ -5976,24 +6797,30 @@ export default function App() {
     [user],
   );
 
-  const markAllPaid = useCallback(async (clientName) => {
-    if (!user) return;
-    const ids = [];
-    setTx((p) => p.map((t) => {
-      if (t.client !== clientName || t.type !== "income" || t.paid) return t;
-      ids.push(t.id);
-      return { ...t, paid: true };
-    }));
-    // Persist all to Supabase
-    for (const id of ids) {
-      const { error } = await supabase
-        .from("transactions")
-        .update({ paid: true })
-        .eq("id", id)
-        .eq("user_id", user.id);
-      if (error) console.error("markAllPaid failed for", id, error.message);
-    }
-  }, [user]);
+  const markAllPaid = useCallback(
+    async (clientName) => {
+      if (!user) return;
+      const ids = [];
+      setTx((p) =>
+        p.map((t) => {
+          if (t.client !== clientName || t.type !== "income" || t.paid)
+            return t;
+          ids.push(t.id);
+          return { ...t, paid: true };
+        }),
+      );
+      // Persist all to Supabase
+      for (const id of ids) {
+        const { error } = await supabase
+          .from("transactions")
+          .update({ paid: true })
+          .eq("id", id)
+          .eq("user_id", user.id);
+        if (error) console.error("markAllPaid failed for", id, error.message);
+      }
+    },
+    [user],
+  );
 
   const openAdd = (type = "income", client = "") =>
     setAddState({ type, client });
@@ -6051,22 +6878,23 @@ export default function App() {
   if (!user) return <AuthScreen onLogin={setUser} />;
 
   // Password recovery screen — shown after clicking reset email link
-  if (showPwReset) return <ResetPasswordModal onDone={() => setShowPwReset(false)} />;
+  if (showPwReset)
+    return <ResetPasswordModal onDone={() => setShowPwReset(false)} />;
 
   const tabs = [
-    { id: "dashboard",   label: "Dashboard",   icon: "home" },
-    { id: "transactions",label: "Transactions", icon: "list" },
-    { id: "calendar",    label: "Calendar",     icon: "calendar" },
-    { id: "invoice",     label: "Invoice",      icon: "receipt" },
-    { id: "bugreport",   label: "Bug Report",   icon: "alert" },
+    { id: "dashboard", label: "Dashboard", icon: "home" },
+    { id: "transactions", label: "Transactions", icon: "list" },
+    { id: "calendar", label: "Calendar", icon: "calendar" },
+    { id: "invoice", label: "Invoice", icon: "receipt" },
+    { id: "bugreport", label: "Bug Report", icon: "alert" },
   ];
 
   const navItems = [
-    { id: "dashboard",   label: "Dashboard",   icon: "home" },
-    { id: "transactions",label: "Transactions", icon: "list" },
-    { id: "calendar",    label: "Calendar",     icon: "calendar" },
-    { id: "invoice",     label: "Invoice",      icon: "receipt" },
-    { id: "bugreport",   label: "Bug Report",   icon: "alert" },
+    { id: "dashboard", label: "Dashboard", icon: "home" },
+    { id: "transactions", label: "Transactions", icon: "list" },
+    { id: "calendar", label: "Calendar", icon: "calendar" },
+    { id: "invoice", label: "Invoice", icon: "receipt" },
+    { id: "bugreport", label: "Bug Report", icon: "alert" },
   ];
 
   const pageContent = (
@@ -6165,14 +6993,334 @@ export default function App() {
               </button>
             )}
             <ThemeToggle dark={darkMode} onToggle={toggleTheme} />
-            <button
-              onClick={logout}
-              className="pill-ghost"
-              style={{ padding: "6px 14px" }}
-            >
-              <Icon n="logout" size={13} />
-              <span className="btn-lbl">Logout</span>
-            </button>
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => setShowProfile((p) => !p)}
+                className="pill-ghost"
+                style={{ padding: "6px 14px" }}
+              >
+                <div
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: "50%",
+                    background: "linear-gradient(135deg, #6366f1, #22c55e)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 10,
+                    fontWeight: 800,
+                    color: "#fff",
+                    flexShrink: 0,
+                  }}
+                >
+                  {(user?.user_metadata?.name ||
+                    user?.email ||
+                    "U")[0].toUpperCase()}
+                </div>
+                <span className="btn-lbl">Account</span>
+              </button>
+
+              {/* Profile Card */}
+              {showProfile && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    onClick={() => setShowProfile(false)}
+                    style={{ position: "fixed", inset: 0, zIndex: 998 }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "calc(100% + 10px)",
+                      right: 0,
+                      zIndex: 999,
+                      width: 260,
+                      background: "var(--surface2)",
+                      border: "1px solid var(--cb)",
+                      borderRadius: 16,
+                      padding: "18px",
+                      boxShadow: "0 16px 48px rgba(0,0,0,0.4)",
+                      animation: "fadeUp .2s ease both",
+                    }}
+                  >
+                    {/* Avatar + Name */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        marginBottom: 16,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: "50%",
+                          background:
+                            "linear-gradient(135deg, #6366f1, #22c55e)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: 16,
+                          fontWeight: 800,
+                          color: "#fff",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {(user?.user_metadata?.name ||
+                          user?.email ||
+                          "U")[0].toUpperCase()}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <p
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 700,
+                            color: "var(--t1)",
+                            marginBottom: 2,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {user?.user_metadata?.name || "Freelancer"}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: 11,
+                            color: "var(--t3)",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {user?.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div
+                      style={{
+                        height: 1,
+                        background: "var(--cb)",
+                        marginBottom: 14,
+                      }}
+                    />
+
+                    {/* Subscription Info */}
+                    <div
+                      style={{
+                        background: sub?.unlocked
+                          ? "rgba(34,197,94,0.06)"
+                          : "rgba(245,158,11,0.06)",
+                        border: `1px solid ${sub?.unlocked ? "rgba(34,197,94,0.15)" : "rgba(245,158,11,0.15)"}`,
+                        borderRadius: 10,
+                        padding: "12px 14px",
+                        marginBottom: 14,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          marginBottom: 8,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: "var(--t3)",
+                            textTransform: "uppercase",
+                            letterSpacing: ".08em",
+                          }}
+                        >
+                          Subscription
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 700,
+                            borderRadius: 99,
+                            padding: "2px 8px",
+                            background: sub?.unlocked
+                              ? "rgba(34,197,94,0.12)"
+                              : "rgba(245,158,11,0.12)",
+                            color: sub?.unlocked ? "#4ade80" : "#fbbf24",
+                            border: `1px solid ${sub?.unlocked ? "rgba(34,197,94,0.25)" : "rgba(245,158,11,0.25)"}`,
+                          }}
+                        >
+                          {sub?.unlocked ? "Active" : "Trial"}
+                        </span>
+                      </div>
+
+                      {sub?.unlocked ? (
+                        <div>
+                          <p
+                            style={{
+                              fontSize: 12,
+                              color: "var(--t2)",
+                              marginBottom: 4,
+                            }}
+                          >
+                            Plan:{" "}
+                            <strong style={{ color: "var(--t1)" }}>
+                              {sub?.plan === "yearly"
+                                ? "Pro Annual"
+                                : "Starter Monthly"}
+                            </strong>
+                          </p>
+                          {sub?.expires_at &&
+                            (() => {
+                              const daysRem = Math.max(
+                                0,
+                                Math.ceil(
+                                  (new Date(sub.expires_at) - new Date()) /
+                                    86400000,
+                                ),
+                              );
+                              return (
+                                <div>
+                                  <p
+                                    style={{
+                                      fontSize: 12,
+                                      color: "var(--t2)",
+                                      marginBottom: 6,
+                                    }}
+                                  >
+                                    <strong
+                                      style={{
+                                        color:
+                                          daysRem <= 7 ? "#f87171" : "#4ade80",
+                                      }}
+                                    >
+                                      {daysRem} days
+                                    </strong>{" "}
+                                    remaining
+                                  </p>
+                                  <div
+                                    style={{
+                                      height: 4,
+                                      background: "rgba(255,255,255,0.06)",
+                                      borderRadius: 99,
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        height: "100%",
+                                        borderRadius: 99,
+                                        width: `${Math.min(100, (daysRem / (sub?.plan === "yearly" ? 365 : 30)) * 100)}%`,
+                                        background:
+                                          daysRem <= 7
+                                            ? "#ef4444"
+                                            : "var(--green)",
+                                        transition: "width .3s",
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                        </div>
+                      ) : (
+                        <div>
+                          <p
+                            style={{
+                              fontSize: 12,
+                              color: "var(--t2)",
+                              marginBottom: 6,
+                            }}
+                          >
+                            <strong
+                              style={{
+                                color: daysLeft <= 2 ? "#f87171" : "#fbbf24",
+                              }}
+                            >
+                              {daysLeft} days
+                            </strong>{" "}
+                            left in trial
+                          </p>
+                          <div
+                            style={{
+                              height: 4,
+                              background: "rgba(255,255,255,0.06)",
+                              borderRadius: 99,
+                            }}
+                          >
+                            <div
+                              style={{
+                                height: "100%",
+                                borderRadius: 99,
+                                width: `${(daysLeft / 7) * 100}%`,
+                                background:
+                                  daysLeft <= 2 ? "#ef4444" : "#fbbf24",
+                                transition: "width .3s",
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    {!sub?.unlocked && (
+                      <button
+                        onClick={() => {
+                          setShowProfile(false);
+                          setPayw(true);
+                        }}
+                        style={{
+                          width: "100%",
+                          background:
+                            "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 10,
+                          padding: "10px",
+                          fontSize: 13,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          marginBottom: 8,
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        Upgrade to Pro →
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        setShowProfile(false);
+                        logout();
+                      }}
+                      style={{
+                        width: "100%",
+                        background: "rgba(239,68,68,0.08)",
+                        color: "#f87171",
+                        border: "1px solid rgba(239,68,68,0.15)",
+                        borderRadius: 10,
+                        padding: "9px",
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 6,
+                      }}
+                    >
+                      <Icon n="logout" size={13} color="#f87171" />
+                      Sign Out
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -6204,16 +7352,19 @@ export default function App() {
           }}
         />
       )}
-      {!DEV_SKIP_PAYWALL && !sub?.unlocked && daysLeft === 0 && !showPaywall && (
-        <Paywall
-          daysLeft={0}
-          user={user}
-          onUnlock={() => {
-            setSub(loadSub());
-            setPayw(false);
-          }}
-        />
-      )}
+      {!DEV_SKIP_PAYWALL &&
+        !sub?.unlocked &&
+        daysLeft === 0 &&
+        !showPaywall && (
+          <Paywall
+            daysLeft={0}
+            user={user}
+            onUnlock={() => {
+              setSub(loadSub());
+              setPayw(false);
+            }}
+          />
+        )}
 
       {/* ══ BODY = SIDEBAR + CONTENT ══ */}
       <div className="app-body">
@@ -6329,25 +7480,51 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{
-          minHeight: "100vh", background: "#0d0d12",
-          display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center",
-          padding: 24, textAlign: "center", fontFamily: "sans-serif"
-        }}>
+        <div
+          style={{
+            minHeight: "100vh",
+            background: "#0d0d12",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 24,
+            textAlign: "center",
+            fontFamily: "sans-serif",
+          }}
+        >
           <div style={{ fontSize: 40, marginBottom: 16 }}>⚠️</div>
-          <p style={{ color: "#fff", fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
+          <p
+            style={{
+              color: "#fff",
+              fontSize: 18,
+              fontWeight: 700,
+              marginBottom: 8,
+            }}
+          >
             Something went wrong
           </p>
-          <p style={{ color: "#888", fontSize: 13, marginBottom: 24, maxWidth: 300 }}>
+          <p
+            style={{
+              color: "#888",
+              fontSize: 13,
+              marginBottom: 24,
+              maxWidth: 300,
+            }}
+          >
             {this.state.error?.message || "Unknown error"}
           </p>
           <button
             onClick={() => window.location.reload()}
             style={{
-              background: "#22c55e", color: "#000", border: "none",
-              borderRadius: 10, padding: "12px 24px",
-              fontSize: 14, fontWeight: 700, cursor: "pointer"
+              background: "#22c55e",
+              color: "#000",
+              border: "none",
+              borderRadius: 10,
+              padding: "12px 24px",
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: "pointer",
             }}
           >
             Reload App
