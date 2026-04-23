@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "./supabase";
 
 /* ══════════════════════════════════════════════
@@ -230,6 +231,16 @@ const IC = {
     <svg viewBox="0 0 20 20" fill="none">
       <path
         d="M10 4v12M4 10h12"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  minus: (
+    <svg viewBox="0 0 20 20" fill="none">
+      <path
+        d="M4 10h12"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
@@ -1259,20 +1270,36 @@ const SparkBar = ({ value, max, color = "var(--green)" }) => {
    MODAL
 ══════════════════════════════════════════════ */
 const Modal = ({ open, onClose, title, children, width = 480 }) => {
+  // Lock body scroll when modal open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
   if (!open) return null;
-  return (
+
+  // Use createPortal to render OUTSIDE scroll containers — fixes fixed positioning on mobile
+  return createPortal(
     <div
       onClick={onClose}
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(0,0,0,.6)",
+        background: "rgba(0,0,0,.65)",
         backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
         zIndex: 9999,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 16,
+        overflowY: "auto",
       }}
     >
       <div
@@ -1281,9 +1308,11 @@ const Modal = ({ open, onClose, title, children, width = 480 }) => {
         style={{
           width: "100%",
           maxWidth: width,
-          maxHeight: "92vh",
+          maxHeight: "92dvh",
           overflowY: "auto",
           padding: "22px 24px",
+          margin: "auto",
+          animation: "scaleIn .2s cubic-bezier(.34,1.56,.64,1) both",
         }}
       >
         <div
@@ -1322,7 +1351,8 @@ const Modal = ({ open, onClose, title, children, width = 480 }) => {
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 
@@ -2860,6 +2890,435 @@ const GroupedList = ({ transactions, onEdit, onDelete, onTogglePaid }) => {
           </div>
         );
       })}
+    </div>
+  );
+};
+
+/* ══════════════════════════════════════════════
+   MINI INCOME CHART — SVG sparkline
+══════════════════════════════════════════════ */
+const MiniChart = ({ transactions }) => {
+  const days = 14;
+  const today = new Date();
+
+  // Build last N days data
+  const pts = Array.from({ length: days }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (days - 1 - i));
+    const iso = d.toISOString().slice(0, 10);
+    const income = transactions
+      .filter((t) => t.date === iso && t.type === "income")
+      .reduce((s, t) => s + t.amount, 0);
+    const label = d.getDate();
+    return { iso, income, label };
+  });
+
+  const maxVal = Math.max(...pts.map((p) => p.income), 1);
+  const W = 100,
+    H = 36;
+  const pad = 2;
+
+  const coords = pts.map((p, i) => {
+    const x = pad + (i / (days - 1)) * (W - 2 * pad);
+    const y = H - pad - (p.income / maxVal) * (H - 2 * pad);
+    return { x, y, ...p };
+  });
+
+  const pathD = coords
+    .map((c, i) => (i === 0 ? `M${c.x},${c.y}` : `L${c.x},${c.y}`))
+    .join(" ");
+
+  const areaD = `${pathD} L${coords[coords.length - 1].x},${H} L${coords[0].x},${H} Z`;
+
+  const hasData = pts.some((p) => p.income > 0);
+
+  return (
+    <div style={{ width: "100%", position: "relative" }}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        style={{ width: "100%", height: 48, display: "block" }}
+      >
+        <defs>
+          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#22c55e" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {hasData ? (
+          <>
+            <path d={areaD} fill="url(#chartGrad)" />
+            <path
+              d={pathD}
+              fill="none"
+              stroke="#22c55e"
+              strokeWidth="0.8"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+            {/* Highlight today's dot */}
+            <circle
+              cx={coords[coords.length - 1].x}
+              cy={coords[coords.length - 1].y}
+              r="1.5"
+              fill="#4ade80"
+            />
+          </>
+        ) : (
+          <line
+            x1={pad}
+            y1={H / 2}
+            x2={W - pad}
+            y2={H / 2}
+            stroke="rgba(255,255,255,0.06)"
+            strokeWidth="0.8"
+            strokeDasharray="2,2"
+          />
+        )}
+      </svg>
+      {/* X axis labels */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: 2,
+        }}
+      >
+        {[0, Math.floor(days / 2), days - 1].map((i) => (
+          <span key={i} style={{ fontSize: 9, color: "var(--t3)" }}>
+            {pts[i]?.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ══════════════════════════════════════════════
+   DASHBOARD HERO BANNER
+══════════════════════════════════════════════ */
+const DashHero = ({ transactions, goal, openAdd }) => {
+  const now = new Date();
+  const mk = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const monthName = now.toLocaleString("en-IN", { month: "long" });
+
+  const mtx = transactions.filter((t) => t.date.startsWith(mk));
+  const inc = mtx
+    .filter((t) => t.type === "income")
+    .reduce((s, t) => s + t.amount, 0);
+  const exp = mtx
+    .filter((t) => t.type === "expense")
+    .reduce((s, t) => s + t.amount, 0);
+  const recd = mtx
+    .filter((t) => t.type === "income" && t.paid)
+    .reduce((s, t) => s + t.amount, 0);
+  const pend = mtx
+    .filter((t) => t.type === "income" && !t.paid)
+    .reduce((s, t) => s + t.amount, 0);
+  const net = inc - exp;
+
+  const goalAmt = goal?.monthly || 0;
+  const goalPct =
+    goalAmt > 0 ? Math.min(100, Math.round((inc / goalAmt) * 100)) : 0;
+
+  // Days left in month
+  const daysInMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+  ).getDate();
+  const daysLeft = daysInMonth - now.getDate();
+  const dailyNeeded =
+    daysLeft > 0 && goalAmt > inc ? Math.ceil((goalAmt - inc) / daysLeft) : 0;
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      {/* Hero card */}
+      <div
+        className="gc"
+        style={{
+          padding: "24px 24px 20px",
+          marginBottom: 12,
+          background:
+            "linear-gradient(145deg, var(--surface2) 0%, var(--surface) 100%)",
+          border: "1px solid var(--cb)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Subtle glow */}
+        <div
+          style={{
+            position: "absolute",
+            top: -40,
+            right: -40,
+            width: 160,
+            height: 160,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${inc > 0 ? "rgba(34,197,94,0.08)" : "rgba(99,102,241,0.06)"}, transparent 70%)`,
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Header row */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            marginBottom: 20,
+          }}
+        >
+          <div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
+                marginBottom: 5,
+              }}
+            >
+              <div
+                className="blink"
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: "var(--green)",
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: ".1em",
+                  textTransform: "uppercase",
+                  color: "var(--t3)",
+                }}
+              >
+                {monthName} {now.getFullYear()}
+              </span>
+            </div>
+            <p style={{ fontSize: 12, color: "var(--t3)" }}>Total Income</p>
+          </div>
+
+          <div style={{ display: "flex", gap: 6 }}>
+            <button
+              onClick={() => openAdd("income", "")}
+              className="btn-i"
+              style={{
+                padding: "7px 14px",
+                fontSize: 12,
+                borderRadius: 8,
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              <Icon n="plus" size={12} color="#fff" />
+              Income
+            </button>
+            <button
+              onClick={() => openAdd("expense", "")}
+              className="btn-ghost"
+              style={{
+                padding: "7px 12px",
+                fontSize: 12,
+                borderRadius: 8,
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              <Icon n="minus" size={12} />
+              Expense
+            </button>
+          </div>
+        </div>
+
+        {/* Big number */}
+        <div style={{ marginBottom: 8 }}>
+          <span
+            className="num"
+            style={{
+              fontSize: "clamp(32px, 7vw, 48px)",
+              fontWeight: 800,
+              color: inc > 0 ? "var(--green)" : "var(--t2)",
+              letterSpacing: "-.05em",
+              lineHeight: 1,
+            }}
+          >
+            {fmtINR(inc)}
+          </span>
+          {net !== inc && (
+            <span style={{ fontSize: 12, color: "var(--t3)", marginLeft: 10 }}>
+              Net{" "}
+              <span
+                className="num"
+                style={{
+                  color: net >= 0 ? "var(--green)" : "var(--red)",
+                  fontWeight: 600,
+                }}
+              >
+                {net >= 0 ? "+" : ""}
+                {fmtINR(net)}
+              </span>
+            </span>
+          )}
+        </div>
+
+        {/* Goal progress bar */}
+        {goalAmt > 0 && (
+          <div style={{ marginBottom: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 5,
+              }}
+            >
+              <span style={{ fontSize: 11, color: "var(--t3)" }}>
+                Goal:{" "}
+                <span
+                  className="num"
+                  style={{ color: "var(--t2)", fontWeight: 600 }}
+                >
+                  {fmtINR(goalAmt)}
+                </span>
+              </span>
+              <span
+                style={{
+                  fontSize: 11,
+                  color: goalPct >= 100 ? "var(--green)" : "var(--t3)",
+                  fontWeight: 700,
+                }}
+              >
+                {goalPct}%
+              </span>
+            </div>
+            <div
+              style={{
+                height: 5,
+                background: "rgba(255,255,255,0.06)",
+                borderRadius: 99,
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  width: `${goalPct}%`,
+                  background:
+                    goalPct >= 100
+                      ? "var(--green)"
+                      : goalPct >= 60
+                        ? "var(--green)"
+                        : goalPct >= 30
+                          ? "var(--amber)"
+                          : "var(--red)",
+                  borderRadius: 99,
+                  transition: "width .5s ease",
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Mini chart */}
+        <MiniChart transactions={transactions} />
+      </div>
+
+      {/* Stats row — 4 cards */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: 10,
+        }}
+      >
+        {[
+          {
+            label: "Received",
+            value: fmtINR(recd),
+            icon: "check",
+            color: "var(--green)",
+            sub: `${mtx.filter((t) => t.type === "income" && t.paid).length} invoices`,
+          },
+          {
+            label: "Pending",
+            value: fmtINR(pend),
+            icon: "clock",
+            color: pend > 0 ? "var(--amber)" : "var(--t3)",
+            sub: pend > 0 ? "Awaiting payment" : "All clear ✓",
+          },
+          {
+            label: "Expenses",
+            value: fmtINR(exp),
+            icon: "minus",
+            color: exp > 0 ? "var(--red)" : "var(--t3)",
+            sub: `${mtx.filter((t) => t.type === "expense").length} entries`,
+          },
+          {
+            label: "Daily Target",
+            value: dailyNeeded > 0 ? fmtINR(dailyNeeded) : "—",
+            icon: "target",
+            color: "var(--indigo)",
+            sub:
+              daysLeft > 0 ? `${daysLeft}d left in month` : "Month ends today",
+          },
+        ].map((c) => (
+          <div key={c.label} className="gc" style={{ padding: "14px 16px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: 8,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: ".08em",
+                  textTransform: "uppercase",
+                  color: "var(--t3)",
+                }}
+              >
+                {c.label}
+              </span>
+              <div
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 7,
+                  background: `${c.color}14`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Icon n={c.icon} size={12} color={c.color} />
+              </div>
+            </div>
+            <div
+              className="num"
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                color: c.color,
+                marginBottom: 2,
+                letterSpacing: "-.03em",
+              }}
+            >
+              {c.value}
+            </div>
+            <p style={{ fontSize: 10, color: "var(--t3)" }}>{c.sub}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -5479,10 +5938,8 @@ const Dashboard = ({
         />
       )}
 
-      {/* ── TOP: full-width ── */}
-      <TodayOverview transactions={transactions} />
-      <MonthlyGoal transactions={transactions} goal={goal} setGoal={setGoal} />
-      <StatsRow transactions={rangeFiltered} />
+      {/* ── HERO ── */}
+      <DashHero transactions={transactions} goal={goal} openAdd={openAdd} />
 
       {/* ── BODY: 2-col on desktop, 1-col on mobile/tablet ── */}
       <div className="dash-grid">
