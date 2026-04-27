@@ -4928,18 +4928,16 @@ const Paywall = ({ daysLeft, onUnlock, onClose, user }) => {
         selPlan === "yearly"
           ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-      await supabase
-        .from("subscriptions")
-        .upsert(
-          {
-            user_id: user.id,
-            plan: selPlan,
-            status: "active",
-            unlock_code: trimmed,
-            expires_at: expiresAt,
-          },
-          { onConflict: "user_id" },
-        );
+      await supabase.from("subscriptions").upsert(
+        {
+          user_id: user.id,
+          plan: selPlan,
+          status: "active",
+          unlock_code: trimmed,
+          expires_at: expiresAt,
+        },
+        { onConflict: "user_id" },
+      );
       if (codeRow) {
         await supabase
           .from("unlock_codes")
@@ -4978,8 +4976,8 @@ const Paywall = ({ daysLeft, onUnlock, onClose, user }) => {
 
   const payLink =
     selPlan === "yearly"
-      ? "https://rzp.io/rzp/FQ6PDFlu"
-      : "https://rzp.io/rzp/So1SE4j";
+      ? "https://rzp.io/rzp/So1SE4j"
+      : "https://rzp.io/rzp/FQ6PDFlu";
 
   if (success) {
     return (
