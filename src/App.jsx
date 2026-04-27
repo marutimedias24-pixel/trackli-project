@@ -7048,6 +7048,14 @@ export default function App() {
   });
   const daysLeft = sub ? getTrialDaysLeft(sub) : 7;
 
+  const requirePro = useCallback(() => {
+    if (DEV_SKIP_PAYWALL) return true;
+    if (sub?.unlocked) return true;
+    if (daysLeft > 0) return true;
+    setPayw(true);
+    return false;
+  }, [sub, daysLeft]);
+
   // Apply theme
   useEffect(() => {
     updateTheme(darkMode);
@@ -7161,6 +7169,7 @@ export default function App() {
   const addTx = useCallback(
     async (tx) => {
       if (!user?.id) return;
+      if (!requirePro()) return;
       const row = {
         id: tx.id,
         user_id: user.id,
@@ -7175,11 +7184,12 @@ export default function App() {
       setTx((p) => [row, ...p]);
       await supabase.from("transactions").insert(row);
     },
-    [user],
+    [user, requirePro],
   );
 
   const saveTxEdit = useCallback(
     async (u) => {
+      if (!requirePro()) return;
       setTx((p) => p.map((t) => (t.id === u.id ? u : t)));
       setEditTx(null);
       await supabase
@@ -7188,19 +7198,21 @@ export default function App() {
         .eq("id", u.id)
         .eq("user_id", user?.id);
     },
-    [user],
+    [user, requirePro],
   );
 
   const confirmDel = useCallback(async () => {
     if (!delTx) return;
+    if (!requirePro()) return;
     setTx((p) => p.filter((t) => t.id !== delTx.id));
     setDelTx(null);
     await supabase.from("transactions").delete().eq("id", delTx.id);
-  }, [delTx]);
+  }, [delTx, requirePro]);
 
   const togglePaid = useCallback(
     async (id) => {
       if (!user) return;
+      if (!requirePro()) return;
       // Find current value
       let newPaid = false;
       setTx((p) =>
@@ -7224,11 +7236,12 @@ export default function App() {
         );
       }
     },
-    [user],
+    [user, requirePro],
   );
 
   const handleAddClient = useCallback(
     async (name) => {
+      if (!requirePro()) return;
       setEC((p) => [...p, name]);
       if (!user) return;
       await supabase
@@ -7236,11 +7249,12 @@ export default function App() {
         .insert({ user_id: user.id, name })
         .select();
     },
-    [user],
+    [user, requirePro],
   );
 
   const deleteClient = useCallback(
     async (name) => {
+      if (!requirePro()) return;
       setTx((p) => p.filter((t) => t.client !== name));
       setEC((p) => p.filter((c) => c !== name));
       if (!user) return;
@@ -7255,12 +7269,13 @@ export default function App() {
         .eq("user_id", user.id)
         .eq("name", name);
     },
-    [user],
+    [user, requirePro],
   );
 
   const markAllPaid = useCallback(
     async (clientName) => {
       if (!user) return;
+      if (!requirePro()) return;
       const ids = [];
       setTx((p) =>
         p.map((t) => {
@@ -7280,7 +7295,7 @@ export default function App() {
         if (error) console.error("markAllPaid failed for", id, error.message);
       }
     },
-    [user],
+    [user, requirePro],
   );
 
   const openAdd = (type = "income", client = "") =>
