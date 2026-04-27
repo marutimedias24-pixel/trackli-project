@@ -492,7 +492,7 @@ const saveArchive = (a) => {
 // ── SUBSCRIPTION ──
 const UNLOCK_CODES = ["FREELANCER60", "FL60PRO", "VIDEOEDITOR60"]; // add more when someone pays
 const TRIAL_DAYS = 7;
-const DEV_SKIP_PAYWALL = true; // ← LAUNCH SE PEHLE false KARO!
+const DEV_SKIP_PAYWALL = false; // ← LAUNCH SE PEHLE false KARO!
 const loadSub = () => {
   try {
     const r = localStorage.getItem("flt_sub");
@@ -4925,18 +4925,16 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
         selPlan === "yearly"
           ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-      await supabase
-        .from("subscriptions")
-        .upsert(
-          {
-            user_id: user.id,
-            plan: selPlan,
-            status: "active",
-            unlock_code: trimmed,
-            expires_at: expiresAt,
-          },
-          { onConflict: "user_id" },
-        );
+      await supabase.from("subscriptions").upsert(
+        {
+          user_id: user.id,
+          plan: selPlan,
+          status: "active",
+          unlock_code: trimmed,
+          expires_at: expiresAt,
+        },
+        { onConflict: "user_id" },
+      );
       if (codeRow) {
         await supabase
           .from("unlock_codes")
