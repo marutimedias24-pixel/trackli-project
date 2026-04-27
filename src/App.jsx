@@ -4892,12 +4892,15 @@ const PlanCard = ({
 /* ══════════════════════════════════════════════
    PAYWALL / SUBSCRIPTION — Glass Morphism
 ══════════════════════════════════════════════ */
-const Paywall = ({ daysLeft, onUnlock, user }) => {
+const Paywall = ({ daysLeft, onUnlock, onClose, user }) => {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [selPlan, setSelPlan] = useState("yearly");
+  const [verifying, setVerifying] = useState(false);
+  const [verifyMsg, setVerifyMsg] = useState("");
   const trialOver = daysLeft === 0;
+  const setPayw = onClose; // alias for close button
 
   const tryUnlock = async () => {
     const trimmed = code.trim().toUpperCase();
@@ -4925,16 +4928,18 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
         selPlan === "yearly"
           ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-      await supabase.from("subscriptions").upsert(
-        {
-          user_id: user.id,
-          plan: selPlan,
-          status: "active",
-          unlock_code: trimmed,
-          expires_at: expiresAt,
-        },
-        { onConflict: "user_id" },
-      );
+      await supabase
+        .from("subscriptions")
+        .upsert(
+          {
+            user_id: user.id,
+            plan: selPlan,
+            status: "active",
+            unlock_code: trimmed,
+            expires_at: expiresAt,
+          },
+          { onConflict: "user_id" },
+        );
       if (codeRow) {
         await supabase
           .from("unlock_codes")
@@ -5060,39 +5065,38 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
         padding: "clamp(16px, 4vw, 40px) clamp(14px, 3vw, 28px)",
       }}
     >
-      {!trialOver && (
-        <button
-          onClick={onUnlock}
-          aria-label="Close"
-          style={{
-            position: "fixed",
-            top: 18,
-            right: 18,
-            zIndex: 10000,
-            width: 36,
-            height: 36,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.08)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            color: "rgba(255,255,255,0.85)",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            transition: "all .15s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(255,255,255,0.16)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-          }}
-        >
-          <Icon n="close" size={14} color="currentColor" />
-        </button>
-      )}
+      {/* Close button — always visible, just dismisses paywall */}
+      <button
+        onClick={() => setPayw(false)}
+        aria-label="Close"
+        style={{
+          position: "fixed",
+          top: 18,
+          right: 18,
+          zIndex: 10000,
+          width: 36,
+          height: 36,
+          borderRadius: "50%",
+          background: "rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.15)",
+          color: "rgba(255,255,255,0.85)",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          transition: "all .15s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(255,255,255,0.16)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+        }}
+      >
+        <Icon n="close" size={14} color="currentColor" />
+      </button>
 
       <div
         style={{
@@ -5261,7 +5265,7 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
             textAlign: "center",
             fontSize: 11.5,
             color: "rgba(255,255,255,0.4)",
-            marginBottom: 28,
+            marginBottom: 20,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -5274,116 +5278,166 @@ const Paywall = ({ daysLeft, onUnlock, user }) => {
           <span>UPI, Cards, Net Banking</span>
         </p>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 14,
-            maxWidth: 440,
-            margin: "0 auto 20px",
-          }}
-        >
-          <div
-            style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }}
-          />
-          <span
+        {/* Already paid? Verify button */}
+        <div style={{ maxWidth: 440, margin: "0 auto 16px" }}>
+          <button
+            onClick={async () => {
+              setVerifying(true);
+              setVerifyMsg("");
+              try {
+                const { data } = await supabase
+                  .from("subscriptions")
+                  .select("*")
+                  .eq("user_id", user?.id)
+                  .eq("status", "active")
+                  .maybeSingle();
+                if (data) {
+                  const sub = loadSub();
+                  sub.unlocked = true;
+                  sub.plan = data.plan;
+                  sub.unlockedAt = data.created_at;
+                  sub.expiresAt = data.expires_at;
+                  saveSub(sub);
+                  setSuccess(true);
+                  setTimeout(() => onUnlock(), 1200);
+                } else {
+                  setVerifyMsg(
+                    "No active subscription found. Please complete payment first.",
+                  );
+                }
+              } catch (e) {
+                setVerifyMsg("Could not verify. Please try again.");
+              }
+              setVerifying(false);
+            }}
+            disabled={verifying}
             style={{
-              fontSize: 11,
-              color: "rgba(255,255,255,0.3)",
+              width: "100%",
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              color: "rgba(255,255,255,0.75)",
+              borderRadius: 12,
+              padding: "13px",
+              fontSize: 13,
               fontWeight: 600,
-              letterSpacing: ".08em",
-              textTransform: "uppercase",
+              cursor: verifying ? "not-allowed" : "pointer",
+              fontFamily: "inherit",
+              transition: "all .15s",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+            }}
+            onMouseEnter={(e) => {
+              if (!verifying)
+                e.currentTarget.style.background = "rgba(255,255,255,0.09)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.05)";
             }}
           >
-            Or
-          </span>
-          <div
-            style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }}
-          />
-        </div>
-
-        <div
-          style={{
-            maxWidth: 440,
-            margin: "0 auto",
-            background: "rgba(255,255,255,0.04)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 14,
-            padding: "18px 20px",
-          }}
-        >
-          <p
-            style={{
-              fontSize: 12,
-              color: "rgba(255,255,255,0.5)",
-              marginBottom: 12,
-              textAlign: "center",
-              lineHeight: 1.5,
-            }}
-          >
-            Have an unlock code? Enter it below to activate Pro instantly.
-          </p>
-          <div style={{ display: "flex", gap: 8 }}>
-            <input
-              value={code}
-              onChange={(e) => {
-                setCode(e.target.value);
-                setError("");
-              }}
-              onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
-              placeholder="UNLOCK-CODE"
-              style={{
-                flex: 1,
-                background: "rgba(0,0,0,0.25)",
-                border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.1)"}`,
-                borderRadius: 10,
-                padding: "10px 14px",
-                color: "#fff",
-                fontSize: 13,
-                outline: "none",
-                fontFamily: "inherit",
-                letterSpacing: ".04em",
-                textTransform: "uppercase",
-              }}
-            />
-            <button
-              onClick={tryUnlock}
-              disabled={!code.trim()}
-              style={{
-                background: code.trim() ? "#fff" : "rgba(255,255,255,0.1)",
-                color: code.trim() ? "#0d0d12" : "rgba(255,255,255,0.4)",
-                border: "none",
-                borderRadius: 10,
-                padding: "10px 20px",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: code.trim() ? "pointer" : "not-allowed",
-                whiteSpace: "nowrap",
-                fontFamily: "inherit",
-                transition: "all .15s",
-              }}
-            >
-              Unlock
-            </button>
-          </div>
-          {error && (
+            {verifying ? (
+              <>Checking...</>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M7 1v2M7 11v2M1 7h2M11 7h2M3 3l1.4 1.4M9.6 9.6L11 11M3 11l1.4-1.4M9.6 4.4L11 3"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                Already paid? Verify my payment
+              </>
+            )}
+          </button>
+          {verifyMsg && (
             <p
               style={{
-                fontSize: 11.5,
+                fontSize: 12,
                 color: "#f87171",
-                marginTop: 10,
-                display: "flex",
-                alignItems: "flex-start",
-                gap: 6,
-                lineHeight: 1.45,
+                marginTop: 8,
+                textAlign: "center",
               }}
             >
-              <Icon n="alert" size={12} color="#f87171" />
-              <span style={{ flex: 1 }}>{error}</span>
+              {verifyMsg}
             </p>
           )}
+        </div>
+
+        {/* Hidden unlock code — for giveaway winners only */}
+        <div style={{ maxWidth: 440, margin: "0 auto" }}>
+          <details style={{ cursor: "pointer" }}>
+            <summary
+              style={{
+                fontSize: 11,
+                color: "rgba(255,255,255,0.2)",
+                textAlign: "center",
+                listStyle: "none",
+                userSelect: "none",
+              }}
+            >
+              Have a giveaway code?
+            </summary>
+            <div
+              style={{
+                marginTop: 10,
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                borderRadius: 12,
+                padding: "14px 16px",
+              }}
+            >
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value);
+                    setError("");
+                  }}
+                  onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
+                  placeholder="GIVEAWAY-CODE"
+                  style={{
+                    flex: 1,
+                    background: "rgba(0,0,0,0.25)",
+                    border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.08)"}`,
+                    borderRadius: 10,
+                    padding: "10px 14px",
+                    color: "#fff",
+                    fontSize: 13,
+                    outline: "none",
+                    fontFamily: "inherit",
+                    letterSpacing: ".04em",
+                    textTransform: "uppercase",
+                  }}
+                />
+                <button
+                  onClick={tryUnlock}
+                  disabled={!code.trim()}
+                  style={{
+                    background: code.trim() ? "#fff" : "rgba(255,255,255,0.08)",
+                    color: code.trim() ? "#0d0d12" : "rgba(255,255,255,0.3)",
+                    border: "none",
+                    borderRadius: 10,
+                    padding: "10px 18px",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: code.trim() ? "pointer" : "not-allowed",
+                    fontFamily: "inherit",
+                    transition: "all .15s",
+                  }}
+                >
+                  Apply
+                </button>
+              </div>
+              {error && (
+                <p style={{ fontSize: 11.5, color: "#f87171", marginTop: 8 }}>
+                  {error}
+                </p>
+              )}
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -7820,6 +7874,7 @@ export default function App() {
         <Paywall
           daysLeft={daysLeft}
           user={user}
+          onClose={() => setPayw(false)}
           onUnlock={() => {
             setSub(loadSub());
             setPayw(false);
@@ -7833,6 +7888,7 @@ export default function App() {
           <Paywall
             daysLeft={0}
             user={user}
+            onClose={() => setPayw(false)}
             onUnlock={() => {
               setSub(loadSub());
               setPayw(false);
