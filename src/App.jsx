@@ -490,9 +490,9 @@ const saveArchive = (a) => {
 };
 
 // ── SUBSCRIPTION ──
-const UNLOCK_CODES = ["FREELANCER60", "FL60PRO", "VIDEOEDITOR60"]; // add more when someone pays
+// UNLOCK_CODES removed from frontend — validated server-side only
 const TRIAL_DAYS = 7;
-const DEV_SKIP_PAYWALL = false; // ← LAUNCH SE PEHLE false KARO!
+const DEV_SKIP_PAYWALL = false;
 const loadSub = () => {
   try {
     const r = localStorage.getItem("flt_sub");
@@ -539,10 +539,9 @@ const saveClients = (a) => {
 };
 
 /* ══════════════════════════════════════════════
-   AUTH
+   AUTH — handled entirely by Supabase
+   No local password storage or bypass
 ══════════════════════════════════════════════ */
-const PASS_KEY = "flt_auth_v1";
-const CORRECT_PASSWORD = "freelancer123";
 
 /* ══════════════════════════════════════════════
    DESIGN TOKENS
@@ -4904,55 +4903,30 @@ const Paywall = ({ daysLeft, onUnlock, onClose, user }) => {
 
   const tryUnlock = async () => {
     const trimmed = code.trim().toUpperCase();
-    if (!UNLOCK_CODES.includes(trimmed)) {
-      setError(
-        "Invalid code. You'll receive your unlock code on WhatsApp after payment.",
+    if (!trimmed) return;
+    setError("");
+    try {
+      // Server-side validation — codes never exposed in frontend bundle
+      const { data, error: fnErr } = await supabase.functions.invoke(
+        "validate-unlock-code",
+        {
+          body: { code: trimmed, user_id: user?.id, plan: selPlan },
+        },
       );
-      return;
-    }
-    const { data: codeRow } = await supabase
-      .from("unlock_codes")
-      .select("*")
-      .eq("code", trimmed)
-      .maybeSingle();
-    if (codeRow && codeRow.is_used && codeRow.used_by !== user?.id) {
-      setError("This code has already been used.");
-      return;
-    }
-    const sub = loadSub();
-    sub.unlocked = true;
-    sub.unlockedAt = new Date().toISOString();
-    saveSub(sub);
-    if (user?.id) {
-      const expiresAt =
-        selPlan === "yearly"
-          ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-      await supabase
-        .from("subscriptions")
-        .upsert(
-          {
-            user_id: user.id,
-            plan: selPlan,
-            status: "active",
-            unlock_code: trimmed,
-            expires_at: expiresAt,
-          },
-          { onConflict: "user_id" },
-        );
-      if (codeRow) {
-        await supabase
-          .from("unlock_codes")
-          .update({
-            is_used: true,
-            used_by: user.id,
-            used_at: new Date().toISOString(),
-          })
-          .eq("code", trimmed);
+      if (fnErr || !data?.valid) {
+        setError(data?.message || "Invalid code. Please check and try again.");
+        return;
       }
+      const s = loadSub();
+      s.unlocked = true;
+      s.unlockedAt = new Date().toISOString();
+      s.plan = data.plan || selPlan;
+      saveSub(s);
+      setSuccess(true);
+      setTimeout(() => onUnlock(), 1500);
+    } catch (e) {
+      setError("Could not validate code. Please try again.");
     }
-    setSuccess(true);
-    setTimeout(() => onUnlock(), 1500);
   };
 
   const monthlyFeatures = [
