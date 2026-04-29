@@ -4928,16 +4928,18 @@ const Paywall = ({ daysLeft, onUnlock, onClose, user }) => {
         selPlan === "yearly"
           ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
           : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-      await supabase.from("subscriptions").upsert(
-        {
-          user_id: user.id,
-          plan: selPlan,
-          status: "active",
-          unlock_code: trimmed,
-          expires_at: expiresAt,
-        },
-        { onConflict: "user_id" },
-      );
+      await supabase
+        .from("subscriptions")
+        .upsert(
+          {
+            user_id: user.id,
+            plan: selPlan,
+            status: "active",
+            unlock_code: trimmed,
+            expires_at: expiresAt,
+          },
+          { onConflict: "user_id" },
+        );
       if (codeRow) {
         await supabase
           .from("unlock_codes")
@@ -7196,7 +7198,9 @@ export default function App() {
           // Supabase mein nahi — localStorage check karo (trial)
           const s = initTrial();
           setSub(s);
-          if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) <= 3)
+          if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) === 0)
+            setPayw(true);
+          else if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) <= 3)
             setPayw(true);
         }
       } catch (e) {
@@ -7879,20 +7883,6 @@ export default function App() {
           }}
         />
       )}
-      {!DEV_SKIP_PAYWALL &&
-        !sub?.unlocked &&
-        daysLeft === 0 &&
-        !showPaywall && (
-          <Paywall
-            daysLeft={0}
-            user={user}
-            onClose={() => setPayw(false)}
-            onUnlock={() => {
-              setSub(loadSub());
-              setPayw(false);
-            }}
-          />
-        )}
 
       {/* ══ BODY = SIDEBAR + CONTENT ══ */}
       <div className="app-body">
