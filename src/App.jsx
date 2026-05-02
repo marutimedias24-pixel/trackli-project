@@ -3622,7 +3622,12 @@ const StatsRow = ({ transactions }) => {
    PENDING SUMMARY
 ══════════════════════════════════════════════ */
 const PendingSummary = ({ transactions }) => {
-  const incTx = transactions.filter((t) => t.type === "income");
+  const now = new Date();
+  const currentMK = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  // Sirf current month ka pending dikha — purana data nahi
+  const incTx = transactions.filter(
+    (t) => t.type === "income" && t.date.startsWith(currentMK),
+  );
   const pendTx = incTx.filter((t) => !t.paid);
   const recdTx = incTx.filter((t) => t.paid);
   const tP = pendTx.reduce((s, t) => s + t.amount, 0);
@@ -3961,7 +3966,10 @@ const ClientPanel = (props) => {
   );
 
   const monthTx = useMemo(() => {
-    if (selMonth === currentMonthKey) return rangeFiltered;
+    if (selMonth === currentMonthKey) {
+      // Sirf current month ka data — no old months leaking in
+      return rangeFiltered.filter((t) => t.date.startsWith(currentMonthKey));
+    }
     return archive[selMonth] || [];
   }, [selMonth, rangeFiltered, archive, currentMonthKey]);
 
@@ -7065,8 +7073,6 @@ export default function App() {
   const [showPaywall, setPayw] = useState(false);
   const [showPwReset, setShowPwReset] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
-  const [celebStats, setCelebStats] = useState(null);
   const [darkMode, setDark] = useState(() => {
     try {
       const s = localStorage.getItem("flt_theme");
@@ -7096,46 +7102,6 @@ export default function App() {
       localStorage.setItem("flt_theme", d ? "dark" : "light");
     } catch {}
   };
-
-  // ── MONTH RESET — naye mahine mein auto archive ──
-  useEffect(() => {
-    if (!user || !transactions.length) return;
-    const now = new Date();
-    const currentMK = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-    const lastMK = loadLastMonth();
-    if (lastMK && lastMK !== currentMK) {
-      const archive = loadArchive();
-      archive[lastMK] = transactions.filter((t) => t.date.startsWith(lastMK));
-      saveArchive(archive);
-      const oldTx = archive[lastMK];
-      const income = oldTx
-        .filter((t) => t.type === "income")
-        .reduce((s, t) => s + t.amount, 0);
-      const received = oldTx
-        .filter((t) => t.type === "income" && t.paid)
-        .reduce((s, t) => s + t.amount, 0);
-      const videos = oldTx.filter((t) => t.type === "income").length;
-      const clientMap = {};
-      oldTx
-        .filter((t) => t.type === "income")
-        .forEach((t) => {
-          clientMap[t.client] = (clientMap[t.client] || 0) + t.amount;
-        });
-      const topClient = Object.entries(clientMap).sort(
-        (a, b) => b[1] - a[1],
-      )[0];
-      setCelebStats({
-        income,
-        received,
-        videos,
-        clients: Object.keys(clientMap).length,
-        topClient: topClient?.[0],
-        topAmount: topClient?.[1],
-      });
-      setShowCelebration(true);
-    }
-    saveLastMonth(currentMK);
-  }, [user, transactions]);
 
   // Supabase auth
   useEffect(() => {
@@ -7887,17 +7853,6 @@ export default function App() {
           ))}
         </div>
       </header>
-
-      {/* ══ NEW MONTH CELEBRATION ══ */}
-      {showCelebration && celebStats && (
-        <NewMonthCelebration
-          stats={celebStats}
-          monthName={
-            MONTHS[new Date().getMonth() === 0 ? 11 : new Date().getMonth() - 1]
-          }
-          onClose={() => setShowCelebration(false)}
-        />
-      )}
 
       {/* ══ PAYWALL ══ */}
       {showPaywall && (
