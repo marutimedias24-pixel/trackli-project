@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { createPortal } from "react-dom";
 import { supabase } from "./supabase";
 
 /* ══════════════════════════════════════════════
@@ -231,16 +230,6 @@ const IC = {
     <svg viewBox="0 0 20 20" fill="none">
       <path
         d="M10 4v12M4 10h12"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  ),
-  minus: (
-    <svg viewBox="0 0 20 20" fill="none">
-      <path
-        d="M4 10h12"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
@@ -490,9 +479,8 @@ const saveArchive = (a) => {
 };
 
 // ── SUBSCRIPTION ──
-// UNLOCK_CODES removed from frontend — validated server-side only
-const TRIAL_DAYS = 7;
-const DEV_SKIP_PAYWALL = false;
+const UNLOCK_CODES = ["FREELANCER60", "FL60PRO", "VIDEOEDITOR60"]; // add more when someone pays
+const TRIAL_DAYS = 30;
 const loadSub = () => {
   try {
     const r = localStorage.getItem("flt_sub");
@@ -539,9 +527,10 @@ const saveClients = (a) => {
 };
 
 /* ══════════════════════════════════════════════
-   AUTH — handled entirely by Supabase
-   No local password storage or bypass
+   AUTH
 ══════════════════════════════════════════════ */
+const PASS_KEY = "flt_auth_v1";
+const CORRECT_PASSWORD = "freelancer123";
 
 /* ══════════════════════════════════════════════
    DESIGN TOKENS
@@ -585,13 +574,9 @@ const C = {
 ══════════════════════════════════════════════ */
 const injectStyles = (dark = true) => {
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-  // Always update styles — prevents HMR stale CSS bug
-  let s = document.getElementById("flt-styles");
-  if (!s) {
-    s = document.createElement("style");
-    s.id = "flt-styles";
-    document.head.appendChild(s);
-  }
+  if (document.getElementById("flt-s")) return;
+  const s = document.createElement("style");
+  s.id = "flt-s";
   s.textContent = `
     @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&display=swap');
 
@@ -657,22 +642,15 @@ const injectStyles = (dark = true) => {
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { height: 100%; font-size: 15px; scroll-behavior: smooth; width: 100%; }
+    html { height: 100%; font-size: 15px; scroll-behavior: smooth; }
     body {
       background: var(--bg); color: var(--t1);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh; overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       transition: background .25s, color .25s;
-      margin: 0 !important; padding: 0 !important; width: 100% !important;
     }
-    /* Override Vite default index.css #root constraints */
-    #root {
-      min-height: 100vh; display: flex; flex-direction: column;
-      width: 100% !important; max-width: 100% !important;
-      margin: 0 !important; padding: 0 !important;
-      text-align: unset !important;
-    }
+    #root { min-height: 100vh; display: flex; flex-direction: column; }
     input, select, button, textarea { font-family: inherit; }
     ::placeholder { color: var(--t3); }
     ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -737,16 +715,8 @@ const injectStyles = (dark = true) => {
     .main-content {
       flex: 1; min-width: 0; /* prevents overflow */
       height: 100%; overflow-y: auto;
-      padding: 20px 24px 60px;
+      padding: 20px 28px 60px;
       background: var(--bg);
-    }
-
-    /* ── CONTENT WRAP — comfortable max-width on large screens ── */
-    .content-wrap {
-      width: 100%;
-      max-width: 1400px;
-      margin: 0 auto;
-      box-sizing: border-box;
     }
 
     /* Sidebar nav items */
@@ -928,7 +898,7 @@ const injectStyles = (dark = true) => {
     /* Full-width top section */
     .dash-top { width: 100%; margin-bottom: 0; }
     /* Right column sticky */
-    .dash-right-sticky { position: sticky; top: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .dash-right-sticky { position: sticky; top: 74px; display: flex; flex-direction: column; gap: 14px; }
 
     /* ── PROGRESS ── */
     .prog-track { height: 5px; background: var(--divider); border-radius: 99px; overflow: hidden; }
@@ -980,27 +950,6 @@ const injectStyles = (dark = true) => {
       .fab          { display: none !important; }
     }
 
-    /* ── MEDIUM DESKTOP (961–1200px): single column dashboard ── */
-    @media (min-width: 961px) and (max-width: 1200px) {
-      .main-content { padding: 16px 18px 60px !important; }
-      .dash-grid    { grid-template-columns: 1fr !important; }
-      .stats-grid   { grid-template-columns: repeat(2,1fr) !important; }
-      .dash-right-sticky { position: static !important; }
-    }
-
-    /* ── LARGE DESKTOP (1201–1600px): 2-col with flexible right ── */
-    @media (min-width: 1201px) and (max-width: 1600px) {
-      .main-content { padding: 20px 28px 60px !important; }
-      .dash-grid    { grid-template-columns: minmax(0,1fr) clamp(280px, 26%, 360px) !important; }
-    }
-
-    /* ── EXTRA LARGE (>1600px): wider right column ── */
-    @media (min-width: 1601px) {
-      .main-content { padding: 24px 40px 60px !important; }
-      .dash-grid    { grid-template-columns: minmax(0,1fr) 420px !important; }
-      .stats-grid   { gap: 16px !important; }
-    }
-
     /* ── TABLET (641–960px): no sidebar, top tabs ── */
     @media (min-width: 641px) and (max-width: 960px) {
       .sidebar      { display: none !important; }
@@ -1009,11 +958,10 @@ const injectStyles = (dark = true) => {
       .fab          { display: none !important; }
       /* Stack layout vertically */
       .app-body     { display: block !important; overflow-y: auto !important; height: auto !important; }
-      .main-content { height: auto !important; overflow-y: visible !important; padding: 16px 16px 40px !important; }
+      .main-content { height: auto !important; overflow-y: visible !important; padding: 16px 20px 40px !important; }
       .dash-grid    { grid-template-columns: 1fr !important; }
       .stats-grid   { grid-template-columns: repeat(2,1fr) !important; }
-      .dash-right-sticky { position: static !important; order: -1 !important; }
-      .dash-left-col { order: 1 !important; }
+      .dash-right-sticky { position: static !important; }
     }
 
     /* ── MOBILE (≤640px): no sidebar, bottom nav ── */
@@ -1025,11 +973,10 @@ const injectStyles = (dark = true) => {
       .hdr-inner    { padding: 0 14px; height: 50px; }
       /* Stack layout vertically */
       .app-body     { display: block !important; overflow-y: auto !important; height: auto !important; }
-      .main-content { height: auto !important; overflow-y: visible !important; padding: 12px 10px 80px !important; }
+      .main-content { height: auto !important; overflow-y: visible !important; padding: 12px 12px 80px !important; }
       .dash-grid    { grid-template-columns: 1fr !important; }
-      .stats-grid   { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
-      .dash-right-sticky { position: static !important; order: -1 !important; }
-      .dash-left-col { order: 1 !important; }
+      .stats-grid   { grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; }
+      .dash-right-sticky { position: static !important; }
       .hide-sm      { display: none !important; }
       .hdr-logo-sub { display: none !important; }
       .hdr-actions .btn-lbl { display: none !important; }
@@ -1041,6 +988,7 @@ const injectStyles = (dark = true) => {
       #inv-print { position: fixed !important; inset: 0; background: #fff !important; }
     }
   `;
+  document.head.appendChild(s);
 };
 
 const updateTheme = (dark) => {
@@ -1269,36 +1217,20 @@ const SparkBar = ({ value, max, color = "var(--green)" }) => {
    MODAL
 ══════════════════════════════════════════════ */
 const Modal = ({ open, onClose, title, children, width = 480 }) => {
-  // Lock body scroll when modal open
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
   if (!open) return null;
-
-  // Use createPortal to render OUTSIDE scroll containers — fixes fixed positioning on mobile
-  return createPortal(
+  return (
     <div
       onClick={onClose}
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(0,0,0,.65)",
+        background: "rgba(0,0,0,.6)",
         backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
         zIndex: 9999,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 16,
-        overflowY: "auto",
       }}
     >
       <div
@@ -1307,11 +1239,9 @@ const Modal = ({ open, onClose, title, children, width = 480 }) => {
         style={{
           width: "100%",
           maxWidth: width,
-          maxHeight: "92dvh",
+          maxHeight: "92vh",
           overflowY: "auto",
           padding: "22px 24px",
-          margin: "auto",
-          animation: "scaleIn .2s cubic-bezier(.34,1.56,.64,1) both",
         }}
       >
         <div
@@ -1350,8 +1280,7 @@ const Modal = ({ open, onClose, title, children, width = 480 }) => {
         </div>
         {children}
       </div>
-    </div>,
-    document.body,
+    </div>
   );
 };
 
@@ -1360,6 +1289,7 @@ const Modal = ({ open, onClose, title, children, width = 480 }) => {
 ══════════════════════════════════════════════ */
 const AuthScreen = ({ onLogin }) => {
   const [mode, setMode] = useState(() => {
+    // If URL has access_token, it's a reset link — show reset form
     return window.location.hash.includes("access_token") ? "reset" : "login";
   });
   const [email, setEmail] = useState("");
@@ -1371,7 +1301,6 @@ const AuthScreen = ({ onLogin }) => {
   const [error, setError] = useState("");
   const [success, setOk] = useState("");
   const [showPw, setShowPw] = useState(false);
-  const [legal, setLegal] = useState(null); // 'privacy' | 'terms' | null
 
   const switchMode = (m) => {
     setMode(m);
@@ -1386,17 +1315,17 @@ const AuthScreen = ({ onLogin }) => {
     try {
       if (mode === "reset") {
         if (!newPass || !newPass2) {
-          setError("Please fill in all fields.");
+          setError("Dono fields fill karo!");
           setLoad(false);
           return;
         }
         if (newPass.length < 6) {
-          setError("Password must be at least 6 characters.");
+          setError("Password kam se kam 6 characters!");
           setLoad(false);
           return;
         }
         if (newPass !== newPass2) {
-          setError("Passwords do not match.");
+          setError("Dono passwords match nahi kar rahe!");
           setLoad(false);
           return;
         }
@@ -1404,14 +1333,14 @@ const AuthScreen = ({ onLogin }) => {
           password: newPass,
         });
         if (e) throw e;
-        setOk("Password updated successfully! Please sign in.");
+        setOk("Password update ho gaya! Ab login karo.");
         setTimeout(() => {
           window.location.hash = "";
           switchMode("login");
         }, 2000);
       } else if (mode === "forgot") {
         if (!email) {
-          setError("Please enter your email address.");
+          setError("Email daalo pehle!");
           setLoad(false);
           return;
         }
@@ -1420,21 +1349,21 @@ const AuthScreen = ({ onLogin }) => {
         });
         if (e) throw e;
         setOk(
-          "Reset link sent! Check your inbox (and spam folder). Click the link to set a new password.",
+          "Reset link bhej diya! Email check karo (spam bhi dekho). Link se wapas aao to new password set hoga.",
         );
       } else if (mode === "register") {
         if (!name.trim()) {
-          setError("Name is required.");
+          setError("Naam zaroori hai!");
           setLoad(false);
           return;
         }
         if (!email || !pass) {
-          setError("Please fill in all fields.");
+          setError("Sab fields fill karo!");
           setLoad(false);
           return;
         }
         if (pass.length < 6) {
-          setError("Password must be at least 6 characters.");
+          setError("Password kam se kam 6 characters!");
           setLoad(false);
           return;
         }
@@ -1444,11 +1373,11 @@ const AuthScreen = ({ onLogin }) => {
           options: { data: { full_name: name.trim() } },
         });
         if (e) throw e;
-        setOk("Account created! Please sign in.");
+        setOk("Account ban gaya! Ab login karo.");
         switchMode("login");
       } else {
         if (!email || !pass) {
-          setError("Please enter your email and password.");
+          setError("Email aur password fill karo!");
           setLoad(false);
           return;
         }
@@ -1461,12 +1390,13 @@ const AuthScreen = ({ onLogin }) => {
       }
     } catch (e) {
       const msg = e.message || "";
-      if (msg.includes("Invalid login")) setError("Invalid email or password.");
+      if (msg.includes("Invalid login"))
+        setError("Email ya password galat hai!");
       else if (msg.includes("already registered"))
-        setError("This email is already registered.");
+        setError("Yeh email pehle se registered hai!");
       else if (msg.includes("rate limit"))
-        setError("Too many attempts. Please wait and try again.");
-      else setError(msg || "Something went wrong. Please try again.");
+        setError("Zyada attempts! Thoda ruko phir try karo.");
+      else setError(msg || "Kuch gadbad ho gayi, dobara try karo.");
     }
     setLoad(false);
   };
@@ -1484,191 +1414,6 @@ const AuthScreen = ({ onLogin }) => {
         overflow: "hidden",
       }}
     >
-      {/* Legal Modal */}
-      {legal && (
-        <div
-          onClick={() => setLegal(null)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 99999,
-            background: "rgba(0,0,0,0.7)",
-            backdropFilter: "blur(8px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 20,
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--cb)",
-              borderRadius: 16,
-              padding: "28px 28px",
-              maxWidth: 560,
-              width: "100%",
-              maxHeight: "80vh",
-              overflowY: "auto",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 20,
-              }}
-            >
-              <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--t1)" }}>
-                {legal === "privacy" ? "Privacy Policy" : "Terms of Service"}
-              </h2>
-              <button
-                onClick={() => setLegal(null)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "var(--t3)",
-                  cursor: "pointer",
-                  fontSize: 20,
-                  lineHeight: 1,
-                }}
-              >
-                ✕
-              </button>
-            </div>
-            {legal === "privacy" ? (
-              <div
-                style={{
-                  fontSize: 13,
-                  color: "var(--t2)",
-                  lineHeight: 1.8,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 14,
-                }}
-              >
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>Last updated:</strong>{" "}
-                  {fmtFull(todayISO())}
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>
-                    1. Information We Collect
-                  </strong>
-                  <br />
-                  We collect your email address for authentication, and
-                  financial data (income, expenses) that you voluntarily enter
-                  into the app. We do not sell your data to third parties.
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>
-                    2. How We Use Your Data
-                  </strong>
-                  <br />
-                  Your data is used solely to provide the Trackli service —
-                  tracking your income, generating invoices, and displaying your
-                  financial dashboard.
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>
-                    3. Data Storage
-                  </strong>
-                  <br />
-                  Your data is stored securely on Supabase servers with
-                  row-level security. Only you can access your own data.
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>4. Payments</strong>
-                  <br />
-                  Payments are processed by Razorpay. We do not store your card
-                  or UPI details.
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>5. Contact</strong>
-                  <br />
-                  For any privacy concerns, contact us via WhatsApp or email
-                  listed on our support page.
-                </p>
-              </div>
-            ) : (
-              <div
-                style={{
-                  fontSize: 13,
-                  color: "var(--t2)",
-                  lineHeight: 1.8,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 14,
-                }}
-              >
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>Last updated:</strong>{" "}
-                  {fmtFull(todayISO())}
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>1. Acceptance</strong>
-                  <br />
-                  By using Trackli, you agree to these terms. If you do not
-                  agree, please do not use the app.
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>2. Free Trial</strong>
-                  <br />
-                  Trackli offers a 7-day free trial. After the trial, a
-                  subscription is required to continue using the app.
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>
-                    3. Subscriptions
-                  </strong>
-                  <br />
-                  Monthly (₹59/month) and Yearly (₹499/year) plans are
-                  available. Subscriptions can be cancelled anytime.
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>4. Refunds</strong>
-                  <br />
-                  We offer refunds within 7 days of payment if the app is not
-                  working as described. Contact support to request a refund.
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>
-                    5. Prohibited Use
-                  </strong>
-                  <br />
-                  You may not share your account credentials or unlock codes
-                  with others. Each subscription is for one user only.
-                </p>
-                <p>
-                  <strong style={{ color: "var(--t1)" }}>
-                    6. Limitation of Liability
-                  </strong>
-                  <br />
-                  Trackli is provided "as is". We are not liable for any
-                  financial decisions made based on data in the app.
-                </p>
-              </div>
-            )}
-            <button
-              onClick={() => setLegal(null)}
-              className="btn-i"
-              style={{
-                width: "100%",
-                padding: "11px 0",
-                fontSize: 13,
-                fontWeight: 600,
-                borderRadius: 10,
-                marginTop: 20,
-              }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Ambient glows */}
       <div
         style={{
@@ -1767,7 +1512,7 @@ const AuthScreen = ({ onLogin }) => {
                   lineHeight: 1.6,
                 }}
               >
-                You've arrived via a reset link — set your new password below.
+                Email link se aaye ho — naya password set karo.
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                 <span className="lbl">New Password</span>
@@ -1808,7 +1553,7 @@ const AuthScreen = ({ onLogin }) => {
                 value={newPass2}
                 onChange={(e) => setNew2(e.target.value)}
                 type="password"
-                placeholder="Confirm your password"
+                placeholder="Same password dobara"
               />
             </div>
           )}
@@ -1827,7 +1572,7 @@ const AuthScreen = ({ onLogin }) => {
                   lineHeight: 1.6,
                 }}
               >
-                Enter your registered email — we'll send you a reset link.
+                Registered email daalo — reset link milega inbox mein.
               </div>
               <FI
                 label="Email Address"
@@ -2117,37 +1862,19 @@ const AuthScreen = ({ onLogin }) => {
           }}
         >
           By continuing you agree to our{" "}
-          <button
-            onClick={() => setLegal("privacy")}
-            style={{
-              color: "var(--t2)",
-              textDecoration: "underline",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "inherit",
-              fontFamily: "inherit",
-              padding: 0,
-            }}
+          <a
+            href="/privacy"
+            style={{ color: "var(--t2)", textDecoration: "underline" }}
           >
             Privacy Policy
-          </button>
+          </a>
           {" & "}
-          <button
-            onClick={() => setLegal("terms")}
-            style={{
-              color: "var(--t2)",
-              textDecoration: "underline",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "inherit",
-              fontFamily: "inherit",
-              padding: 0,
-            }}
+          <a
+            href="/terms"
+            style={{ color: "var(--t2)", textDecoration: "underline" }}
           >
             Terms
-          </button>
+          </a>
         </p>
       </div>
     </div>
@@ -2221,7 +1948,7 @@ const LoginScreen = ({ onLogin }) => {
             Trackli
           </h1>
           <p style={{ fontSize: 13, color: "var(--text-3)", marginTop: 4 }}>
-            Enter your password to continue
+            Apna password enter karo
           </p>
         </div>
         <div style={{ position: "relative", marginBottom: 14 }}>
@@ -2267,7 +1994,7 @@ const LoginScreen = ({ onLogin }) => {
               fontWeight: 600,
             }}
           >
-            Incorrect password. Please try again.
+            ❌ Galat password — dobara try karo
           </p>
         )}
         <button
@@ -2521,7 +2248,7 @@ const EditForm = ({ tx, onSave, onClose }) => {
           label="Client / Category"
           value={form.client}
           onChange={set("client")}
-          placeholder="e.g. Vivek Gupta"
+          placeholder="Client name"
         />
         <FI
           label="Amount ₹"
@@ -2799,10 +2526,10 @@ const GroupedList = ({ transactions, onEdit, onDelete, onTogglePaid }) => {
           <Icon n="list" size={20} color="var(--t3)" />
         </div>
         <p style={{ fontSize: 14, fontWeight: 600, color: "var(--t2)" }}>
-          No transactions yet
+          Koi transaction nahi
         </p>
         <p style={{ fontSize: 12, color: "var(--t3)", lineHeight: 1.7 }}>
-          Add income or expense using the buttons above
+          Income ya expense add karo upar se
         </p>
       </div>
     );
@@ -2889,435 +2616,6 @@ const GroupedList = ({ transactions, onEdit, onDelete, onTogglePaid }) => {
           </div>
         );
       })}
-    </div>
-  );
-};
-
-/* ══════════════════════════════════════════════
-   MINI INCOME CHART — SVG sparkline
-══════════════════════════════════════════════ */
-const MiniChart = ({ transactions }) => {
-  const days = 14;
-  const today = new Date();
-
-  // Build last N days data
-  const pts = Array.from({ length: days }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() - (days - 1 - i));
-    const iso = d.toISOString().slice(0, 10);
-    const income = transactions
-      .filter((t) => t.date === iso && t.type === "income")
-      .reduce((s, t) => s + t.amount, 0);
-    const label = d.getDate();
-    return { iso, income, label };
-  });
-
-  const maxVal = Math.max(...pts.map((p) => p.income), 1);
-  const W = 100,
-    H = 36;
-  const pad = 2;
-
-  const coords = pts.map((p, i) => {
-    const x = pad + (i / (days - 1)) * (W - 2 * pad);
-    const y = H - pad - (p.income / maxVal) * (H - 2 * pad);
-    return { x, y, ...p };
-  });
-
-  const pathD = coords
-    .map((c, i) => (i === 0 ? `M${c.x},${c.y}` : `L${c.x},${c.y}`))
-    .join(" ");
-
-  const areaD = `${pathD} L${coords[coords.length - 1].x},${H} L${coords[0].x},${H} Z`;
-
-  const hasData = pts.some((p) => p.income > 0);
-
-  return (
-    <div style={{ width: "100%", position: "relative" }}>
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        preserveAspectRatio="none"
-        style={{ width: "100%", height: 48, display: "block" }}
-      >
-        <defs>
-          <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#22c55e" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        {hasData ? (
-          <>
-            <path d={areaD} fill="url(#chartGrad)" />
-            <path
-              d={pathD}
-              fill="none"
-              stroke="#22c55e"
-              strokeWidth="0.8"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            />
-            {/* Highlight today's dot */}
-            <circle
-              cx={coords[coords.length - 1].x}
-              cy={coords[coords.length - 1].y}
-              r="1.5"
-              fill="#4ade80"
-            />
-          </>
-        ) : (
-          <line
-            x1={pad}
-            y1={H / 2}
-            x2={W - pad}
-            y2={H / 2}
-            stroke="rgba(255,255,255,0.06)"
-            strokeWidth="0.8"
-            strokeDasharray="2,2"
-          />
-        )}
-      </svg>
-      {/* X axis labels */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: 2,
-        }}
-      >
-        {[0, Math.floor(days / 2), days - 1].map((i) => (
-          <span key={i} style={{ fontSize: 9, color: "var(--t3)" }}>
-            {pts[i]?.label}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-/* ══════════════════════════════════════════════
-   DASHBOARD HERO BANNER
-══════════════════════════════════════════════ */
-const DashHero = ({ transactions, goal, openAdd }) => {
-  const now = new Date();
-  const mk = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const monthName = now.toLocaleString("en-IN", { month: "long" });
-
-  const mtx = transactions.filter((t) => t.date.startsWith(mk));
-  const inc = mtx
-    .filter((t) => t.type === "income")
-    .reduce((s, t) => s + t.amount, 0);
-  const exp = mtx
-    .filter((t) => t.type === "expense")
-    .reduce((s, t) => s + t.amount, 0);
-  const recd = mtx
-    .filter((t) => t.type === "income" && t.paid)
-    .reduce((s, t) => s + t.amount, 0);
-  const pend = mtx
-    .filter((t) => t.type === "income" && !t.paid)
-    .reduce((s, t) => s + t.amount, 0);
-  const net = inc - exp;
-
-  const goalAmt = goal?.monthly || 0;
-  const goalPct =
-    goalAmt > 0 ? Math.min(100, Math.round((inc / goalAmt) * 100)) : 0;
-
-  // Days left in month
-  const daysInMonth = new Date(
-    now.getFullYear(),
-    now.getMonth() + 1,
-    0,
-  ).getDate();
-  const daysLeft = daysInMonth - now.getDate();
-  const dailyNeeded =
-    daysLeft > 0 && goalAmt > inc ? Math.ceil((goalAmt - inc) / daysLeft) : 0;
-
-  return (
-    <div style={{ marginBottom: 16 }}>
-      {/* Hero card */}
-      <div
-        className="gc"
-        style={{
-          padding: "24px 24px 20px",
-          marginBottom: 12,
-          background:
-            "linear-gradient(145deg, var(--surface2) 0%, var(--surface) 100%)",
-          border: "1px solid var(--cb)",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        {/* Subtle glow */}
-        <div
-          style={{
-            position: "absolute",
-            top: -40,
-            right: -40,
-            width: 160,
-            height: 160,
-            borderRadius: "50%",
-            background: `radial-gradient(circle, ${inc > 0 ? "rgba(34,197,94,0.08)" : "rgba(99,102,241,0.06)"}, transparent 70%)`,
-            pointerEvents: "none",
-          }}
-        />
-
-        {/* Header row */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            marginBottom: 20,
-          }}
-        >
-          <div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 7,
-                marginBottom: 5,
-              }}
-            >
-              <div
-                className="blink"
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  background: "var(--green)",
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: ".1em",
-                  textTransform: "uppercase",
-                  color: "var(--t3)",
-                }}
-              >
-                {monthName} {now.getFullYear()}
-              </span>
-            </div>
-            <p style={{ fontSize: 12, color: "var(--t3)" }}>Total Income</p>
-          </div>
-
-          <div style={{ display: "flex", gap: 6 }}>
-            <button
-              onClick={() => openAdd("income", "")}
-              className="btn-i"
-              style={{
-                padding: "7px 14px",
-                fontSize: 12,
-                borderRadius: 8,
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
-              <Icon n="plus" size={12} color="#fff" />
-              Income
-            </button>
-            <button
-              onClick={() => openAdd("expense", "")}
-              className="btn-ghost"
-              style={{
-                padding: "7px 12px",
-                fontSize: 12,
-                borderRadius: 8,
-                display: "flex",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
-              <Icon n="minus" size={12} />
-              Expense
-            </button>
-          </div>
-        </div>
-
-        {/* Big number */}
-        <div style={{ marginBottom: 8 }}>
-          <span
-            className="num"
-            style={{
-              fontSize: "clamp(32px, 7vw, 48px)",
-              fontWeight: 800,
-              color: inc > 0 ? "var(--green)" : "var(--t2)",
-              letterSpacing: "-.05em",
-              lineHeight: 1,
-            }}
-          >
-            {fmtINR(inc)}
-          </span>
-          {net !== inc && (
-            <span style={{ fontSize: 12, color: "var(--t3)", marginLeft: 10 }}>
-              Net{" "}
-              <span
-                className="num"
-                style={{
-                  color: net >= 0 ? "var(--green)" : "var(--red)",
-                  fontWeight: 600,
-                }}
-              >
-                {net >= 0 ? "+" : ""}
-                {fmtINR(net)}
-              </span>
-            </span>
-          )}
-        </div>
-
-        {/* Goal progress bar */}
-        {goalAmt > 0 && (
-          <div style={{ marginBottom: 16 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 5,
-              }}
-            >
-              <span style={{ fontSize: 11, color: "var(--t3)" }}>
-                Goal:{" "}
-                <span
-                  className="num"
-                  style={{ color: "var(--t2)", fontWeight: 600 }}
-                >
-                  {fmtINR(goalAmt)}
-                </span>
-              </span>
-              <span
-                style={{
-                  fontSize: 11,
-                  color: goalPct >= 100 ? "var(--green)" : "var(--t3)",
-                  fontWeight: 700,
-                }}
-              >
-                {goalPct}%
-              </span>
-            </div>
-            <div
-              style={{
-                height: 5,
-                background: "rgba(255,255,255,0.06)",
-                borderRadius: 99,
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  width: `${goalPct}%`,
-                  background:
-                    goalPct >= 100
-                      ? "var(--green)"
-                      : goalPct >= 60
-                        ? "var(--green)"
-                        : goalPct >= 30
-                          ? "var(--amber)"
-                          : "var(--red)",
-                  borderRadius: 99,
-                  transition: "width .5s ease",
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Mini chart */}
-        <MiniChart transactions={transactions} />
-      </div>
-
-      {/* Stats row — 4 cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          gap: 10,
-        }}
-      >
-        {[
-          {
-            label: "Received",
-            value: fmtINR(recd),
-            icon: "check",
-            color: "var(--green)",
-            sub: `${mtx.filter((t) => t.type === "income" && t.paid).length} invoices`,
-          },
-          {
-            label: "Pending",
-            value: fmtINR(pend),
-            icon: "clock",
-            color: pend > 0 ? "var(--amber)" : "var(--t3)",
-            sub: pend > 0 ? "Awaiting payment" : "All clear ✓",
-          },
-          {
-            label: "Expenses",
-            value: fmtINR(exp),
-            icon: "minus",
-            color: exp > 0 ? "var(--red)" : "var(--t3)",
-            sub: `${mtx.filter((t) => t.type === "expense").length} entries`,
-          },
-          {
-            label: "Daily Target",
-            value: dailyNeeded > 0 ? fmtINR(dailyNeeded) : "—",
-            icon: "target",
-            color: "var(--indigo)",
-            sub:
-              daysLeft > 0 ? `${daysLeft}d left in month` : "Month ends today",
-          },
-        ].map((c) => (
-          <div key={c.label} className="gc" style={{ padding: "14px 16px" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 8,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: ".08em",
-                  textTransform: "uppercase",
-                  color: "var(--t3)",
-                }}
-              >
-                {c.label}
-              </span>
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: 7,
-                  background: `${c.color}14`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Icon n={c.icon} size={12} color={c.color} />
-              </div>
-            </div>
-            <div
-              className="num"
-              style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: c.color,
-                marginBottom: 2,
-                letterSpacing: "-.03em",
-              }}
-            >
-              {c.value}
-            </div>
-            <p style={{ fontSize: 10, color: "var(--t3)" }}>{c.sub}</p>
-          </div>
-        ))}
-      </div>
     </div>
   );
 };
@@ -3435,10 +2733,10 @@ const TodayOverview = ({ transactions }) => {
                   marginBottom: 2,
                 }}
               >
-                No entries yet
+                Koi entry nahi abhi
               </p>
               <p style={{ fontSize: 12, color: "var(--t3)" }}>
-                Add income or expense using the buttons above
+                Income ya expense add karo upar se
               </p>
             </div>
           </div>
@@ -3544,7 +2842,7 @@ const StatsRow = ({ transactions }) => {
     {
       lbl: "Pending",
       val: fmtINR(pend),
-      sub: pend > 0 ? "Pending" : "All clear",
+      sub: pend > 0 ? "Collect karo" : "All clear",
       color: pend > 0 ? "var(--amber)" : "var(--green)",
       icon: "clock",
       bar: null,
@@ -3662,7 +2960,7 @@ const PendingSummary = ({ transactions }) => {
             }}
           />
           <span className="lbl" style={{ color: "var(--amber)" }}>
-            Outstanding Payments
+            Pending Payment
           </span>
         </div>
         <div style={{ textAlign: "right" }}>
@@ -3759,50 +3057,21 @@ const useReminder = (transactions) => {
     const today = todayISO();
     const hasToday = transactions.some((t) => t.date === today);
     setShowBanner(!hasToday);
-
-    // Safe notification — only on desktop where supported
-    try {
-      if (typeof Notification === "undefined") return;
-      if (!("permission" in Notification)) return;
-      const lastNotif = localStorage.getItem("flt_last_notif");
-      if (lastNotif === today) return;
-
-      const send = () => {
-        try {
-          if (Notification.permission === "granted" && !hasToday) {
-            // Use ServiceWorker if available (mobile), else direct (desktop)
-            if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-              navigator.serviceWorker.ready
-                .then((reg) => {
-                  reg.showNotification("Trackli", {
-                    body: "Log today's income and keep your tracker up to date.",
-                  });
-                })
-                .catch(() => {});
-            } else {
-              new Notification("Trackli", {
-                body: "Log today's income and keep your tracker up to date.",
-              });
-            }
-            localStorage.setItem("flt_last_notif", today);
-          }
-        } catch (e) {
-          // Notification not supported — silently ignore
-        }
-      };
-
-      if (Notification.permission === "default") {
-        Notification.requestPermission()
-          .then((p) => {
-            if (p === "granted") send();
-          })
-          .catch(() => {});
-      } else {
-        send();
+    const lastNotif = localStorage.getItem("flt_last_notif");
+    if (lastNotif === today) return;
+    const send = () => {
+      if (Notification.permission === "granted" && !hasToday) {
+        new Notification("💰 Trackli", {
+          body: "Aaj ka hisaab kiya? Income log karo!",
+        });
+        localStorage.setItem("flt_last_notif", today);
       }
-    } catch (e) {
-      // Notification API not available — silently ignore
-    }
+    };
+    if (Notification.permission === "default")
+      Notification.requestPermission().then((p) => {
+        if (p === "granted") send();
+      });
+    else send();
   }, [transactions]);
   return { showBanner, setShowBanner };
 };
@@ -3845,16 +3114,16 @@ const ReminderBanner = ({ onAdd, onDismiss }) => (
             marginBottom: 2,
           }}
         >
-          Log today's earnings
+          Aaj ka hisaab log karo!
         </p>
         <p style={{ fontSize: 11, color: "var(--t3)" }}>
-          No entries yet — did you work today?
+          Koi entry nahi abhi — kuch kaam kiya?
         </p>
       </div>
     </div>
     <div style={{ display: "flex", gap: 8 }}>
       <Btn v="ghost" sz="sm" onClick={onDismiss}>
-        Later
+        Baad mein
       </Btn>
       <button
         onClick={onAdd}
@@ -3894,7 +3163,7 @@ const AddClientModal = ({ onAdd, onClose, existingClients }) => {
   return (
     <>
       <p style={{ fontSize: 13, color: "var(--t3)", marginBottom: 16 }}>
-        Enter a client name — you can add income for them later.
+        Client ka naam daalo — baad mein income add kar sakte ho.
       </p>
       <FI
         label="Client Name"
@@ -3911,7 +3180,7 @@ const AddClientModal = ({ onAdd, onClose, existingClients }) => {
             fontWeight: 600,
           }}
         >
-          ⚠️ This client already exists
+          ⚠️ Yeh client pehle se exist karta hai
         </p>
       )}
       <div
@@ -3926,7 +3195,7 @@ const AddClientModal = ({ onAdd, onClose, existingClients }) => {
           Cancel
         </Btn>
         <Btn onClick={submit} disabled={!name.trim() || exists}>
-          Add Client
+          + Client Add Karo
         </Btn>
       </div>
     </>
@@ -4073,7 +3342,7 @@ const ClientPanel = (props) => {
             textAlign: "center",
           }}
         >
-          No clients yet — add one using the + Client button.
+          Koi client nahi — + Client se add karo!
         </p>
       ) : (
         clients.map((c) => {
@@ -4213,7 +3482,7 @@ const ClientPanel = (props) => {
                       fontWeight: 500,
                     }}
                   >
-                    Remove "{c.name}"?
+                    "{c.name}" delete karo?
                   </span>
                   <div style={{ display: "flex", gap: 5 }}>
                     <button
@@ -4233,7 +3502,7 @@ const ClientPanel = (props) => {
                         fontFamily: "inherit",
                       }}
                     >
-                      Yes
+                      Haan
                     </button>
                     <button
                       onClick={() => setConfirmClient(null)}
@@ -4249,7 +3518,7 @@ const ClientPanel = (props) => {
                         fontFamily: "inherit",
                       }}
                     >
-                      No
+                      Nahi
                     </button>
                   </div>
                 </div>
@@ -4303,7 +3572,7 @@ const ClientPanel = (props) => {
                       }}
                     >
                       <span style={{ fontSize: 10, color: "var(--t3)" }}>
-                        Received?
+                        Mila?
                       </span>
                       <button
                         onClick={() => {
@@ -4322,7 +3591,7 @@ const ClientPanel = (props) => {
                           fontFamily: "inherit",
                         }}
                       >
-                        Yes
+                        Haan
                       </button>
                       <button
                         onClick={() => setConfirmClient(null)}
@@ -4338,7 +3607,7 @@ const ClientPanel = (props) => {
                           fontFamily: "inherit",
                         }}
                       >
-                        No
+                        Nahi
                       </button>
                     </div>
                   ) : (
@@ -4358,7 +3627,7 @@ const ClientPanel = (props) => {
                         fontFamily: "inherit",
                       }}
                     >
-                      Received? {fmtINR(c.pending)}
+                      Mila? {fmtINR(c.pending)}
                     </button>
                   ))}
               </div>
@@ -4444,10 +3713,10 @@ const MonthlyGoal = ({ transactions, goal, setGoal }) => {
         </div>
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: "var(--t1)" }}>
-            Monthly Goal
+            Set Monthly Goal
           </p>
           <p style={{ fontSize: 11, color: "var(--t3)", marginTop: 2 }}>
-            Set your income target for this month.
+            Is mahine kitna kamana hai?
           </p>
         </div>
         <div
@@ -4480,7 +3749,7 @@ const MonthlyGoal = ({ transactions, goal, setGoal }) => {
         }}
       >
         <p className="lbl" style={{ marginBottom: 10 }}>
-          Monthly Goal
+          Set Monthly Goal
         </p>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <div style={{ flex: 1, position: "relative" }}>
@@ -4618,7 +3887,7 @@ const MonthlyGoal = ({ transactions, goal, setGoal }) => {
           }}
         >
           <p style={{ fontSize: 13, fontWeight: 700, color: "var(--green)" }}>
-            Goal achieved! Great work!
+            Goal complete! Ekdum zakkas!
           </p>
         </div>
       ) : (
@@ -4662,758 +3931,246 @@ const MonthlyGoal = ({ transactions, goal, setGoal }) => {
 };
 
 /* ══════════════════════════════════════════════
-   PLAN CARD — glass morphism sub-component
+   PAYWALL / SUBSCRIPTION
 ══════════════════════════════════════════════ */
-const PlanCard = ({
-  selected,
-  onClick,
-  name,
-  tagline,
-  price,
-  period,
-  features,
-  accent,
-  popular,
-  perDay,
-  savings,
-}) => (
-  <div
-    onClick={onClick}
-    style={{
-      position: "relative",
-      flex: "1 1 280px",
-      maxWidth: 400,
-      minWidth: 240,
-      background: selected
-        ? "rgba(255,255,255,0.07)"
-        : "rgba(255,255,255,0.03)",
-      backdropFilter: "blur(24px) saturate(180%)",
-      WebkitBackdropFilter: "blur(24px) saturate(180%)",
-      border: `1.5px solid ${selected ? accent : "rgba(255,255,255,0.09)"}`,
-      borderRadius: 18,
-      padding: "26px 22px 22px",
-      cursor: "pointer",
-      transition: "all .25s cubic-bezier(.16,1,.3,1)",
-      boxShadow: selected
-        ? `0 12px 40px ${accent}35, inset 0 1px 0 rgba(255,255,255,0.05)`
-        : "0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.03)",
-      transform: selected ? "translateY(-2px)" : "translateY(0)",
-    }}
-  >
-    {popular && (
-      <div
-        style={{
-          position: "absolute",
-          top: -11,
-          left: "50%",
-          transform: "translateX(-50%)",
-          background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-          color: "#fff",
-          borderRadius: 99,
-          padding: "4px 13px",
-          fontSize: 10.5,
-          fontWeight: 800,
-          letterSpacing: ".08em",
-          textTransform: "uppercase",
-          whiteSpace: "nowrap",
-          boxShadow: "0 4px 14px rgba(99,102,241,0.5)",
-        }}
-      >
-        Most Popular
-      </div>
-    )}
-
-    <div
-      style={{
-        position: "absolute",
-        top: 18,
-        right: 18,
-        width: 20,
-        height: 20,
-        borderRadius: "50%",
-        background: selected ? accent : "transparent",
-        border: `1.5px solid ${selected ? accent : "rgba(255,255,255,0.18)"}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transition: "all .2s",
-      }}
-    >
-      {selected && <Icon n="check" size={11} color="#fff" />}
-    </div>
-
-    <p
-      style={{
-        fontSize: 11,
-        fontWeight: 700,
-        color: accent,
-        textTransform: "uppercase",
-        letterSpacing: ".14em",
-        marginBottom: 5,
-      }}
-    >
-      {name}
-    </p>
-    <p
-      style={{
-        fontSize: 12.5,
-        color: "rgba(255,255,255,0.48)",
-        marginBottom: 20,
-        lineHeight: 1.45,
-        paddingRight: 28,
-      }}
-    >
-      {tagline}
-    </p>
-
-    <div
-      style={{
-        display: "flex",
-        alignItems: "baseline",
-        gap: 6,
-        marginBottom: 6,
-      }}
-    >
-      <span
-        style={{
-          fontSize: "clamp(32px, 5vw, 40px)",
-          fontWeight: 800,
-          color: "#fff",
-          letterSpacing: "-.04em",
-          lineHeight: 1,
-          fontVariantNumeric: "tabular-nums",
-        }}
-      >
-        {price}
-      </span>
-      <span
-        style={{
-          fontSize: 13,
-          color: "rgba(255,255,255,0.45)",
-          fontWeight: 500,
-        }}
-      >
-        {period}
-      </span>
-    </div>
-
-    {perDay || savings ? (
-      <div
-        style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}
-      >
-        {perDay && (
-          <span
-            style={{
-              background: "rgba(34,197,94,0.12)",
-              border: "1px solid rgba(34,197,94,0.28)",
-              color: "#4ade80",
-              borderRadius: 99,
-              padding: "3px 10px",
-              fontSize: 11,
-              fontWeight: 700,
-            }}
-          >
-            {perDay}
-          </span>
-        )}
-        {savings && (
-          <span
-            style={{
-              background: "rgba(99,102,241,0.14)",
-              border: "1px solid rgba(99,102,241,0.3)",
-              color: "#a5b4fc",
-              borderRadius: 99,
-              padding: "3px 10px",
-              fontSize: 11,
-              fontWeight: 700,
-            }}
-          >
-            {savings}
-          </span>
-        )}
-      </div>
-    ) : (
-      <div style={{ height: 20 }} />
-    )}
-
-    <div
-      style={{
-        height: 1,
-        background: "rgba(255,255,255,0.08)",
-        margin: "0 0 18px",
-      }}
-    />
-
-    <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-      {features.map((f, i) => (
-        <div
-          key={i}
-          style={{ display: "flex", alignItems: "flex-start", gap: 10 }}
-        >
-          <div
-            style={{
-              width: 16,
-              height: 16,
-              borderRadius: "50%",
-              background: f.ok
-                ? "rgba(34,197,94,0.15)"
-                : "rgba(255,255,255,0.04)",
-              border: `1px solid ${f.ok ? "rgba(34,197,94,0.32)" : "rgba(255,255,255,0.08)"}`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              marginTop: 1,
-            }}
-          >
-            <Icon
-              n={f.ok ? "check" : "close"}
-              size={9}
-              color={f.ok ? "#4ade80" : "rgba(255,255,255,0.28)"}
-            />
-          </div>
-          <span
-            style={{
-              fontSize: 12.5,
-              lineHeight: 1.45,
-              color: f.ok ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.3)",
-              textDecoration: f.ok ? "none" : "line-through",
-            }}
-          >
-            {f.text}
-          </span>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-/* ══════════════════════════════════════════════
-   PAYWALL / SUBSCRIPTION — Glass Morphism
-══════════════════════════════════════════════ */
-const Paywall = ({ daysLeft, onUnlock, onClose, user }) => {
+const Paywall = ({ daysLeft, onUnlock }) => {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [selPlan, setSelPlan] = useState("yearly");
-  const [verifying, setVerifying] = useState(false);
-  const [verifyMsg, setVerifyMsg] = useState("");
   const trialOver = daysLeft === 0;
-  const setPayw = onClose; // alias for close button
 
-  const tryUnlock = async () => {
+  const tryUnlock = () => {
     const trimmed = code.trim().toUpperCase();
-    if (!trimmed) return;
-    setError("");
-    try {
-      // Server-side validation — codes never exposed in frontend bundle
-      const { data, error: fnErr } = await supabase.functions.invoke(
-        "validate-unlock-code",
-        {
-          body: { code: trimmed, user_id: user?.id, plan: selPlan },
-        },
-      );
-      if (fnErr || !data?.valid) {
-        setError(data?.message || "Invalid code. Please check and try again.");
-        return;
-      }
-      const s = loadSub();
-      s.unlocked = true;
-      s.unlockedAt = new Date().toISOString();
-      s.plan = data.plan || selPlan;
-      saveSub(s);
+    if (UNLOCK_CODES.includes(trimmed)) {
+      const sub = loadSub();
+      sub.unlocked = true;
+      sub.unlockedAt = new Date().toISOString();
+      saveSub(sub);
       setSuccess(true);
       setTimeout(() => onUnlock(), 1500);
-    } catch (e) {
-      setError("Could not validate code. Please try again.");
+    } else {
+      setError(
+        "❌ Code galat hai! Payment ke baad WhatsApp pe code bheja jaayega.",
+      );
     }
   };
-
-  const monthlyFeatures = [
-    { ok: true, text: "Income & expense tracking" },
-    { ok: true, text: "Clean dashboard overview" },
-    { ok: true, text: "Last 15 days history" },
-    { ok: true, text: "Basic reminders" },
-    { ok: true, text: "Standard support" },
-    { ok: false, text: "Advanced insights & analytics" },
-    { ok: false, text: "Full history access" },
-  ];
-
-  const yearlyFeatures = [
-    { ok: true, text: "Everything in Starter" },
-    { ok: true, text: "Unlimited tracking, no limits" },
-    { ok: true, text: "Full history access" },
-    { ok: true, text: "Advanced insights & analytics" },
-    { ok: true, text: "Smart reminders with custom timing" },
-    { ok: true, text: "Monthly progress reports" },
-    { ok: true, text: "Priority WhatsApp support" },
-    { ok: true, text: "Early access to new features" },
-  ];
-
-  const userEmail = encodeURIComponent(user?.email || "");
-  const payLink =
-    selPlan === "yearly"
-      ? `https://rzp.io/rzp/So1SE4j?prefill[email]=${userEmail}&notes[email]=${userEmail}`
-      : `https://rzp.io/rzp/FQ6PDFlu?prefill[email]=${userEmail}&notes[email]=${userEmail}`;
-
-  if (success) {
-    return (
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 9999,
-          background: "rgba(0,0,0,0.75)",
-          backdropFilter: "blur(14px)",
-          WebkitBackdropFilter: "blur(14px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 20,
-        }}
-      >
-        <div
-          style={{
-            background: "rgba(255,255,255,0.06)",
-            backdropFilter: "blur(30px) saturate(180%)",
-            WebkitBackdropFilter: "blur(30px) saturate(180%)",
-            border: "1px solid rgba(34,197,94,0.25)",
-            borderRadius: 20,
-            padding: "52px 36px",
-            maxWidth: 400,
-            width: "100%",
-            textAlign: "center",
-            animation: "scaleIn .3s cubic-bezier(.34,1.56,.64,1) both",
-            boxShadow: "0 20px 60px rgba(34,197,94,0.15)",
-          }}
-        >
-          <div
-            style={{
-              width: 64,
-              height: 64,
-              borderRadius: 20,
-              margin: "0 auto 20px",
-              background: "rgba(34,197,94,0.15)",
-              border: "1px solid rgba(34,197,94,0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Icon n="check" size={30} color="#4ade80" />
-          </div>
-          <h2
-            style={{
-              fontSize: 22,
-              fontWeight: 800,
-              color: "#fff",
-              marginBottom: 8,
-              letterSpacing: "-.03em",
-            }}
-          >
-            Access Unlocked
-          </h2>
-          <p
-            style={{
-              fontSize: 14,
-              color: "rgba(255,255,255,0.6)",
-              lineHeight: 1.55,
-            }}
-          >
-            Welcome to Trackli Pro. Loading your dashboard...
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div
       style={{
         position: "fixed",
         inset: 0,
+        background: "rgba(0,0,0,0.92)",
         zIndex: 9999,
-        background: "rgba(0,0,0,0.72)",
-        backdropFilter: "blur(14px)",
-        WebkitBackdropFilter: "blur(14px)",
-        overflowY: "auto",
-        padding: "clamp(16px, 4vw, 40px) clamp(14px, 3vw, 28px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
       }}
     >
-      {/* Close button — always visible, just dismisses paywall */}
-      <button
-        onClick={() => setPayw(false)}
-        aria-label="Close"
-        style={{
-          position: "fixed",
-          top: 18,
-          right: 18,
-          zIndex: 10000,
-          width: 36,
-          height: 36,
-          borderRadius: "50%",
-          background: "rgba(255,255,255,0.08)",
-          border: "1px solid rgba(255,255,255,0.15)",
-          color: "rgba(255,255,255,0.85)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          transition: "all .15s",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = "rgba(255,255,255,0.16)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-        }}
-      >
-        <Icon n="close" size={14} color="currentColor" />
-      </button>
-
       <div
         style={{
-          position: "fixed",
-          top: "-20%",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 700,
-          height: 700,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(99,102,241,0.12), transparent 60%)",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      />
-
-      <div
-        style={{
+          background: "var(--surface2)",
+          border: "1px solid rgba(34,197,94,.2)",
+          borderRadius: 20,
+          padding: "36px 28px",
+          maxWidth: 400,
           width: "100%",
-          maxWidth: 880,
-          margin: "0 auto",
-          position: "relative",
-          zIndex: 1,
-          animation: "scaleIn .35s cubic-bezier(.16,1,.3,1) both",
+          textAlign: "center",
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 7,
-              background: trialOver
-                ? "rgba(239,68,68,0.12)"
-                : "rgba(245,158,11,0.12)",
-              border: `1px solid ${trialOver ? "rgba(239,68,68,0.3)" : "rgba(245,158,11,0.3)"}`,
-              borderRadius: 99,
-              padding: "6px 14px",
-              marginBottom: 20,
-              backdropFilter: "blur(10px)",
-              WebkitBackdropFilter: "blur(10px)",
-            }}
-          >
-            <Icon
-              n={trialOver ? "alert" : "clock"}
-              size={12}
-              color={trialOver ? "#f87171" : "#fbbf24"}
-            />
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: ".02em",
-                color: trialOver ? "#f87171" : "#fbbf24",
-              }}
-            >
-              {trialOver
-                ? "Free trial ended"
-                : `${daysLeft} day${daysLeft === 1 ? "" : "s"} left in trial`}
-            </span>
-          </div>
-          <h1
-            style={{
-              fontSize: "clamp(26px, 4.5vw, 34px)",
-              fontWeight: 800,
-              color: "#fff",
-              letterSpacing: "-.045em",
-              marginBottom: 10,
-              lineHeight: 1.15,
-            }}
-          >
-            Unlock Trackli Pro
-          </h1>
-          <p
-            style={{
-              fontSize: "clamp(13px, 2vw, 15px)",
-              color: "rgba(255,255,255,0.55)",
-              maxWidth: 500,
-              margin: "0 auto",
-              lineHeight: 1.55,
-            }}
-          >
-            Keep tracking your freelance income without limits. Cancel anytime.
-          </p>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 16,
-            marginBottom: 28,
-            justifyContent: "center",
-          }}
-        >
-          <PlanCard
-            selected={selPlan === "monthly"}
-            onClick={() => setSelPlan("monthly")}
-            name="Starter"
-            tagline="Essentials to get started"
-            price="₹59"
-            period="per month"
-            features={monthlyFeatures}
-            accent="#22c55e"
-          />
-          <PlanCard
-            selected={selPlan === "yearly"}
-            onClick={() => setSelPlan("yearly")}
-            name="Pro"
-            tagline="Everything you need, 30% off"
-            price="₹499"
-            period="per year"
-            features={yearlyFeatures}
-            accent="#6366f1"
-            popular
-            perDay="₹1.36 / day"
-            savings="Save ₹209"
-          />
-        </div>
-
-        <a
-          href={payLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            width: "100%",
-            maxWidth: 440,
-            margin: "0 auto 14px",
-            background:
-              selPlan === "yearly"
-                ? "linear-gradient(135deg, #6366f1, #8b5cf6)"
-                : "linear-gradient(135deg, #16a34a, #22c55e)",
-            color: "#fff",
-            borderRadius: 13,
-            padding: "15px 24px",
-            fontSize: 15,
-            fontWeight: 700,
-            textDecoration: "none",
-            letterSpacing: ".005em",
-            boxShadow:
-              selPlan === "yearly"
-                ? "0 10px 32px rgba(99,102,241,0.45)"
-                : "0 10px 32px rgba(34,197,94,0.35)",
-            transition: "transform .15s",
-          }}
-        >
-          Continue to Payment
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path
-              d="M3 7h8M8 4l3 3-3 3"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </a>
-
-        <p
-          style={{
-            textAlign: "center",
-            fontSize: 11.5,
-            color: "rgba(255,255,255,0.4)",
-            marginBottom: 20,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
-            flexWrap: "wrap",
-          }}
-        >
-          <span>Secure payment via Razorpay</span>
-          <span style={{ color: "rgba(255,255,255,0.2)" }}>•</span>
-          <span>UPI, Cards, Net Banking</span>
-        </p>
-
-        {/* Already paid? Verify button */}
-        <div style={{ maxWidth: 440, margin: "0 auto 16px" }}>
-          <button
-            onClick={async () => {
-              setVerifying(true);
-              setVerifyMsg("");
-              try {
-                const { data } = await supabase
-                  .from("subscriptions")
-                  .select("*")
-                  .eq("user_id", user?.id)
-                  .eq("status", "active")
-                  .maybeSingle();
-                if (data) {
-                  const sub = loadSub();
-                  sub.unlocked = true;
-                  sub.plan = data.plan;
-                  sub.unlockedAt = data.created_at;
-                  sub.expiresAt = data.expires_at;
-                  saveSub(sub);
-                  setSuccess(true);
-                  setTimeout(() => onUnlock(), 1200);
-                } else {
-                  setVerifyMsg(
-                    "No active subscription found. Please complete payment first.",
-                  );
-                }
-              } catch (e) {
-                setVerifyMsg("Could not verify. Please try again.");
-              }
-              setVerifying(false);
-            }}
-            disabled={verifying}
-            style={{
-              width: "100%",
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              color: "rgba(255,255,255,0.75)",
-              borderRadius: 12,
-              padding: "13px",
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: verifying ? "not-allowed" : "pointer",
-              fontFamily: "inherit",
-              transition: "all .15s",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-            }}
-            onMouseEnter={(e) => {
-              if (!verifying)
-                e.currentTarget.style.background = "rgba(255,255,255,0.09)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-            }}
-          >
-            {verifying ? (
-              <>Checking...</>
-            ) : (
-              <>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path
-                    d="M7 1v2M7 11v2M1 7h2M11 7h2M3 3l1.4 1.4M9.6 9.6L11 11M3 11l1.4-1.4M9.6 4.4L11 3"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                Already paid? Verify my payment
-              </>
-            )}
-          </button>
-          {verifyMsg && (
+        {success ? (
+          <>
+            <div style={{ fontSize: 56, marginBottom: 12 }}>🎉</div>
             <p
-              style={{
-                fontSize: 12,
-                color: "#f87171",
-                marginTop: 8,
-                textAlign: "center",
-              }}
+              style={{ fontSize: 20, fontWeight: 800, color: "var(--green2)" }}
             >
-              {verifyMsg}
+              Unlock ho gaya!
             </p>
-          )}
-        </div>
+            <p style={{ fontSize: 13, color: "var(--t3)", marginTop: 8 }}>
+              Welcome to Trackli Pro! 🚀
+            </p>
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>
+              {trialOver ? "🔒" : "⏳"}
+            </div>
 
-        {/* Hidden unlock code — for giveaway winners only */}
-        <div style={{ maxWidth: 440, margin: "0 auto" }}>
-          <details style={{ cursor: "pointer" }}>
-            <summary
-              style={{
-                fontSize: 11,
-                color: "rgba(255,255,255,0.2)",
-                textAlign: "center",
-                listStyle: "none",
-                userSelect: "none",
-              }}
-            >
-              Have a giveaway code?
-            </summary>
-            <div
-              style={{
-                marginTop: 10,
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                borderRadius: 12,
-                padding: "14px 16px",
-              }}
-            >
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  value={code}
-                  onChange={(e) => {
-                    setCode(e.target.value);
-                    setError("");
-                  }}
-                  onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
-                  placeholder="GIVEAWAY-CODE"
+            {trialOver ? (
+              <>
+                <p
                   style={{
-                    flex: 1,
-                    background: "rgba(0,0,0,0.25)",
-                    border: `1px solid ${error ? "rgba(239,68,68,0.5)" : "rgba(255,255,255,0.08)"}`,
-                    borderRadius: 10,
-                    padding: "10px 14px",
-                    color: "#fff",
-                    fontSize: 13,
-                    outline: "none",
-                    fontFamily: "inherit",
-                    letterSpacing: ".04em",
-                    textTransform: "uppercase",
-                  }}
-                />
-                <button
-                  onClick={tryUnlock}
-                  disabled={!code.trim()}
-                  style={{
-                    background: code.trim() ? "#fff" : "rgba(255,255,255,0.08)",
-                    color: code.trim() ? "#0d0d12" : "rgba(255,255,255,0.3)",
-                    border: "none",
-                    borderRadius: 10,
-                    padding: "10px 18px",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: code.trim() ? "pointer" : "not-allowed",
-                    fontFamily: "inherit",
-                    transition: "all .15s",
+                    fontSize: 20,
+                    fontWeight: 800,
+                    color: "var(--t1)",
+                    marginBottom: 8,
                   }}
                 >
-                  Apply
-                </button>
-              </div>
-              {error && (
-                <p style={{ fontSize: 11.5, color: "#f87171", marginTop: 8 }}>
-                  {error}
+                  Free Trial Khatam!
                 </p>
-              )}
+                <p
+                  style={{ fontSize: 13, color: "var(--t3)", marginBottom: 20 }}
+                >
+                  Tumhara 30 din ka free trial complete ho gaya.
+                  <br />
+                  App use karte rehne ke liye subscribe karo! 🙏
+                </p>
+              </>
+            ) : (
+              <>
+                <p
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 800,
+                    color: "var(--t1)",
+                    marginBottom: 8,
+                  }}
+                >
+                  Sirf {daysLeft} din baaki!
+                </p>
+                <p
+                  style={{ fontSize: 13, color: "var(--t3)", marginBottom: 20 }}
+                >
+                  Free trial mein {daysLeft} din baaki hain.
+                  <br />
+                  Abhi subscribe karo aur uninterrupted use karo!
+                </p>
+              </>
+            )}
+
+            {/* Plan card */}
+            <div
+              style={{
+                background:
+                  "linear-gradient(135deg,var(--surface),var(--surface2))",
+                border: `1px solid ${"var(--green)"}40`,
+                borderRadius: 14,
+                padding: "18px 20px",
+                marginBottom: 20,
+              }}
+            >
+              <p
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "var(--t3)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                  marginBottom: 6,
+                }}
+              >
+                Trackli Pro
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  justifyContent: "center",
+                  gap: 4,
+                  marginBottom: 4,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 36,
+                    fontWeight: 900,
+                    color: "var(--green2)",
+                  }}
+                >
+                  ₹60
+                </span>
+                <span style={{ fontSize: 14, color: "var(--t3)" }}>/month</span>
+              </div>
+              <p style={{ fontSize: 11, color: "var(--t3)" }}>
+                Income tracker • Clients • Invoice • Goal
+              </p>
             </div>
-          </details>
-        </div>
+
+            {/* Pay button */}
+            <a
+              href="https://razorpay.me/@yourlink"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "block",
+                background:
+                  "linear-gradient(135deg,var(--green),var(--green2))",
+                color: "#fff",
+                borderRadius: 12,
+                padding: "13px 0",
+                fontSize: 14,
+                fontWeight: 800,
+                marginBottom: 16,
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+            >
+              💳 Abhi Pay Karo — ₹60/month
+            </a>
+
+            <p style={{ fontSize: 11, color: "var(--t3)", marginBottom: 12 }}>
+              Payment ke baad WhatsApp pe unlock code milega 👇
+            </p>
+
+            {/* Unlock code input */}
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                value={code}
+                onChange={(e) => {
+                  setCode(e.target.value);
+                  setError("");
+                }}
+                onKeyDown={(e) => e.key === "Enter" && tryUnlock()}
+                placeholder="Unlock code daalo..."
+                style={{
+                  flex: 1,
+                  background: "var(--surface2)",
+                  border: `1px solid ${error ? "var(--red)" : "var(--cb)"}`,
+                  borderRadius: 9,
+                  padding: "10px 14px",
+                  color: "var(--t1)",
+                  fontSize: 13,
+                  outline: "none",
+                }}
+              />
+              <button
+                onClick={tryUnlock}
+                style={{
+                  background: "var(--green)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 9,
+                  padding: "10px 16px",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Unlock
+              </button>
+            </div>
+            {error && (
+              <p
+                style={{
+                  fontSize: 11,
+                  color: "var(--red2)",
+                  marginTop: 8,
+                  textAlign: "left",
+                }}
+              >
+                {error}
+              </p>
+            )}
+
+            {trialOver && (
+              <p style={{ fontSize: 10, color: "var(--t3)", marginTop: 16 }}>
+                Support: wa.me/91XXXXXXXXXX
+              </p>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
@@ -5494,7 +4251,7 @@ const NewMonthCelebration = ({ stats, monthName, onClose }) => {
           {monthName} Complete!
         </p>
         <p style={{ fontSize: 13, color: "var(--t3)", marginBottom: 24 }}>
-          Here's a look at last month's performance.
+          Bhai kya mahina tha — dekho kya kiya tumne!
         </p>
 
         {/* Stats */}
@@ -5523,7 +4280,7 @@ const NewMonthCelebration = ({ stats, monthName, onClose }) => {
                 marginBottom: 6,
               }}
             >
-              Total Earned
+              💰 Total Kamaya
             </p>
             <p
               style={{ fontSize: 22, fontWeight: 800, color: "var(--green2)" }}
@@ -5632,9 +4389,9 @@ const NewMonthCelebration = ({ stats, monthName, onClose }) => {
         )}
 
         <p style={{ fontSize: 12, color: "var(--t3)", marginBottom: 20 }}>
-          Your previous data has been safely archived.
+          Purana data archive mein safe hai 📁
           <br />
-          Fresh start — track smarter this month!
+          Naya mahina, naya shuruaat! 🚀
         </p>
 
         <button
@@ -5652,7 +4409,7 @@ const NewMonthCelebration = ({ stats, monthName, onClose }) => {
             letterSpacing: "0.02em",
           }}
         >
-          Start Fresh Month
+          ✨ Naya Mahina Shuru Karo!
         </button>
       </div>
     </div>
@@ -5972,9 +4729,8 @@ const Dashboard = ({
 
       {/* ── BODY: 2-col on desktop, 1-col on mobile/tablet ── */}
       <div className="dash-grid">
-        {/* LEFT col — Outstanding Payments + date filter + transactions */}
+        {/* LEFT col — date filter + transactions */}
         <div
-          className="dash-left-col"
           style={{
             minWidth: 0,
             display: "flex",
@@ -5982,9 +4738,6 @@ const Dashboard = ({
             gap: 14,
           }}
         >
-          {/* Outstanding Payments — TOP of left col */}
-          <PendingSummary transactions={transactions} />
-
           {/* Date Range Filter */}
           <div className="gc" style={{ padding: "14px 16px" }}>
             <div
@@ -6122,7 +4875,10 @@ const Dashboard = ({
 
         {/* RIGHT col — sticky sidebar */}
         <div className="dash-right-sticky">
-          {/* Clients panel — FIRST */}
+          {/* Pending Summary */}
+          <PendingSummary transactions={transactions} />
+
+          {/* Clients panel */}
           <div className="gc" style={{ padding: "16px 18px" }}>
             <SecTitle
               extra={
@@ -6158,8 +4914,6 @@ const Dashboard = ({
               onMarkAllPaid={onMarkAllPaid}
             />
           </div>
-
-          {/* Pending Summary removed from here — now in left col */}
         </div>
       </div>
 
@@ -6327,6 +5081,8 @@ const InvoicePage = ({ transactions }) => {
     .reduce((s, t) => s + t.amount, 0);
 
   const printInvoice = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: html2canvas } = await import("html2canvas");
     const grouped = {};
     filtered
       .sort((a, b) => a.date.localeCompare(b.date))
@@ -6347,99 +5103,80 @@ const InvoicePage = ({ transactions }) => {
         <td style="padding:11px 16px;font-size:13px;font-weight:600;border-bottom:1px solid #f1f5f9">${month}</td>
         <td style="padding:11px 16px;font-size:13px;text-align:center;border-bottom:1px solid #f1f5f9">${g.videos}</td>
         <td style="padding:11px 16px;font-size:12px;text-align:center;border-bottom:1px solid #f1f5f9">
-          ${g.received > 0 ? `<span style="background:#dcfce7;color:#15803d;padding:3px 10px;border-radius:20px;font-weight:700">Received ${fmtINR(g.received)}</span>` : ""}
-          ${g.pending > 0 ? `<span style="background:#fef3c7;color:#b45309;padding:3px 10px;border-radius:20px;font-weight:700">Pending ${fmtINR(g.pending)}</span>` : ""}
+          ${g.received > 0 ? `<span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:20px;font-weight:700">Recd ${fmtINR(g.received)}</span>` : ""}
+          ${g.pending > 0 ? `<span style="background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:20px;font-weight:700">Pend ${fmtINR(g.pending)}</span>` : ""}
         </td>
         <td style="padding:11px 16px;font-size:14px;font-weight:700;text-align:right;border-bottom:1px solid #f1f5f9">${fmtINR(g.total)}</td>
       </tr>`,
       )
       .join("");
-
-    const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Invoice-${invoiceNo}</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    @page { margin: 0; size: A4 portrait; }
-    body { font-family: Arial, sans-serif; color: #1a1a2e; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    @media print { .no-print { display: none !important; } }
-  </style>
-</head>
-<body>
-  <!-- Header -->
-  <div style="background:#0d2a16;padding:28px 36px;display:flex;justify-content:space-between;align-items:center">
-    <div>
-      <div style="font-size:22px;font-weight:900;color:#22c55e">${yourName || "Your Name"}</div>
-      <div style="font-size:11px;color:#86efac;margin-top:4px">${yourEmail || "your@email.com"} &nbsp;|&nbsp; Freelance Video Editor</div>
-    </div>
-    <div style="text-align:right">
-      <div style="font-size:10px;color:#86efac;text-transform:uppercase;letter-spacing:2px">Invoice</div>
-      <div style="font-size:26px;font-weight:900;color:#fff;margin-top:2px">#${invoiceNo}</div>
-      <div style="font-size:11px;color:#86efac;margin-top:3px">${fmtFull(todayISO())}</div>
-    </div>
-  </div>
-
-  <!-- Meta row -->
-  <div style="padding:24px 36px 0">
-    <div style="display:flex;margin-bottom:20px;background:#f8fafc;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0">
-      <div style="flex:1;padding:14px 18px;border-right:1px solid #e2e8f0">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:6px">BILL TO</div>
-        <div style="font-size:15px;font-weight:700">${client}</div>
+    const div = document.createElement("div");
+    div.style.cssText =
+      "position:absolute;left:-9999px;top:0;width:794px;background:#fff;font-family:Arial,sans-serif;color:#1a1a2e";
+    div.innerHTML = `
+      <div style="background:#0d2a16;padding:28px 36px;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:22px;font-weight:900;color:#22c55e">${yourName || "Your Name"}</div>
+          <div style="font-size:11px;color:#86efac;margin-top:3px">${yourEmail || "your@email.com"} | Freelance Video Editor</div></div>
+        <div style="text-align:right"><div style="font-size:11px;color:#86efac;text-transform:uppercase;letter-spacing:2px">Invoice</div>
+          <div style="font-size:24px;font-weight:900;color:#fff;margin-top:2px">#${invoiceNo}</div>
+          <div style="font-size:11px;color:#86efac;margin-top:3px">${fmtFull(todayISO())}</div></div>
       </div>
-      <div style="flex:1;padding:14px 18px;border-right:1px solid #e2e8f0">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:6px">PERIOD</div>
-        <div style="font-size:12px;font-weight:600">${fromDate ? fmtFull(fromDate) : "All time"} – ${fmtFull(toDate)}</div>
-      </div>
-      <div style="flex:1;padding:14px 18px">
-        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:6px">TOTAL VIDEOS</div>
-        <div style="font-size:22px;font-weight:900;color:#16a34a">${filtered.length}</div>
-      </div>
-    </div>
-
-    <!-- Table -->
-    <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
-      <thead>
-        <tr style="background:#f0fdf4;border-top:3px solid #16a34a">
-          <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#374151">Month</th>
-          <th style="padding:10px 16px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#374151">Videos</th>
-          <th style="padding:10px 16px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#374151">Status</th>
-          <th style="padding:10px 16px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#374151">Amount</th>
-        </tr>
-      </thead>
-      <tbody>${groupRows}</tbody>
-    </table>
-
-    <!-- Totals -->
-    <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
-      <div style="width:260px;background:#f8fafc;border-radius:10px;padding:16px 20px;border:1px solid #e2e8f0">
-        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;color:#64748b">
-          <span>Received</span><span style="color:#16a34a;font-weight:700">${fmtINR(received)}</span>
+      <div style="padding:24px 36px">
+        <div style="display:flex;margin-bottom:20px;background:#f8fafc;border-radius:10px;overflow:hidden">
+          <div style="flex:1;padding:14px 18px;border-right:1px solid #e2e8f0">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">BILL TO</div>
+            <div style="font-size:14px;font-weight:700">${client}</div></div>
+          <div style="flex:1;padding:14px 18px;border-right:1px solid #e2e8f0">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">PERIOD</div>
+            <div style="font-size:12px;font-weight:600">${fromDate ? fmtFull(fromDate) : "All time"} - ${fmtFull(toDate)}</div></div>
+          <div style="flex:1;padding:14px 18px">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:5px">TOTAL VIDEOS</div>
+            <div style="font-size:20px;font-weight:900;color:#16a34a">${filtered.length}</div></div>
         </div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;color:#64748b">
-          <span>Pending</span><span style="color:#d97706;font-weight:700">${fmtINR(pending)}</span>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:18px">
+          <thead><tr style="background:#f0fdf4;border-top:3px solid #16a34a">
+            <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#374151">Month</th>
+            <th style="padding:10px 16px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#374151">Videos</th>
+            <th style="padding:10px 16px;text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#374151">Status</th>
+            <th style="padding:10px 16px;text-align:right;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#374151">Amount</th>
+          </tr></thead>
+          <tbody>${groupRows}</tbody>
+        </table>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:18px">
+          <div style="width:240px;background:#f8fafc;border-radius:8px;padding:14px 18px">
+            <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#64748b">
+              <span>Received</span><span style="color:#16a34a;font-weight:600">${fmtINR(received)}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:#64748b">
+              <span>Pending</span><span style="color:#d97706;font-weight:600">${fmtINR(pending)}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:10px 0 0;margin-top:6px;border-top:2px solid #16a34a;font-size:16px;font-weight:900">
+              <span>TOTAL</span><span style="color:#16a34a">${fmtINR(total)}</span></div>
+          </div>
         </div>
-        <div style="display:flex;justify-content:space-between;padding:12px 0 0;margin-top:8px;border-top:2px solid #16a34a;font-size:17px;font-weight:900">
-          <span>TOTAL</span><span style="color:#16a34a">${fmtINR(total)}</span>
-        </div>
-      </div>
-    </div>
-
-    ${note ? `<div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:12px 16px;font-size:12px;color:#166534;margin-bottom:16px;border-radius:0 8px 8px 0">${note}</div>` : ""}
-
-    <div style="text-align:center;font-size:10px;color:#94a3b8;border-top:1px solid #f1f5f9;padding-top:14px;margin-top:8px">
-      Generated by Trackli
-    </div>
-  </div>
-
-  <script>window.onload = () => { window.print(); }<\/script>
-</body>
-</html>`;
-
-    const win = window.open("", "_blank");
-    win.document.write(html);
-    win.document.close();
+        ${note ? `<div style="background:#f0fdf4;border-left:4px solid #16a34a;padding:10px 14px;font-size:12px;color:#166534;margin-bottom:14px">${note}</div>` : ""}
+        <div style="text-align:center;font-size:10px;color:#94a3b8;border-top:1px solid #f1f5f9;padding-top:12px">Generated by Trackli</div>
+      </div>`;
+    document.body.appendChild(div);
+    const canvas = await html2canvas(div, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
+    const imgData = canvas.toDataURL("image/png", 1.0);
+    const imgW = canvas.width;
+    const imgH = canvas.height;
+    const pdfW = 794; // A4 px at 96dpi
+    const pdfH = Math.ceil((imgH / imgW) * pdfW);
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "px",
+      format: [pdfW, pdfH],
+      hotfixes: ["px_scaling"],
+    });
+    pdf.addImage(imgData, "PNG", 0, 0, pdfW, pdfH);
+    pdf.save(
+      `Invoice-${invoiceNo}-${client.replace(/[^a-zA-Z0-9]/g, "-")}.pdf`,
+    );
+    document.body.removeChild(div);
   };
 
   return (
@@ -6453,7 +5190,7 @@ const InvoicePage = ({ transactions }) => {
         }}
       >
         <Card>
-          <SecTitle>Invoice Details</SecTitle>
+          <SecTitle>🧾 Invoice Details</SecTitle>
           <div
             style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
           >
@@ -6504,7 +5241,7 @@ const InvoicePage = ({ transactions }) => {
           </div>
         </Card>
         <Card>
-          <SecTitle>Preview</SecTitle>
+          <SecTitle>📋 Preview</SecTitle>
           {filtered.length === 0 ? (
             <p
               style={{
@@ -6514,7 +5251,7 @@ const InvoicePage = ({ transactions }) => {
                 padding: "30px 0",
               }}
             >
-              Select a client and date range to preview the invoice
+              Client ya date select karo
             </p>
           ) : (
             <>
@@ -6582,7 +5319,7 @@ const InvoicePage = ({ transactions }) => {
                       </p>
                       {g.pending > 0 && (
                         <p style={{ fontSize: 11, color: "var(--amber)" }}>
-                          Pending {fmtINR(g.pending)}
+                          ⏳ {fmtINR(g.pending)}
                         </p>
                       )}
                     </div>
@@ -6658,389 +5395,18 @@ const InvoicePage = ({ transactions }) => {
 /* ══════════════════════════════════════════════
    MAIN APP
 ══════════════════════════════════════════════ */
-// ── Boot: inject styles safely ──
-try {
-  const d = localStorage.getItem("flt_theme");
-  const dark = d ? d === "dark" : true;
-  injectStyles(dark);
-  updateTheme(dark);
-} catch (e) {
+// ── Boot: inject styles immediately before React renders ──
+(() => {
   try {
+    const d = localStorage.getItem("flt_theme");
+    const dark = d ? d === "dark" : true;
+    injectStyles(dark);
+    updateTheme(dark);
+  } catch (e) {
     injectStyles(true);
     updateTheme(true);
-  } catch {}
-}
-
-/* ══════════════════════════════════════════════
-   RESET PASSWORD MODAL
-══════════════════════════════════════════════ */
-const ResetPasswordModal = ({ onDone }) => {
-  const [pw, setPw] = useState("");
-  const [pw2, setPw2] = useState("");
-  const [loading, setLoad] = useState(false);
-  const [error, setErr] = useState("");
-  const [success, setOk] = useState(false);
-
-  const submit = async () => {
-    setErr("");
-    if (!pw || !pw2) return setErr("Please fill in all fields.");
-    if (pw.length < 6) return setErr("Password must be at least 6 characters.");
-    if (pw !== pw2) return setErr("Passwords do not match.");
-    setLoad(true);
-    const { error: e } = await supabase.auth.updateUser({ password: pw });
-    setLoad(false);
-    if (e) return setErr(e.message);
-    setOk(true);
-    setTimeout(() => onDone(), 2000);
-  };
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 99999,
-        background: "rgba(0,0,0,0.75)",
-        backdropFilter: "blur(12px)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-      }}
-    >
-      <div
-        className="gc pop"
-        style={{ width: "100%", maxWidth: 420, padding: "32px 28px" }}
-      >
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div
-            style={{
-              width: 52,
-              height: 52,
-              borderRadius: 14,
-              margin: "0 auto 14px",
-              background: "linear-gradient(135deg,var(--indigo),var(--green))",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Icon n="bolt" size={22} color="#fff" />
-          </div>
-          <h2
-            style={{
-              fontSize: 20,
-              fontWeight: 800,
-              color: "var(--t1)",
-              marginBottom: 6,
-            }}
-          >
-            Set New Password
-          </h2>
-          <p style={{ fontSize: 13, color: "var(--t3)" }}>
-            Password reset link se aaye ho — set a new password below
-          </p>
-        </div>
-
-        {success ? (
-          <div
-            style={{
-              background: "var(--greenbg)",
-              border: "1px solid rgba(34,197,94,.25)",
-              borderRadius: 12,
-              padding: "16px 20px",
-              textAlign: "center",
-            }}
-          >
-            <p style={{ fontSize: 14, fontWeight: 700, color: "var(--green)" }}>
-              Password update ho gaya! Redirect ho raha hai...
-            </p>
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-              <span className="lbl">Naya Password</span>
-              <input
-                type="password"
-                value={pw}
-                onChange={(e) => setPw(e.target.value)}
-                placeholder="Minimum 6 characters"
-                className="inp"
-                autoFocus
-              />
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-              <span className="lbl">Password Confirm Karo</span>
-              <input
-                type="password"
-                value={pw2}
-                onChange={(e) => setPw2(e.target.value)}
-                placeholder="Confirm your new password"
-                className="inp"
-                onKeyDown={(e) => e.key === "Enter" && submit()}
-              />
-            </div>
-            {error && (
-              <p style={{ fontSize: 12, color: "var(--red)", fontWeight: 500 }}>
-                {error}
-              </p>
-            )}
-            <button
-              onClick={submit}
-              disabled={loading}
-              className="btn-i"
-              style={{
-                padding: "11px 0",
-                fontSize: 14,
-                fontWeight: 700,
-                borderRadius: 11,
-                width: "100%",
-              }}
-            >
-              {loading ? "Updating..." : "Update Password"}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-/* ══════════════════════════════════════════════
-   BUG REPORT PAGE
-══════════════════════════════════════════════ */
-const BugReport = ({ user }) => {
-  const [form, setForm] = useState({
-    type: "bug",
-    title: "",
-    desc: "",
-    steps: "",
-  });
-  const [loading, setLoad] = useState(false);
-  const [done, setDone] = useState(false);
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-
-  const submit = async () => {
-    if (!form.title.trim() || !form.desc.trim()) return;
-    setLoad(true);
-    const msg = `Bug Report — Trackli\n\nType: ${form.type}\nTitle: ${form.title}\nDescription: ${form.desc}\nSteps to Reproduce: ${form.steps || "Not provided"}\nReported by: ${user?.email || "Unknown"}`;
-    const waLink = `https://wa.me/91XXXXXXXXXX?text=${encodeURIComponent(msg)}`;
-    window.open(waLink, "_blank");
-    setLoad(false);
-    setDone(true);
-    setTimeout(() => {
-      setDone(false);
-      setForm({ type: "bug", title: "", desc: "", steps: "" });
-    }, 3000);
-  };
-
-  const types = [
-    { v: "bug", l: "Bug — Something isn't working" },
-    { v: "ui", l: "UI Issue — Design or layout problem" },
-    { v: "feature", l: "Feature Request — Suggest something new" },
-    { v: "other", l: "Other — Something else" },
-  ];
-
-  return (
-    <div
-      className="fu"
-      style={{ maxWidth: 580, margin: "0 auto", padding: "8px 0 60px" }}
-    >
-      {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <h2
-          style={{
-            fontSize: 20,
-            fontWeight: 700,
-            color: "var(--t1)",
-            letterSpacing: "-.03em",
-            marginBottom: 6,
-          }}
-        >
-          Report an Issue
-        </h2>
-        <p style={{ fontSize: 13, color: "var(--t3)", lineHeight: 1.6 }}>
-          Found a bug or have feedback? Let us know and we'll get it fixed as
-          soon as possible.
-        </p>
-      </div>
-
-      {done ? (
-        <div
-          className="gc"
-          style={{
-            padding: 40,
-            textAlign: "center",
-            borderColor: "rgba(34,197,94,.2)",
-          }}
-        >
-          <div
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 14,
-              background: "var(--greenbg)",
-              border: "1px solid rgba(34,197,94,.2)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 16px",
-            }}
-          >
-            <Icon n="check" size={22} color="var(--green)" />
-          </div>
-          <p
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              color: "var(--t1)",
-              marginBottom: 6,
-            }}
-          >
-            Report Submitted
-          </p>
-          <p style={{ fontSize: 13, color: "var(--t3)" }}>
-            Thank you for your feedback. We'll look into it shortly.
-          </p>
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {/* Type selector */}
-          <div className="gc" style={{ padding: 18 }}>
-            <p className="lbl" style={{ marginBottom: 12 }}>
-              Issue Type
-            </p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 8,
-              }}
-            >
-              {types.map((t) => (
-                <button
-                  key={t.v}
-                  onClick={() => setForm((f) => ({ ...f, type: t.v }))}
-                  style={{
-                    background:
-                      form.type === t.v ? "var(--indigobg)" : "var(--surface2)",
-                    border: `1px solid ${form.type === t.v ? "rgba(99,102,241,.3)" : "var(--cb)"}`,
-                    color: form.type === t.v ? "var(--indigo)" : "var(--t2)",
-                    borderRadius: 10,
-                    padding: "10px 13px",
-                    fontSize: 12,
-                    fontWeight: 500,
-                    cursor: "pointer",
-                    textAlign: "left",
-                    fontFamily: "inherit",
-                    transition: "all .15s",
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {t.l}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Title */}
-          <div className="gc" style={{ padding: 18 }}>
-            <p className="lbl" style={{ marginBottom: 10 }}>
-              Title <span style={{ color: "var(--red)" }}>*</span>
-            </p>
-            <input
-              value={form.title}
-              onChange={set("title")}
-              placeholder="Brief summary of the issue"
-              className="inp"
-            />
-          </div>
-
-          {/* Description */}
-          <div className="gc" style={{ padding: 18 }}>
-            <p className="lbl" style={{ marginBottom: 10 }}>
-              Description <span style={{ color: "var(--red)" }}>*</span>
-            </p>
-            <textarea
-              value={form.desc}
-              onChange={set("desc")}
-              placeholder="What happened? What did you expect to happen? Include any error messages you saw."
-              className="inp"
-              rows={4}
-              style={{ resize: "vertical", lineHeight: 1.6 }}
-            />
-          </div>
-
-          {/* Steps */}
-          <div className="gc" style={{ padding: 18 }}>
-            <p className="lbl" style={{ marginBottom: 6 }}>
-              Steps to Reproduce{" "}
-              <span
-                style={{
-                  color: "var(--t3)",
-                  fontWeight: 400,
-                  textTransform: "none",
-                  letterSpacing: 0,
-                }}
-              >
-                (optional)
-              </span>
-            </p>
-            <p style={{ fontSize: 11, color: "var(--t3)", marginBottom: 10 }}>
-              Help us reproduce the issue faster
-            </p>
-            <textarea
-              value={form.steps}
-              onChange={set("steps")}
-              placeholder={
-                "1. Go to Dashboard\n2. Click Add Income\n3. Error appears"
-              }
-              className="inp"
-              rows={3}
-              style={{ resize: "vertical", lineHeight: 1.6 }}
-            />
-          </div>
-
-          {/* Footer note */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "10px 14px",
-              background: "var(--surface2)",
-              borderRadius: 10,
-              border: "1px solid var(--cb)",
-            }}
-          >
-            <Icon n="info" size={14} color="var(--t3)" />
-            <p style={{ fontSize: 12, color: "var(--t3)" }}>
-              Your email{" "}
-              <strong style={{ color: "var(--t2)" }}>{user?.email}</strong> will
-              be included so we can follow up.
-            </p>
-          </div>
-
-          {/* Submit */}
-          <button
-            onClick={submit}
-            disabled={loading || !form.title.trim() || !form.desc.trim()}
-            className="btn-i"
-            style={{
-              padding: "13px 0",
-              fontSize: 14,
-              fontWeight: 600,
-              borderRadius: 11,
-              width: "100%",
-            }}
-          >
-            {loading ? "Submitting..." : "Submit Report"}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
+  }
+})();
 
 export default function App() {
   // injectStyles already called at module level above
@@ -7063,8 +5429,8 @@ export default function App() {
   const [goal, setGoalSt] = useState({ monthly: 0 });
   const [sub, setSub] = useState(null);
   const [showPaywall, setPayw] = useState(false);
-  const [showPwReset, setShowPwReset] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebStats, setCelebStats] = useState(null);
   const [darkMode, setDark] = useState(() => {
     try {
       const s = localStorage.getItem("flt_theme");
@@ -7073,15 +5439,52 @@ export default function App() {
       return true;
     }
   });
-  const daysLeft = sub ? getTrialDaysLeft(sub) : 7;
+  const daysLeft = sub ? getTrialDaysLeft(sub) : 30;
 
-  const requirePro = useCallback(() => {
-    if (DEV_SKIP_PAYWALL) return true;
-    if (sub?.unlocked) return true;
-    if (daysLeft > 0) return true;
-    setPayw(true);
-    return false;
-  }, [sub, daysLeft]);
+  // ── MONTH RESET — new month detect karo aur archive karo ──
+  useEffect(() => {
+    if (!user) return;
+    const now = new Date();
+    const currentMK = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const lastMK = loadLastMonth();
+
+    if (lastMK && lastMK !== currentMK) {
+      // Naya mahina! Purane transactions archive karo
+      const archive = loadArchive();
+      archive[lastMK] = transactions.filter((t) => t.date.startsWith(lastMK));
+      saveArchive(archive);
+
+      // Stats calculate karo celebration ke liye
+      const oldTx = archive[lastMK];
+      const income = oldTx
+        .filter((t) => t.type === "income")
+        .reduce((s, t) => s + t.amount, 0);
+      const received = oldTx
+        .filter((t) => t.type === "income" && t.paid)
+        .reduce((s, t) => s + t.amount, 0);
+      const videos = oldTx.filter((t) => t.type === "income").length;
+      const clientMap = {};
+      oldTx
+        .filter((t) => t.type === "income")
+        .forEach((t) => {
+          clientMap[t.client] = (clientMap[t.client] || 0) + t.amount;
+        });
+      const topClient = Object.entries(clientMap).sort(
+        (a, b) => b[1] - a[1],
+      )[0];
+      setCelebStats({
+        income,
+        received,
+        videos,
+        clients: Object.keys(clientMap).length,
+        topClient: topClient?.[0],
+        topAmount: topClient?.[1],
+      });
+      setShowCelebration(true);
+    }
+
+    saveLastMonth(currentMK);
+  }, [user, transactions]);
 
   // Apply theme
   useEffect(() => {
@@ -7098,7 +5501,7 @@ export default function App() {
   // Supabase auth
   useEffect(() => {
     // Timeout fallback — if Supabase takes too long, show auth screen
-    const timer = setTimeout(() => setAuthL(false), 2000);
+    const timer = setTimeout(() => setAuthL(false), 5000);
     supabase.auth
       .getSession()
       .then(({ data: { session } }) => {
@@ -7112,13 +5515,7 @@ export default function App() {
       });
     const {
       data: { subscription: s2 },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
-        // User clicked reset link — show new password form
-        setUser(session?.user ?? null);
-        setShowPwReset(true);
-        return;
-      }
+    } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null);
     });
     return () => s2.unsubscribe();
@@ -7151,33 +5548,9 @@ export default function App() {
           .eq("user_id", user.id)
           .maybeSingle();
         if (gData) setGoalSt({ monthly: gData.monthly });
-
-        // ── Subscription check — Supabase FIRST, localStorage fallback ──
-        const { data: subData } = await supabase
-          .from("subscriptions")
-          .select("*")
-          .eq("user_id", user.id)
-          .eq("status", "active")
-          .maybeSingle();
-
-        if (subData) {
-          // Supabase mein active subscription hai — unlocked!
-          const dbSub = {
-            unlocked: true,
-            unlockedAt: subData.started_at,
-            plan: subData.plan,
-          };
-          setSub(dbSub);
-          saveSub(dbSub); // sync to localStorage as well
-        } else {
-          // Supabase mein nahi — localStorage check karo (trial)
-          const s = initTrial();
-          setSub(s);
-          if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) === 0)
-            setPayw(true);
-          else if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) <= 3)
-            setPayw(true);
-        }
+        const s = initTrial();
+        setSub(s);
+        if (!s.unlocked && getTrialDaysLeft(s) <= 7) setPayw(true);
       } catch (e) {
         console.error(e);
       }
@@ -7198,7 +5571,6 @@ export default function App() {
   const addTx = useCallback(
     async (tx) => {
       if (!user?.id) return;
-      if (!requirePro()) return;
       const row = {
         id: tx.id,
         user_id: user.id,
@@ -7213,12 +5585,11 @@ export default function App() {
       setTx((p) => [row, ...p]);
       await supabase.from("transactions").insert(row);
     },
-    [user, requirePro],
+    [user],
   );
 
   const saveTxEdit = useCallback(
     async (u) => {
-      if (!requirePro()) return;
       setTx((p) => p.map((t) => (t.id === u.id ? u : t)));
       setEditTx(null);
       await supabase
@@ -7227,50 +5598,29 @@ export default function App() {
         .eq("id", u.id)
         .eq("user_id", user?.id);
     },
-    [user, requirePro],
+    [user],
   );
 
   const confirmDel = useCallback(async () => {
     if (!delTx) return;
-    if (!requirePro()) return;
     setTx((p) => p.filter((t) => t.id !== delTx.id));
     setDelTx(null);
     await supabase.from("transactions").delete().eq("id", delTx.id);
-  }, [delTx, requirePro]);
+  }, [delTx]);
 
-  const togglePaid = useCallback(
-    async (id) => {
-      if (!user) return;
-      if (!requirePro()) return;
-      // Find current value
-      let newPaid = false;
-      setTx((p) =>
-        p.map((t) => {
-          if (t.id !== id) return t;
-          newPaid = !t.paid;
-          return { ...t, paid: newPaid };
-        }),
-      );
-      // Persist to Supabase
-      const { error } = await supabase
-        .from("transactions")
-        .update({ paid: newPaid })
-        .eq("id", id)
-        .eq("user_id", user.id);
-      if (error) {
-        console.error("togglePaid failed:", error.message);
-        // Revert on failure
-        setTx((p) =>
-          p.map((t) => (t.id !== id ? t : { ...t, paid: !newPaid })),
-        );
-      }
-    },
-    [user, requirePro],
-  );
+  const togglePaid = useCallback(async (id) => {
+    setTx((p) =>
+      p.map((t) => {
+        if (t.id !== id) return t;
+        const u = { ...t, paid: !t.paid };
+        supabase.from("transactions").update({ paid: u.paid }).eq("id", id);
+        return u;
+      }),
+    );
+  }, []);
 
   const handleAddClient = useCallback(
     async (name) => {
-      if (!requirePro()) return;
       setEC((p) => [...p, name]);
       if (!user) return;
       await supabase
@@ -7278,12 +5628,11 @@ export default function App() {
         .insert({ user_id: user.id, name })
         .select();
     },
-    [user, requirePro],
+    [user],
   );
 
   const deleteClient = useCallback(
     async (name) => {
-      if (!requirePro()) return;
       setTx((p) => p.filter((t) => t.client !== name));
       setEC((p) => p.filter((c) => c !== name));
       if (!user) return;
@@ -7298,34 +5647,18 @@ export default function App() {
         .eq("user_id", user.id)
         .eq("name", name);
     },
-    [user, requirePro],
+    [user],
   );
 
-  const markAllPaid = useCallback(
-    async (clientName) => {
-      if (!user) return;
-      if (!requirePro()) return;
-      const ids = [];
-      setTx((p) =>
-        p.map((t) => {
-          if (t.client !== clientName || t.type !== "income" || t.paid)
-            return t;
-          ids.push(t.id);
-          return { ...t, paid: true };
-        }),
-      );
-      // Persist all to Supabase
-      for (const id of ids) {
-        const { error } = await supabase
-          .from("transactions")
-          .update({ paid: true })
-          .eq("id", id)
-          .eq("user_id", user.id);
-        if (error) console.error("markAllPaid failed for", id, error.message);
-      }
-    },
-    [user, requirePro],
-  );
+  const markAllPaid = useCallback(async (clientName) => {
+    setTx((p) =>
+      p.map((t) => {
+        if (t.client !== clientName || t.type !== "income" || t.paid) return t;
+        supabase.from("transactions").update({ paid: true }).eq("id", t.id);
+        return { ...t, paid: true };
+      }),
+    );
+  }, []);
 
   const openAdd = (type = "income", client = "") =>
     setAddState({ type, client });
@@ -7382,16 +5715,11 @@ export default function App() {
   // Auth screen
   if (!user) return <AuthScreen onLogin={setUser} />;
 
-  // Password recovery screen — shown after clicking reset email link
-  if (showPwReset)
-    return <ResetPasswordModal onDone={() => setShowPwReset(false)} />;
-
   const tabs = [
     { id: "dashboard", label: "Dashboard", icon: "home" },
     { id: "transactions", label: "Transactions", icon: "list" },
     { id: "calendar", label: "Calendar", icon: "calendar" },
     { id: "invoice", label: "Invoice", icon: "receipt" },
-    { id: "bugreport", label: "Bug Report", icon: "alert" },
   ];
 
   const navItems = [
@@ -7399,7 +5727,6 @@ export default function App() {
     { id: "transactions", label: "Transactions", icon: "list" },
     { id: "calendar", label: "Calendar", icon: "calendar" },
     { id: "invoice", label: "Invoice", icon: "receipt" },
-    { id: "bugreport", label: "Bug Report", icon: "alert" },
   ];
 
   const pageContent = (
@@ -7440,7 +5767,6 @@ export default function App() {
         />
       )}
       {tab === "invoice" && <InvoicePage transactions={transactions} />}
-      {tab === "bugreport" && <BugReport user={user} />}
     </>
   );
 
@@ -7498,334 +5824,14 @@ export default function App() {
               </button>
             )}
             <ThemeToggle dark={darkMode} onToggle={toggleTheme} />
-            <div style={{ position: "relative" }}>
-              <button
-                onClick={() => setShowProfile((p) => !p)}
-                className="pill-ghost"
-                style={{ padding: "6px 14px" }}
-              >
-                <div
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #6366f1, #22c55e)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 10,
-                    fontWeight: 800,
-                    color: "#fff",
-                    flexShrink: 0,
-                  }}
-                >
-                  {(user?.user_metadata?.name ||
-                    user?.email ||
-                    "U")[0].toUpperCase()}
-                </div>
-                <span className="btn-lbl">Account</span>
-              </button>
-
-              {/* Profile Card */}
-              {showProfile && (
-                <>
-                  {/* Backdrop */}
-                  <div
-                    onClick={() => setShowProfile(false)}
-                    style={{ position: "fixed", inset: 0, zIndex: 998 }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "calc(100% + 10px)",
-                      right: 0,
-                      zIndex: 999,
-                      width: 260,
-                      background: "var(--surface2)",
-                      border: "1px solid var(--cb)",
-                      borderRadius: 16,
-                      padding: "18px",
-                      boxShadow: "0 16px 48px rgba(0,0,0,0.4)",
-                      animation: "fadeUp .2s ease both",
-                    }}
-                  >
-                    {/* Avatar + Name */}
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 12,
-                        marginBottom: 16,
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: "50%",
-                          background:
-                            "linear-gradient(135deg, #6366f1, #22c55e)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: 16,
-                          fontWeight: 800,
-                          color: "#fff",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {(user?.user_metadata?.name ||
-                          user?.email ||
-                          "U")[0].toUpperCase()}
-                      </div>
-                      <div style={{ minWidth: 0 }}>
-                        <p
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            color: "var(--t1)",
-                            marginBottom: 2,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {user?.user_metadata?.name || "Freelancer"}
-                        </p>
-                        <p
-                          style={{
-                            fontSize: 11,
-                            color: "var(--t3)",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {user?.email}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-                    <div
-                      style={{
-                        height: 1,
-                        background: "var(--cb)",
-                        marginBottom: 14,
-                      }}
-                    />
-
-                    {/* Subscription Info */}
-                    <div
-                      style={{
-                        background: sub?.unlocked
-                          ? "rgba(34,197,94,0.06)"
-                          : "rgba(245,158,11,0.06)",
-                        border: `1px solid ${sub?.unlocked ? "rgba(34,197,94,0.15)" : "rgba(245,158,11,0.15)"}`,
-                        borderRadius: 10,
-                        padding: "12px 14px",
-                        marginBottom: 14,
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          marginBottom: 8,
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: 11,
-                            fontWeight: 700,
-                            color: "var(--t3)",
-                            textTransform: "uppercase",
-                            letterSpacing: ".08em",
-                          }}
-                        >
-                          Subscription
-                        </span>
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            borderRadius: 99,
-                            padding: "2px 8px",
-                            background: sub?.unlocked
-                              ? "rgba(34,197,94,0.12)"
-                              : "rgba(245,158,11,0.12)",
-                            color: sub?.unlocked ? "#4ade80" : "#fbbf24",
-                            border: `1px solid ${sub?.unlocked ? "rgba(34,197,94,0.25)" : "rgba(245,158,11,0.25)"}`,
-                          }}
-                        >
-                          {sub?.unlocked ? "Active" : "Trial"}
-                        </span>
-                      </div>
-
-                      {sub?.unlocked ? (
-                        <div>
-                          <p
-                            style={{
-                              fontSize: 12,
-                              color: "var(--t2)",
-                              marginBottom: 4,
-                            }}
-                          >
-                            Plan:{" "}
-                            <strong style={{ color: "var(--t1)" }}>
-                              {sub?.plan === "yearly"
-                                ? "Pro Annual"
-                                : "Starter Monthly"}
-                            </strong>
-                          </p>
-                          {sub?.expires_at &&
-                            (() => {
-                              const daysRem = Math.max(
-                                0,
-                                Math.ceil(
-                                  (new Date(sub.expires_at) - new Date()) /
-                                    86400000,
-                                ),
-                              );
-                              return (
-                                <div>
-                                  <p
-                                    style={{
-                                      fontSize: 12,
-                                      color: "var(--t2)",
-                                      marginBottom: 6,
-                                    }}
-                                  >
-                                    <strong
-                                      style={{
-                                        color:
-                                          daysRem <= 7 ? "#f87171" : "#4ade80",
-                                      }}
-                                    >
-                                      {daysRem} days
-                                    </strong>{" "}
-                                    remaining
-                                  </p>
-                                  <div
-                                    style={{
-                                      height: 4,
-                                      background: "rgba(255,255,255,0.06)",
-                                      borderRadius: 99,
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        height: "100%",
-                                        borderRadius: 99,
-                                        width: `${Math.min(100, (daysRem / (sub?.plan === "yearly" ? 365 : 30)) * 100)}%`,
-                                        background:
-                                          daysRem <= 7
-                                            ? "#ef4444"
-                                            : "var(--green)",
-                                        transition: "width .3s",
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                        </div>
-                      ) : (
-                        <div>
-                          <p
-                            style={{
-                              fontSize: 12,
-                              color: "var(--t2)",
-                              marginBottom: 6,
-                            }}
-                          >
-                            <strong
-                              style={{
-                                color: daysLeft <= 2 ? "#f87171" : "#fbbf24",
-                              }}
-                            >
-                              {daysLeft} days
-                            </strong>{" "}
-                            left in trial
-                          </p>
-                          <div
-                            style={{
-                              height: 4,
-                              background: "rgba(255,255,255,0.06)",
-                              borderRadius: 99,
-                            }}
-                          >
-                            <div
-                              style={{
-                                height: "100%",
-                                borderRadius: 99,
-                                width: `${(daysLeft / 7) * 100}%`,
-                                background:
-                                  daysLeft <= 2 ? "#ef4444" : "#fbbf24",
-                                transition: "width .3s",
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Actions */}
-                    {!sub?.unlocked && (
-                      <button
-                        onClick={() => {
-                          setShowProfile(false);
-                          setPayw(true);
-                        }}
-                        style={{
-                          width: "100%",
-                          background:
-                            "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: 10,
-                          padding: "10px",
-                          fontSize: 13,
-                          fontWeight: 700,
-                          cursor: "pointer",
-                          marginBottom: 8,
-                          fontFamily: "inherit",
-                        }}
-                      >
-                        Upgrade to Pro →
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => {
-                        setShowProfile(false);
-                        logout();
-                      }}
-                      style={{
-                        width: "100%",
-                        background: "rgba(239,68,68,0.08)",
-                        color: "#f87171",
-                        border: "1px solid rgba(239,68,68,0.15)",
-                        borderRadius: 10,
-                        padding: "9px",
-                        fontSize: 13,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        fontFamily: "inherit",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: 6,
-                      }}
-                    >
-                      <Icon n="logout" size={13} color="#f87171" />
-                      Sign Out
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+            <button
+              onClick={logout}
+              className="pill-ghost"
+              style={{ padding: "6px 14px" }}
+            >
+              <Icon n="logout" size={13} />
+              <span className="btn-lbl">Logout</span>
+            </button>
           </div>
         </div>
 
@@ -7846,12 +5852,30 @@ export default function App() {
         </div>
       </header>
 
+      {/* ══ NEW MONTH CELEBRATION ══ */}
+      {showCelebration && celebStats && (
+        <NewMonthCelebration
+          stats={celebStats}
+          monthName={
+            MONTHS[new Date().getMonth() === 0 ? 11 : new Date().getMonth() - 1]
+          }
+          onClose={() => setShowCelebration(false)}
+        />
+      )}
+
       {/* ══ PAYWALL ══ */}
       {showPaywall && (
         <Paywall
           daysLeft={daysLeft}
-          user={user}
-          onClose={() => setPayw(false)}
+          onUnlock={() => {
+            setSub(loadSub());
+            setPayw(false);
+          }}
+        />
+      )}
+      {!sub?.unlocked && daysLeft === 0 && !showPaywall && (
+        <Paywall
+          daysLeft={0}
           onUnlock={() => {
             setSub(loadSub());
             setPayw(false);
@@ -7879,9 +5903,7 @@ export default function App() {
         </aside>
 
         {/* ── MAIN CONTENT — desktop: fills rest, mobile: full width ── */}
-        <main className="main-content">
-          <div className="content-wrap">{pageContent}</div>
-        </main>
+        <main className="main-content">{pageContent}</main>
       </div>
 
       {/* ══ MODALS ══ */}
@@ -7955,78 +5977,3 @@ export default function App() {
     </div>
   );
 }
-
-// ── ERROR BOUNDARY ──
-import { Component } from "react";
-
-class ErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-  componentDidCatch(error, info) {
-    console.error("App crashed:", error, info);
-  }
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div
-          style={{
-            minHeight: "100vh",
-            background: "#0d0d12",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 24,
-            textAlign: "center",
-            fontFamily: "sans-serif",
-          }}
-        >
-          <div style={{ fontSize: 40, marginBottom: 16 }}>⚠️</div>
-          <p
-            style={{
-              color: "#fff",
-              fontSize: 18,
-              fontWeight: 700,
-              marginBottom: 8,
-            }}
-          >
-            Something went wrong
-          </p>
-          <p
-            style={{
-              color: "#888",
-              fontSize: 13,
-              marginBottom: 24,
-              maxWidth: 300,
-            }}
-          >
-            {this.state.error?.message || "Unknown error"}
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              background: "#22c55e",
-              color: "#000",
-              border: "none",
-              borderRadius: 10,
-              padding: "12px 24px",
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            Reload App
-          </button>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-export { ErrorBoundary };
