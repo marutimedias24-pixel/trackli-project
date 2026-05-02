@@ -4950,10 +4950,11 @@ const Paywall = ({ daysLeft, onUnlock, onClose, user }) => {
     { ok: true, text: "Early access to new features" },
   ];
 
+  const userEmail = encodeURIComponent(user?.email || "");
   const payLink =
     selPlan === "yearly"
-      ? "https://rzp.io/rzp/So1SE4j"
-      : "https://rzp.io/rzp/FQ6PDFlu";
+      ? `https://rzp.io/rzp/So1SE4j?prefill[email]=${userEmail}&notes[email]=${userEmail}`
+      : `https://rzp.io/rzp/FQ6PDFlu?prefill[email]=${userEmail}&notes[email]=${userEmail}`;
 
   if (success) {
     return (
