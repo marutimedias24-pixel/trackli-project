@@ -15,7 +15,6 @@
         margin: 0;
         padding: 0;
       }
-
       :root {
         --bg: #070a07;
         --surface: #0d110d;
@@ -30,7 +29,6 @@
         --amber: #f59e0b;
         --indigo: #6366f1;
       }
-
       body {
         font-family: "DM Sans", sans-serif;
         background: var(--bg);
@@ -38,8 +36,6 @@
         min-height: 100vh;
         -webkit-font-smoothing: antialiased;
       }
-
-      /* ── LOGIN ── */
       .login-page {
         min-height: 100vh;
         display: flex;
@@ -47,7 +43,6 @@
         justify-content: center;
         padding: 24px;
       }
-
       .login-card {
         width: 100%;
         max-width: 360px;
@@ -56,14 +51,12 @@
         border-radius: 20px;
         padding: 36px 32px;
       }
-
       .login-logo {
         display: flex;
         align-items: center;
         gap: 10px;
         margin-bottom: 28px;
       }
-
       .login-logo-ic {
         width: 36px;
         height: 36px;
@@ -75,13 +68,11 @@
         font-size: 18px;
         box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
       }
-
       .login-logo-name {
         font-size: 20px;
         font-weight: 800;
         letter-spacing: -0.04em;
       }
-
       .login-card h2 {
         font-size: 20px;
         font-weight: 700;
@@ -92,7 +83,6 @@
         color: var(--t2);
         margin-bottom: 24px;
       }
-
       .inp {
         width: 100%;
         background: rgba(255, 255, 255, 0.04);
@@ -112,7 +102,6 @@
       .inp::placeholder {
         color: var(--t3);
       }
-
       .btn-primary {
         width: 100%;
         background: var(--green);
@@ -130,7 +119,6 @@
       .btn-primary:hover {
         background: var(--green2);
       }
-
       .link-btn {
         background: none;
         border: none;
@@ -144,7 +132,6 @@
         text-align: center;
         margin-top: 4px;
       }
-
       .err-box {
         background: rgba(239, 68, 68, 0.08);
         border: 1px solid rgba(239, 68, 68, 0.2);
@@ -154,7 +141,6 @@
         font-size: 13px;
         margin-bottom: 12px;
       }
-
       .ok-box {
         background: rgba(34, 197, 94, 0.08);
         border: 1px solid rgba(34, 197, 94, 0.2);
@@ -164,14 +150,10 @@
         font-size: 13px;
         margin-bottom: 12px;
       }
-
-      /* ── LAYOUT ── */
       .app {
         display: flex;
         min-height: 100vh;
       }
-
-      /* ── SIDEBAR ── */
       .sidebar {
         width: 220px;
         flex-shrink: 0;
@@ -186,7 +168,6 @@
         bottom: 0;
         z-index: 50;
       }
-
       .sidebar-logo {
         display: flex;
         align-items: center;
@@ -195,7 +176,6 @@
         border-bottom: 1px solid var(--border);
         margin-bottom: 16px;
       }
-
       .sidebar-logo-ic {
         width: 28px;
         height: 28px;
@@ -206,7 +186,6 @@
         justify-content: center;
         font-size: 14px;
       }
-
       .sidebar-logo-name {
         font-size: 16px;
         font-weight: 800;
@@ -224,7 +203,6 @@
         text-transform: uppercase;
         margin-left: auto;
       }
-
       .nav-item {
         display: flex;
         align-items: center;
@@ -242,7 +220,6 @@
         text-align: left;
         border-radius: 0;
       }
-
       .nav-item:hover {
         color: var(--t1);
         background: rgba(255, 255, 255, 0.03);
@@ -256,13 +233,11 @@
         width: 18px;
         text-align: center;
       }
-
       .sidebar-bottom {
         margin-top: auto;
         padding: 16px 20px;
         border-top: 1px solid var(--border);
       }
-
       .signout-btn {
         display: flex;
         align-items: center;
@@ -278,15 +253,12 @@
       .signout-btn:hover {
         color: #f87171;
       }
-
-      /* ── MAIN CONTENT ── */
       .main {
         margin-left: 220px;
         flex: 1;
         padding: 28px;
         min-height: 100vh;
       }
-
       .page-title {
         font-size: 22px;
         font-weight: 800;
@@ -294,21 +266,17 @@
         color: var(--t1);
         margin-bottom: 6px;
       }
-
       .page-sub {
         font-size: 13px;
         color: var(--t2);
         margin-bottom: 28px;
       }
-
-      /* ── STAT CARDS ── */
       .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 14px;
         margin-bottom: 28px;
       }
-
       .stat-card {
         background: var(--surface);
         border: 1px solid var(--border);
@@ -317,7 +285,6 @@
         position: relative;
         overflow: hidden;
       }
-
       .stat-card::before {
         content: "";
         position: absolute;
@@ -329,7 +296,6 @@
         opacity: 0.06;
         transform: translate(20px, -20px);
       }
-
       .stat-card.green::before {
         background: #22c55e;
       }
@@ -342,7 +308,6 @@
       .stat-card.red::before {
         background: #ef4444;
       }
-
       .stat-label {
         font-size: 10px;
         font-weight: 700;
@@ -351,7 +316,6 @@
         color: var(--t3);
         margin-bottom: 10px;
       }
-
       .stat-num {
         font-size: 32px;
         font-weight: 800;
@@ -359,7 +323,6 @@
         line-height: 1;
         margin-bottom: 4px;
       }
-
       .stat-card.green .stat-num {
         color: var(--green);
       }
@@ -372,13 +335,10 @@
       .stat-card.red .stat-num {
         color: #f87171;
       }
-
       .stat-sub {
         font-size: 11px;
         color: var(--t3);
       }
-
-      /* ── TABLE ── */
       .section-header {
         display: flex;
         align-items: center;
@@ -387,13 +347,11 @@
         flex-wrap: wrap;
         gap: 10px;
       }
-
       .section-title {
         font-size: 15px;
         font-weight: 700;
         color: var(--t1);
       }
-
       .search-inp {
         background: var(--surface);
         border: 1px solid var(--border);
@@ -412,7 +370,6 @@
       .search-inp::placeholder {
         color: var(--t3);
       }
-
       .export-btn {
         background: rgba(34, 197, 94, 0.08);
         border: 1px solid rgba(34, 197, 94, 0.2);
@@ -428,7 +385,6 @@
       .export-btn:hover {
         background: rgba(34, 197, 94, 0.14);
       }
-
       .table-wrap {
         background: var(--surface);
         border: 1px solid var(--border);
@@ -436,13 +392,11 @@
         overflow: auto;
         margin-bottom: 24px;
       }
-
       table {
         width: 100%;
         border-collapse: collapse;
         min-width: 600px;
       }
-
       thead th {
         padding: 11px 16px;
         text-align: left;
@@ -454,31 +408,26 @@
         border-bottom: 1px solid var(--border);
         white-space: nowrap;
       }
-
       tbody tr {
         border-bottom: 1px solid rgba(255, 255, 255, 0.03);
         transition: background 0.1s;
       }
-
       tbody tr:last-child {
         border-bottom: none;
       }
       tbody tr:hover {
         background: rgba(255, 255, 255, 0.02);
       }
-
       td {
         padding: 12px 16px;
         font-size: 13px;
         color: var(--t2);
         vertical-align: middle;
       }
-
       td:first-child {
         color: var(--t1);
         font-weight: 500;
       }
-
       .badge-pill {
         display: inline-block;
         padding: 3px 9px;
@@ -487,7 +436,6 @@
         font-weight: 700;
         letter-spacing: 0.05em;
       }
-
       .badge-active {
         background: rgba(34, 197, 94, 0.1);
         border: 1px solid rgba(34, 197, 94, 0.2);
@@ -508,7 +456,6 @@
         border: 1px solid rgba(99, 102, 241, 0.2);
         color: #a5b4fc;
       }
-
       .days-bar {
         width: 80px;
         height: 4px;
@@ -519,17 +466,14 @@
         vertical-align: middle;
         margin-left: 6px;
       }
-
       .days-bar-fill {
         height: 100%;
         border-radius: 99px;
         transition: width 0.3s;
       }
-
       .alert-row {
         background: rgba(239, 68, 68, 0.04) !important;
       }
-
       .empty {
         text-align: center;
         padding: 48px;
@@ -542,8 +486,6 @@
         color: var(--t3);
         font-size: 13px;
       }
-
-      /* ── REFRESH BTN ── */
       .refresh-btn {
         background: none;
         border: 1px solid var(--border);
@@ -562,8 +504,6 @@
         color: var(--t1);
         border-color: rgba(255, 255, 255, 0.12);
       }
-
-      /* ── ALERTS ── */
       .alert-card {
         background: rgba(239, 68, 68, 0.06);
         border: 1px solid rgba(239, 68, 68, 0.15);
@@ -574,7 +514,6 @@
         gap: 12px;
         margin-bottom: 10px;
       }
-
       .alert-card .alert-icon {
         font-size: 18px;
         flex-shrink: 0;
@@ -588,8 +527,6 @@
       .alert-card .alert-text strong {
         color: #f87171;
       }
-
-      /* ── RESPONSIVE ── */
       @media (max-width: 768px) {
         .sidebar {
           width: 100%;
@@ -612,7 +549,6 @@
           flex-direction: column;
         }
       }
-
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -623,12 +559,9 @@
           transform: translateY(0);
         }
       }
-
       .fade-in {
         animation: fadeIn 0.3s ease both;
       }
-
-      /* ── LAST SEEN ── */
       .avatar {
         width: 28px;
         height: 28px;
@@ -644,7 +577,6 @@
         margin-right: 8px;
         vertical-align: middle;
       }
-
       .wa-link {
         color: #25d366;
         text-decoration: none;
@@ -660,7 +592,6 @@
     </style>
   </head>
   <body>
-    <!-- ── LOGIN PAGE ── -->
     <div id="loginPage" class="login-page">
       <div class="login-card">
         <div class="login-logo">
@@ -683,7 +614,6 @@
           >
         </div>
 
-        <!-- Sign In -->
         <div id="formSignIn">
           <h2>Admin Access</h2>
           <p>Sign in to manage Trackli users and subscriptions.</p>
@@ -708,7 +638,6 @@
           </button>
         </div>
 
-        <!-- Forgot Password -->
         <div id="formForgot" style="display: none">
           <h2>Reset Password</h2>
           <p>Enter your email to receive a reset link.</p>
@@ -728,7 +657,6 @@
           </button>
         </div>
 
-        <!-- New Password -->
         <div id="formNewPass" style="display: none">
           <h2>Set New Password</h2>
           <p>Choose a strong new password.</p>
@@ -754,17 +682,14 @@
       </div>
     </div>
 
-    <!-- ── DASHBOARD ── -->
     <div id="dashPage" style="display: none">
       <div class="app">
-        <!-- Sidebar -->
         <aside class="sidebar">
           <div class="sidebar-logo">
             <div class="sidebar-logo-ic">⚡</div>
             <span class="sidebar-logo-name">Trackli</span>
             <span class="sidebar-badge">Admin</span>
           </div>
-
           <button
             class="nav-item active"
             onclick="showTab('overview')"
@@ -805,7 +730,6 @@
               "
             ></span>
           </button>
-
           <div class="sidebar-bottom">
             <div
               style="font-size: 11px; color: var(--t3); margin-bottom: 10px"
@@ -819,13 +743,10 @@
           </div>
         </aside>
 
-        <!-- Main -->
         <main class="main">
-          <!-- OVERVIEW TAB -->
           <div id="view-overview" class="fade-in">
             <div class="page-title">Overview</div>
             <div class="page-sub" id="lastRefresh">Loading...</div>
-
             <div class="stats-grid">
               <div class="stat-card green">
                 <div class="stat-label">Total Users</div>
@@ -858,8 +779,6 @@
                 <div class="stat-sub">From active subs</div>
               </div>
             </div>
-
-            <!-- Recent users -->
             <div class="section-header">
               <div class="section-title">Recent Users</div>
               <button class="refresh-btn" onclick="loadAll()">
@@ -886,17 +805,15 @@
             </div>
           </div>
 
-          <!-- USERS TAB -->
           <div id="view-users" style="display: none" class="fade-in">
             <div class="page-title">All Users</div>
             <div class="page-sub">Everyone who has signed up for Trackli.</div>
-
             <div class="section-header">
               <input
                 class="search-inp"
                 type="text"
                 id="userSearch"
-                placeholder="Search email..."
+                placeholder="Search email or name..."
                 oninput="filterUsers()"
               />
               <div style="display: flex; gap: 8px">
@@ -931,13 +848,11 @@
             </div>
           </div>
 
-          <!-- SUBSCRIPTIONS TAB -->
           <div id="view-subscriptions" style="display: none" class="fade-in">
             <div class="page-title">Subscriptions</div>
             <div class="page-sub">
               Track all active and expired subscriptions.
             </div>
-
             <div class="section-header">
               <input
                 class="search-inp"
@@ -973,13 +888,11 @@
             </div>
           </div>
 
-          <!-- WAITLIST TAB -->
           <div id="view-waitlist" style="display: none" class="fade-in">
             <div class="page-title">Waitlist</div>
             <div class="page-sub">
               Pre-launch signups from the landing page.
             </div>
-
             <div class="section-header">
               <input
                 class="search-inp"
@@ -1012,43 +925,42 @@
             </div>
           </div>
 
-          <!-- ALERTS TAB -->
           <div id="view-alerts" style="display: none" class="fade-in">
             <div class="page-title">Alerts</div>
             <div class="page-sub">
               Users who need attention — expiring soon or already expired.
             </div>
-            <div id="alertsList">
-              <div class="loader-cell">Loading...</div>
-            </div>
+            <div id="alertsList"><div class="loader-cell">Loading...</div></div>
           </div>
         </main>
       </div>
     </div>
 
     <script>
+      // ════════════════════════════════════════════════
+      // 🔒 SECURITY — Admin Email Whitelist
+      // Sirf in emails ko admin panel access milega
+      // Naye admin add karne ho to is array mein add karo
+      // ════════════════════════════════════════════════
+      const ADMIN_EMAILS = ["marutimedias.24@gmail.com", "ahiru1534@gmail.com"];
+
       const { createClient } = supabase;
       const sb = createClient(
         "https://afcdoobasrvoxtzwfayf.supabase.co",
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmY2Rvb2Jhc3J2b3h0endmYXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNDE5MjIsImV4cCI6MjA5MDYxNzkyMn0.80CrasucGj9dy1lc-kG_jEZy7j0hJDyp26JZDiKoi6g",
       );
 
-      // ── STATE ──
-      let allUsers = [];
-      let allSubs = [];
-      let allWaitlist = [];
-      let isRecovery = false;
+      let allUsers = [],
+        allSubs = [],
+        allWaitlist = [],
+        isRecovery = false;
 
-      // ── INIT ──
       async function init() {
-        // Check for password recovery token
         if (
           window.location.hash.includes("type=recovery") ||
           window.location.hash.includes("access_token")
-        ) {
+        )
           isRecovery = true;
-        }
-
         sb.auth.onAuthStateChange((event, session) => {
           if (event === "PASSWORD_RECOVERY") {
             isRecovery = true;
@@ -1060,7 +972,6 @@
             showDash(session);
           }
         });
-
         if (!isRecovery) {
           const {
             data: { session },
@@ -1069,19 +980,27 @@
         }
       }
 
-      // ── SHOW DASH ──
-      function showDash(session) {
+      // 🔒 SECURITY CHECK — Sirf admin emails allowed
+      async function showDash(session) {
+        const userEmail = session?.user?.email;
+        if (!userEmail || !ADMIN_EMAILS.includes(userEmail)) {
+          alert(
+            "⚠️ Access Denied\n\nYou are not authorized to access the admin panel. You will be signed out.",
+          );
+          await sb.auth.signOut();
+          location.reload();
+          return;
+        }
         document.getElementById("loginPage").style.display = "none";
         document.getElementById("dashPage").style.display = "block";
-        document.getElementById("adminEmail").textContent =
-          session?.user?.email || "—";
+        document.getElementById("adminEmail").textContent = userEmail;
         loadAll();
       }
 
-      // ── LOAD ALL DATA ──
       async function loadAll() {
         document.getElementById("lastRefresh").textContent = "Loading...";
-        await Promise.all([loadUsers(), loadSubs(), loadWaitlist()]);
+        await Promise.all([loadSubs(), loadWaitlist()]);
+        await loadUsers();
         renderOverview();
         renderAlerts();
         const now = new Date().toLocaleString("en-IN", {
@@ -1093,20 +1012,66 @@
           `Last updated: ${now} IST`;
       }
 
-      // ── LOAD USERS (from auth) ──
       async function loadUsers() {
         try {
-          // Get subscriptions to merge
-          const { data: subs } = await sb.from("subscriptions").select("*");
-          allSubs = subs || [];
-
-          // We can't access auth.admin without service key
-          // So we use subscriptions table + waitlist to build user list
-          // For users not in subscriptions, they're on free trial
+          const { data: profiles, error: pErr } = await sb
+            .from("profiles")
+            .select("*")
+            .order("created_at", { ascending: false });
+          if (pErr) {
+            console.error("Profiles fetch failed:", pErr);
+            return;
+          }
+          const subMap = {};
+          (allSubs || []).forEach((s) => {
+            subMap[s.user_id] = s;
+          });
+          allUsers = (profiles || []).map((p) => {
+            const sub = subMap[p.id];
+            const trialStart = new Date(p.created_at);
+            const trialEnd = new Date(trialStart.getTime() + 7 * 86400000);
+            const now = new Date();
+            const trialDaysLeft = Math.max(
+              0,
+              Math.ceil((trialEnd - now) / 86400000),
+            );
+            let status = "trial",
+              plan = "—",
+              expiresAt = trialEnd.toISOString(),
+              dLeft = trialDaysLeft;
+            if (sub && sub.status === "active") {
+              const subDays = daysLeft(sub.expires_at);
+              if (subDays > 0) {
+                status = "active";
+                plan = sub.plan || "—";
+                expiresAt = sub.expires_at;
+                dLeft = subDays;
+              } else {
+                status = "expired";
+                plan = sub.plan || "—";
+                expiresAt = sub.expires_at;
+                dLeft = 0;
+              }
+            } else if (trialDaysLeft === 0) {
+              status = "expired";
+              dLeft = 0;
+            }
+            return {
+              id: p.id,
+              email: p.email,
+              full_name: p.full_name || "—",
+              created_at: p.created_at,
+              status,
+              plan,
+              expires_at: expiresAt,
+              days_left: dLeft,
+              sub,
+            };
+          });
           renderUsersTable();
           renderSubsTable();
         } catch (e) {
-          console.error(e);
+          console.error("loadUsers failed:", e);
         }
       }
 
@@ -1126,7 +1091,6 @@
         allWaitlist = data || [];
       }
 
-      // ── HELPERS ──
       function daysLeft(expiresAt) {
         if (!expiresAt) return null;
         return Math.max(
@@ -1157,6 +1121,14 @@
         });
       }
 
+      function statusBadgeFromUser(u) {
+        if (u.status === "active")
+          return '<span class="badge-pill badge-active">Active</span>';
+        if (u.status === "trial")
+          return '<span class="badge-pill badge-trial">Trial</span>';
+        return '<span class="badge-pill badge-expired">Expired</span>';
+      }
+
       function statusBadge(sub) {
         if (!sub) return '<span class="badge-pill badge-trial">Trial</span>';
         if (sub.status === "active") {
@@ -1169,53 +1141,38 @@
       }
 
       function daysBar(d, total) {
-        if (d === null) return "";
+        if (d === null || d === undefined) return "—";
         const pct = Math.min(100, (d / total) * 100);
         const color = d <= 7 ? "#ef4444" : d <= 30 ? "#f59e0b" : "#22c55e";
-        return `<span style="display:inline-flex;align-items:center;gap:6px;">
-    <strong style="color:${d <= 7 ? "#f87171" : d <= 30 ? "#fbbf24" : "#4ade80"}">${d}d</strong>
-    <span class="days-bar"><span class="days-bar-fill" style="width:${pct}%;background:${color}"></span></span>
-  </span>`;
+        return `<span style="display:inline-flex;align-items:center;gap:6px;"><strong style="color:${d <= 7 ? "#f87171" : d <= 30 ? "#fbbf24" : "#4ade80"}">${d}d</strong><span class="days-bar"><span class="days-bar-fill" style="width:${pct}%;background:${color}"></span></span></span>`;
       }
 
-      // ── RENDER OVERVIEW ──
       function renderOverview() {
-        const active = allSubs.filter(
-          (s) => s.status === "active" && daysLeft(s.expires_at) > 0,
+        const active = allUsers.filter((u) => u.status === "active");
+        const trial = allUsers.filter((u) => u.status === "trial");
+        const expiring = allUsers.filter(
+          (u) => u.status === "active" && u.days_left <= 7 && u.days_left > 0,
         );
-        const expiring = allSubs.filter(
-          (s) =>
-            s.status === "active" &&
-            daysLeft(s.expires_at) <= 7 &&
-            daysLeft(s.expires_at) > 0,
+        const rev = active.reduce(
+          (acc, u) => acc + (u.plan === "yearly" ? 499 : 59),
+          0,
         );
-
-        // Revenue estimate
-        const rev = allSubs.reduce((acc, s) => {
-          if (s.status !== "active" || daysLeft(s.expires_at) <= 0) return acc;
-          return acc + (s.plan === "yearly" ? 499 : 59);
-        }, 0);
-
         document.getElementById("statUsers").textContent =
-          allSubs.length || "0";
+          allUsers.length || "0";
         document.getElementById("statActive").textContent = active.length;
-        document.getElementById("statTrial").textContent = "—";
+        document.getElementById("statTrial").textContent = trial.length;
         document.getElementById("statExpiring").textContent = expiring.length;
         document.getElementById("statWaitlist").textContent =
           allWaitlist.length;
         document.getElementById("statRevenue").textContent =
           "₹" + rev.toLocaleString("en-IN");
-
-        // Alert count
         const alertN = expiring.length;
         const ac = document.getElementById("alertCount");
         if (alertN > 0) {
           ac.textContent = alertN;
           ac.style.display = "inline";
         } else ac.style.display = "none";
-
-        // Recent table = last 10 subs
-        const recent = [...allSubs].slice(0, 10);
+        const recent = [...allUsers].slice(0, 10);
         const tbody = document.getElementById("recentTable");
         if (!recent.length) {
           tbody.innerHTML =
@@ -1223,27 +1180,20 @@
           return;
         }
         tbody.innerHTML = recent
-          .map((s) => {
-            const d = daysLeft(s.expires_at);
-            const isAlert = d !== null && d <= 7 && d > 0;
-            return `<tr class="${isAlert ? "alert-row" : ""}">
-      <td><span class="avatar">${(s.user_id || "U")[0].toUpperCase()}</span>${s.user_id?.slice(0, 8) || "—"}...</td>
-      <td>${fmt(s.created_at)}</td>
-      <td>${statusBadge(s)}</td>
-      <td style="text-transform:capitalize">${s.plan || "—"}</td>
-      <td>${d !== null ? daysBar(d, s.plan === "yearly" ? 365 : 30) : "—"}</td>
-    </tr>`;
+          .map((u) => {
+            const isAlert = u.days_left <= 7 && u.days_left > 0;
+            const totalDays =
+              u.status === "trial" ? 7 : u.plan === "yearly" ? 365 : 30;
+            return `<tr class="${isAlert ? "alert-row" : ""}"><td><span class="avatar">${(u.email || "U")[0].toUpperCase()}</span>${u.email}</td><td>${fmt(u.created_at)}</td><td>${statusBadgeFromUser(u)}</td><td style="text-transform:capitalize">${u.plan}</td><td>${daysBar(u.days_left, totalDays)}</td></tr>`;
           })
           .join("");
       }
 
-      // ── RENDER USERS TABLE ──
       let filteredUsers = [];
       function renderUsersTable() {
-        filteredUsers = [...allSubs];
+        filteredUsers = [...allUsers];
         _renderUsersTable(filteredUsers);
       }
-
       function _renderUsersTable(data) {
         const tbody = document.getElementById("usersTable");
         if (!data.length) {
@@ -1252,19 +1202,11 @@
           return;
         }
         tbody.innerHTML = data
-          .map((s, i) => {
-            const d = daysLeft(s.expires_at);
-            const isAlert = d !== null && d <= 7 && d > 0;
-            return `<tr class="${isAlert ? "alert-row" : ""}">
-      <td><span class="badge-pill" style="background:rgba(255,255,255,0.05);color:var(--t3)">${data.length - i}</span></td>
-      <td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.user_id || "—"}</td>
-      <td>—</td>
-      <td>${fmt(s.created_at)}</td>
-      <td>${statusBadge(s)}</td>
-      <td style="text-transform:capitalize">${s.plan || "—"}</td>
-      <td>${fmt(s.expires_at)}</td>
-      <td>${d !== null ? daysBar(d, s.plan === "yearly" ? 365 : 30) : "—"}</td>
-    </tr>`;
+          .map((u, i) => {
+            const isAlert = u.days_left <= 7 && u.days_left > 0;
+            const totalDays =
+              u.status === "trial" ? 7 : u.plan === "yearly" ? 365 : 30;
+            return `<tr class="${isAlert ? "alert-row" : ""}"><td><span class="badge-pill" style="background:rgba(255,255,255,0.05);color:var(--t3)">${data.length - i}</span></td><td style="font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email}</td><td>${u.full_name}</td><td>${fmt(u.created_at)}</td><td>${statusBadgeFromUser(u)}</td><td style="text-transform:capitalize">${u.plan}</td><td>${fmt(u.expires_at)}</td><td>${daysBar(u.days_left, totalDays)}</td></tr>`;
           })
           .join("");
       }
@@ -1272,19 +1214,19 @@
       function filterUsers() {
         const q = document.getElementById("userSearch").value.toLowerCase();
         _renderUsersTable(
-          filteredUsers.filter((s) =>
-            (s.user_id || "").toLowerCase().includes(q),
+          filteredUsers.filter(
+            (u) =>
+              (u.email || "").toLowerCase().includes(q) ||
+              (u.full_name || "").toLowerCase().includes(q),
           ),
         );
       }
 
-      // ── RENDER SUBS TABLE ──
       let filteredSubs = [];
       function renderSubsTable() {
         filteredSubs = [...allSubs];
         _renderSubsTable(filteredSubs);
       }
-
       function _renderSubsTable(data) {
         const tbody = document.getElementById("subsTable");
         if (!data.length) {
@@ -1292,36 +1234,37 @@
             '<tr><td colspan="8" class="empty">No subscriptions yet.</td></tr>';
           return;
         }
+        const userMap = {};
+        allUsers.forEach((u) => {
+          userMap[u.id] = u.email;
+        });
         tbody.innerHTML = data
           .map((s, i) => {
             const d = daysLeft(s.expires_at);
             const isAlert = d !== null && d <= 7 && d > 0;
-            return `<tr class="${isAlert ? "alert-row" : ""}">
-      <td><span class="badge-pill" style="background:rgba(255,255,255,0.05);color:var(--t3)">${data.length - i}</span></td>
-      <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.user_id || "—"}</td>
-      <td style="text-transform:capitalize">${s.plan || "—"}</td>
-      <td>${statusBadge(s)}</td>
-      <td><code style="font-size:11px;background:rgba(255,255,255,0.05);padding:2px 6px;border-radius:4px">${s.unlock_code || "—"}</code></td>
-      <td>${fmt(s.created_at)}</td>
-      <td>${fmt(s.expires_at)}</td>
-      <td>${d !== null ? daysBar(d, s.plan === "yearly" ? 365 : 30) : "—"}</td>
-    </tr>`;
+            const email =
+              userMap[s.user_id] ||
+              (s.user_id ? s.user_id.slice(0, 12) + "..." : "—");
+            return `<tr class="${isAlert ? "alert-row" : ""}"><td><span class="badge-pill" style="background:rgba(255,255,255,0.05);color:var(--t3)">${data.length - i}</span></td><td style="font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${email}</td><td style="text-transform:capitalize">${s.plan || "—"}</td><td>${statusBadge(s)}</td><td><code style="font-size:11px;background:rgba(255,255,255,0.05);padding:2px 6px;border-radius:4px">${s.unlock_code || "—"}</code></td><td>${fmt(s.created_at)}</td><td>${fmt(s.expires_at)}</td><td>${d !== null ? daysBar(d, s.plan === "yearly" ? 365 : 30) : "—"}</td></tr>`;
           })
           .join("");
       }
 
       function filterSubs() {
         const q = document.getElementById("subSearch").value.toLowerCase();
+        const userMap = {};
+        allUsers.forEach((u) => {
+          userMap[u.id] = u.email;
+        });
         _renderSubsTable(
-          filteredSubs.filter(
-            (s) =>
-              (s.user_id || "").toLowerCase().includes(q) ||
-              (s.unlock_code || "").toLowerCase().includes(q),
-          ),
+          filteredSubs.filter((s) => {
+            const email = (userMap[s.user_id] || s.user_id || "").toLowerCase();
+            const code = (s.unlock_code || "").toLowerCase();
+            return email.includes(q) || code.includes(q);
+          }),
         );
       }
 
-      // ── RENDER WAITLIST ──
       function renderWaitlistTable(data) {
         const tbody = document.getElementById("waitTable");
         if (!data.length) {
@@ -1331,13 +1274,8 @@
         }
         tbody.innerHTML = data
           .map(
-            (r, i) => `<tr>
-    <td><span class="badge-pill" style="background:rgba(255,255,255,0.05);color:var(--t3)">${data.length - i}</span></td>
-    <td>${r.name || "—"}</td>
-    <td>${r.email}</td>
-    <td>${r.phone ? `<a href="https://wa.me/${r.phone.replace(/[^0-9]/g, "")}" target="_blank" class="wa-link">💬 ${r.phone}</a>` : "—"}</td>
-    <td>${fmtFull(r.joined_at)}</td>
-  </tr>`,
+            (r, i) =>
+              `<tr><td><span class="badge-pill" style="background:rgba(255,255,255,0.05);color:var(--t3)">${data.length - i}</span></td><td>${r.name || "—"}</td><td>${r.email}</td><td>${r.phone ? `<a href="https://wa.me/${r.phone.replace(/[^0-9]/g, "")}" target="_blank" class="wa-link">💬 ${r.phone}</a>` : "—"}</td><td>${fmtFull(r.joined_at)}</td></tr>`,
           )
           .join("");
       }
@@ -1354,8 +1292,11 @@
         );
       }
 
-      // ── RENDER ALERTS ──
       function renderAlerts() {
+        const userMap = {};
+        allUsers.forEach((u) => {
+          userMap[u.id] = u.email;
+        });
         const expiring = allSubs.filter(
           (s) =>
             s.status === "active" &&
@@ -1366,38 +1307,28 @@
           (s) => s.status === "active" && daysLeft(s.expires_at) <= 0,
         );
         const el = document.getElementById("alertsList");
-
         let html = "";
-
         if (!expiring.length && !expired.length) {
           html =
             '<div style="text-align:center;padding:48px;color:var(--t3);font-size:13px">✅ No alerts right now. All good!</div>';
         } else {
           expired.forEach((s) => {
-            html += `<div class="alert-card">
-        <div class="alert-icon">🔴</div>
-        <div class="alert-text">
-          <strong>Subscription Expired</strong><br>
-          User <code>${s.user_id?.slice(0, 12)}...</code> — <strong>${s.plan}</strong> plan expired on ${fmt(s.expires_at)}.
-          They can no longer access the app.
-        </div>
-      </div>`;
+            const email =
+              userMap[s.user_id] ||
+              (s.user_id ? s.user_id.slice(0, 12) + "..." : "—");
+            html += `<div class="alert-card"><div class="alert-icon">🔴</div><div class="alert-text"><strong>Subscription Expired</strong><br>User <code>${email}</code> — <strong>${s.plan}</strong> plan expired on ${fmt(s.expires_at)}. They can no longer access the app.</div></div>`;
           });
           expiring.forEach((s) => {
             const d = daysLeft(s.expires_at);
-            html += `<div class="alert-card" style="background:rgba(245,158,11,0.05);border-color:rgba(245,158,11,0.15)">
-        <div class="alert-icon">⚠️</div>
-        <div class="alert-text" style="color:var(--t2)">
-          <strong style="color:#fbbf24">Expiring in ${d} day${d === 1 ? "" : "s"}</strong><br>
-          User <code>${s.user_id?.slice(0, 12)}...</code> — <strong style="color:var(--t1)">${s.plan}</strong> plan expires on ${fmt(s.expires_at)}.
-        </div>
-      </div>`;
+            const email =
+              userMap[s.user_id] ||
+              (s.user_id ? s.user_id.slice(0, 12) + "..." : "—");
+            html += `<div class="alert-card" style="background:rgba(245,158,11,0.05);border-color:rgba(245,158,11,0.15)"><div class="alert-icon">⚠️</div><div class="alert-text" style="color:var(--t2)"><strong style="color:#fbbf24">Expiring in ${d} day${d === 1 ? "" : "s"}</strong><br>User <code>${email}</code> — <strong style="color:var(--t1)">${s.plan}</strong> plan expires on ${fmt(s.expires_at)}.</div></div>`;
           });
         }
         el.innerHTML = html;
       }
 
-      // ── TABS ──
       const tabs = ["overview", "users", "subscriptions", "waitlist", "alerts"];
       function showTab(name) {
         tabs.forEach((t) => {
@@ -1407,11 +1338,9 @@
             .getElementById(`tab-${t}`)
             ?.classList.toggle("active", t === name);
         });
-        // Lazy render
         if (name === "waitlist") renderWaitlistTable(allWaitlist);
       }
 
-      // ── AUTH FORMS ──
       function showForm(name) {
         ["signIn", "forgot", "newPass"].forEach(
           (f) =>
@@ -1440,6 +1369,11 @@
             '<div class="err-box">Please fill in both fields.</div>';
           return;
         }
+        if (!ADMIN_EMAILS.includes(email)) {
+          errEl.innerHTML =
+            '<div class="err-box">Access denied. This email is not authorized.</div>';
+          return;
+        }
         const { data, error } = await sb.auth.signInWithPassword({
           email,
           password: pass,
@@ -1456,6 +1390,11 @@
         const msgEl = document.getElementById("forgotMsg");
         if (!email) {
           msgEl.innerHTML = '<div class="err-box">Enter your email.</div>';
+          return;
+        }
+        if (!ADMIN_EMAILS.includes(email)) {
+          msgEl.innerHTML =
+            '<div class="err-box">This email is not authorized for admin access.</div>';
           return;
         }
         const { error } = await sb.auth.resetPasswordForEmail(email, {
@@ -1507,7 +1446,6 @@
         location.reload();
       }
 
-      // ── EXPORTS ──
       function exportCSV(data, headers, filename) {
         const csv = [
           headers.join(","),
@@ -1521,17 +1459,32 @@
 
       function exportUsers() {
         exportCSV(
-          allSubs,
-          ["user_id", "plan", "status", "created_at", "expires_at"],
+          allUsers,
+          [
+            "email",
+            "full_name",
+            "status",
+            "plan",
+            "created_at",
+            "expires_at",
+            "days_left",
+          ],
           `trackli-users-${new Date().toISOString().slice(0, 10)}.csv`,
         );
       }
-
       function exportSubs() {
+        const userMap = {};
+        allUsers.forEach((u) => {
+          userMap[u.id] = u.email;
+        });
+        const enriched = allSubs.map((s) => ({
+          ...s,
+          email: userMap[s.user_id] || s.user_id,
+        }));
         exportCSV(
-          allSubs,
+          enriched,
           [
-            "user_id",
+            "email",
             "plan",
             "status",
             "unlock_code",
@@ -1541,7 +1494,6 @@
           `trackli-subs-${new Date().toISOString().slice(0, 10)}.csv`,
         );
       }
-
       function exportWaitlist() {
         exportCSV(
           allWaitlist,
@@ -1550,7 +1502,6 @@
         );
       }
 
-      // ── KEYBOARD ──
       document.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           if (document.getElementById("formSignIn").style.display !== "none")
@@ -1560,9 +1511,7 @@
         }
       });
 
-      // ── AUTO REFRESH every 5 min ──
       setInterval(loadAll, 5 * 60 * 1000);
-
       init();
     </script>
   </body>
