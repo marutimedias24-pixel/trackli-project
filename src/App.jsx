@@ -3622,7 +3622,12 @@ const StatsRow = ({ transactions }) => {
    PENDING SUMMARY
 ══════════════════════════════════════════════ */
 const PendingSummary = ({ transactions }) => {
-  const incTx = transactions.filter((t) => t.type === "income");
+  const now = new Date();
+  const currentMK = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  // Sirf current month ka pending dikha — purana data nahi
+  const incTx = transactions.filter(
+    (t) => t.type === "income" && t.date.startsWith(currentMK),
+  );
   const pendTx = incTx.filter((t) => !t.paid);
   const recdTx = incTx.filter((t) => t.paid);
   const tP = pendTx.reduce((s, t) => s + t.amount, 0);
@@ -3961,7 +3966,10 @@ const ClientPanel = (props) => {
   );
 
   const monthTx = useMemo(() => {
-    if (selMonth === currentMonthKey) return rangeFiltered;
+    if (selMonth === currentMonthKey) {
+      // Sirf current month ka data — no old months leaking in
+      return rangeFiltered.filter((t) => t.date.startsWith(currentMonthKey));
+    }
     return archive[selMonth] || [];
   }, [selMonth, rangeFiltered, archive, currentMonthKey]);
 
@@ -6308,7 +6316,6 @@ const InvoicePage = ({ transactions }) => {
   const [yourName, setYourName] = useState("");
   const [yourEmail, setYourEmail] = useState("");
   const [note, setNote] = useState("Payment due within 7 days.");
-  const [clientPhone, setClientPhone] = useState("");
   const [preview, setPreview] = useState(false);
   const [printMode, setPrintMode] = useState(false);
 
@@ -6326,26 +6333,6 @@ const InvoicePage = ({ transactions }) => {
   const received = filtered
     .filter((t) => t.paid)
     .reduce((s, t) => s + t.amount, 0);
-
-  const sendWhatsAppWithPDF = () => {
-    const phone = clientPhone.replace(/\D/g, "");
-    if (!phone) {
-      alert("Pehle client ka WhatsApp number daalo!");
-      return;
-    }
-    if (!filtered.length) {
-      alert("Koi transaction nahi mili is period mein.");
-      return;
-    }
-    // Step 1: PDF print/download trigger karo
-    printInvoice();
-    // Step 2: 1.5 sec baad WhatsApp kholo (PDF save hone ka time)
-    setTimeout(() => {
-      const msg = `Hi! Please find the attached invoice.\n\nInvoice: ${invoiceNo}\nClient: ${client}\nPeriod: ${fromDate ? fmtFull(fromDate) : "All time"} – ${fmtFull(toDate)}\n\nTotal Videos: ${filtered.length}\nTotal Amount: ${fmtINR(total)}\nReceived: ${fmtINR(received)}\nPending: ${fmtINR(pending)}\n\n${note}\n\n— ${yourName || "Your Editor"}`;
-      const waUrl = `https://wa.me/${phone.startsWith("91") ? phone : "91" + phone}?text=${encodeURIComponent(msg)}`;
-      window.open(waUrl, "_blank");
-    }, 1500);
-  };
 
   const printInvoice = async () => {
     const grouped = {};
@@ -6516,15 +6503,6 @@ const InvoicePage = ({ transactions }) => {
             />
             <div style={{ gridColumn: "1/-1" }}>
               <FI
-                label="Client WhatsApp Number"
-                value={clientPhone}
-                onChange={(e) => setClientPhone(e.target.value)}
-                placeholder="e.g. 9876543210"
-                type="tel"
-              />
-            </div>
-            <div style={{ gridColumn: "1/-1" }}>
-              <FI
                 label="Note / Payment Terms"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
@@ -6661,40 +6639,22 @@ const InvoicePage = ({ transactions }) => {
                   </span>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button
-                  onClick={printInvoice}
-                  style={{
-                    flex: 1,
-                    background: "var(--green)",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 10,
-                    padding: "12px 0",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                  }}
-                >
-                  ⬇️ PDF Download
-                </button>
-                <button
-                  onClick={sendWhatsAppWithPDF}
-                  style={{
-                    flex: 1,
-                    background: "#25D366",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 10,
-                    padding: "12px 0",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                  }}
-                >
-                  WhatsApp Send
-                </button>
-              </div>
+              <button
+                onClick={printInvoice}
+                style={{
+                  width: "100%",
+                  background: "var(--green)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 10,
+                  padding: "12px 0",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                ⬇️ PDF Download Karo
+              </button>
             </>
           )}
         </Card>
