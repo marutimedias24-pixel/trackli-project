@@ -7055,7 +7055,6 @@ const AgencyMode = () => (
       padding: "40px 16px",
     }}
   >
-    {/* Lock badge */}
     <div style={{ textAlign: "center", marginBottom: 32 }}>
       <div
         style={{
@@ -7113,8 +7112,6 @@ const AgencyMode = () => (
         and agency-level insights — all in one place.
       </p>
     </div>
-
-    {/* Feature preview cards */}
     <div
       style={{
         display: "grid",
@@ -7192,8 +7189,6 @@ const AgencyMode = () => (
         </div>
       ))}
     </div>
-
-    {/* Preview mockup */}
     <div
       className="gc"
       style={{
@@ -7283,7 +7278,6 @@ const AgencyMode = () => (
           </div>
         </div>
       ))}
-      {/* Lock overlay */}
       <div
         style={{
           display: "flex",
@@ -7299,8 +7293,6 @@ const AgencyMode = () => (
         </span>
       </div>
     </div>
-
-    {/* CTA */}
     <div
       className="gc"
       style={{
@@ -7676,7 +7668,7 @@ export default function App() {
     { id: "transactions", label: "Transactions", icon: "list" },
     { id: "calendar", label: "Calendar", icon: "calendar" },
     { id: "invoice", label: "Invoice", icon: "receipt" },
-    { id: "agency", label: "Agency", icon: "users" },
+    { id: "agency", label: "Agency", icon: "users", badge: "New" },
     { id: "bugreport", label: "Bug Report", icon: "alert" },
   ];
 
@@ -7685,7 +7677,7 @@ export default function App() {
     { id: "transactions", label: "Transactions", icon: "list" },
     { id: "calendar", label: "Calendar", icon: "calendar" },
     { id: "invoice", label: "Invoice", icon: "receipt" },
-    { id: "agency", label: "Agency", icon: "users" },
+    { id: "agency", label: "Agency", icon: "users", badge: "New" },
     { id: "bugreport", label: "Bug Report", icon: "alert" },
   ];
 
@@ -8129,6 +8121,22 @@ export default function App() {
                 <Icon n={t.icon} size={14} />
               </div>
               {t.label}
+              {t.badge && (
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 800,
+                    background:
+                      "linear-gradient(135deg,var(--indigo),var(--green))",
+                    color: "#fff",
+                    borderRadius: 99,
+                    padding: "2px 6px",
+                    marginLeft: 2,
+                  }}
+                >
+                  {t.badge}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -8161,7 +8169,23 @@ export default function App() {
               <div className="sb-icon">
                 <Icon n={t.icon} size={16} />
               </div>
-              {t.label}
+              <span style={{ flex: 1 }}>{t.label}</span>
+              {t.badge && (
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 800,
+                    background:
+                      "linear-gradient(135deg,var(--indigo),var(--green))",
+                    color: "#fff",
+                    borderRadius: 99,
+                    padding: "2px 7px",
+                    letterSpacing: ".04em",
+                  }}
+                >
+                  {t.badge}
+                </span>
+              )}
             </button>
           ))}
         </aside>
@@ -8225,8 +8249,27 @@ export default function App() {
             key={t.id}
             className={`mob-nav-btn ${tab === t.id ? "active" : ""}`}
             onClick={() => setTab(t.id)}
+            style={{ position: "relative" }}
           >
             <Icon n={t.icon} size={20} />
+            {t.badge && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: 6,
+                  right: "calc(50% - 18px)",
+                  fontSize: 8,
+                  fontWeight: 800,
+                  background:
+                    "linear-gradient(135deg,var(--indigo),var(--green))",
+                  color: "#fff",
+                  borderRadius: 99,
+                  padding: "1px 5px",
+                }}
+              >
+                {t.badge}
+              </span>
+            )}
             <span>{t.label}</span>
           </button>
         ))}
