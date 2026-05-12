@@ -3622,7 +3622,11 @@ const StatsRow = ({ transactions }) => {
    PENDING SUMMARY
 ══════════════════════════════════════════════ */
 const PendingSummary = ({ transactions }) => {
-  const incTx = transactions.filter((t) => t.type === "income");
+  const now = new Date();
+  const currentMK = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const incTx = transactions.filter(
+    (t) => t.type === "income" && t.date.startsWith(currentMK),
+  );
   const pendTx = incTx.filter((t) => !t.paid);
   const recdTx = incTx.filter((t) => t.paid);
   const tP = pendTx.reduce((s, t) => s + t.amount, 0);
@@ -3961,7 +3965,8 @@ const ClientPanel = (props) => {
   );
 
   const monthTx = useMemo(() => {
-    if (selMonth === currentMonthKey) return rangeFiltered;
+    if (selMonth === currentMonthKey)
+      return rangeFiltered.filter((t) => t.date.startsWith(currentMonthKey));
     return archive[selMonth] || [];
   }, [selMonth, rangeFiltered, archive, currentMonthKey]);
 
@@ -7042,283 +7047,6 @@ const BugReport = ({ user }) => {
   );
 };
 
-/* ══════════════════════════════════════════════
-   AGENCY MODE — LOCKED / COMING SOON
-══════════════════════════════════════════════ */
-const AgencyMode = () => (
-  <div
-    className="fu"
-    style={{
-      width: "100%",
-      maxWidth: 600,
-      margin: "0 auto",
-      padding: "40px 16px",
-    }}
-  >
-    <div style={{ textAlign: "center", marginBottom: 32 }}>
-      <div
-        style={{
-          width: 64,
-          height: 64,
-          borderRadius: 20,
-          margin: "0 auto 16px",
-          background: "var(--indigobg)",
-          border: "1px solid rgba(99,102,241,.2)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Icon n="bolt" size={28} color="var(--indigo)" />
-      </div>
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          background: "var(--amberbg)",
-          border: "1px solid rgba(245,158,11,.25)",
-          borderRadius: 99,
-          padding: "5px 14px",
-          marginBottom: 16,
-        }}
-      >
-        <Icon n="clock" size={12} color="var(--amber)" />
-        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--amber)" }}>
-          Coming Soon
-        </span>
-      </div>
-      <h2
-        style={{
-          fontSize: 24,
-          fontWeight: 800,
-          color: "var(--t1)",
-          letterSpacing: "-.03em",
-          marginBottom: 8,
-        }}
-      >
-        Agency Mode
-      </h2>
-      <p
-        style={{
-          fontSize: 14,
-          color: "var(--t2)",
-          lineHeight: 1.6,
-          maxWidth: 420,
-          margin: "0 auto",
-        }}
-      >
-        Manage multiple clients like a pro. Dedicated folders, bulk tracking,
-        and agency-level insights — all in one place.
-      </p>
-    </div>
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-        gap: 12,
-        marginBottom: 28,
-      }}
-    >
-      {[
-        {
-          icon: "users",
-          title: "Client Folders",
-          desc: "Har client ka dedicated workspace. Videos, payments, notes — sab ek jagah.",
-          color: "var(--indigo)",
-        },
-        {
-          icon: "list",
-          title: "Video Tracker",
-          desc: "Client ke andar har video ka record — title, date, amount, delivery status.",
-          color: "var(--green)",
-        },
-        {
-          icon: "receipt",
-          title: "Instant Invoice",
-          desc: "Client folder se seedha invoice generate karo. Ek click.",
-          color: "var(--amber)",
-        },
-        {
-          icon: "trending",
-          title: "Agency Analytics",
-          desc: "Sabhi clients ka combined report — monthly, quarterly, yearly.",
-          color: "var(--purple)",
-        },
-      ].map((f) => (
-        <div
-          key={f.title}
-          className="gc"
-          style={{ padding: "16px 18px", opacity: 0.85 }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 10,
-            }}
-          >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 9,
-                background: `${f.color}15`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Icon n={f.icon} size={15} color={f.color} />
-            </div>
-            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)" }}>
-              {f.title}
-            </span>
-          </div>
-          <p
-            style={{
-              fontSize: 12,
-              color: "var(--t3)",
-              lineHeight: 1.6,
-              margin: 0,
-            }}
-          >
-            {f.desc}
-          </p>
-        </div>
-      ))}
-    </div>
-    <div
-      className="gc"
-      style={{
-        padding: "18px 20px",
-        marginBottom: 24,
-        border: "1px dashed var(--cb)",
-      }}
-    >
-      <p className="lbl" style={{ marginBottom: 12 }}>
-        Preview — Client Folder
-      </p>
-      {[
-        {
-          name: "Vivek Gupta",
-          videos: 12,
-          amount: "₹18,000",
-          pending: "₹3,000",
-          tag: "Top",
-          tagColor: "var(--amber)",
-        },
-        {
-          name: "Priya Sharma",
-          videos: 8,
-          amount: "₹12,000",
-          pending: "₹0",
-          tag: "Active",
-          tagColor: "var(--green)",
-        },
-        {
-          name: "Rahul Kapoor",
-          videos: 3,
-          amount: "₹4,500",
-          pending: "₹4,500",
-          tag: "Inactive",
-          tagColor: "var(--t3)",
-        },
-      ].map((c) => (
-        <div
-          key={c.name}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "10px 12px",
-            background: "var(--surface2)",
-            borderRadius: 10,
-            marginBottom: 8,
-            opacity: 0.6,
-            filter: "blur(0.5px)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Avatar name={c.name} size={28} />
-            <div>
-              <p
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "var(--t1)",
-                  margin: 0,
-                }}
-              >
-                {c.name}
-              </p>
-              <p style={{ fontSize: 11, color: "var(--t3)", margin: 0 }}>
-                {c.videos} videos
-              </p>
-            </div>
-            <Tag color={c.tagColor}>{c.tag}</Tag>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <p
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color: "var(--green)",
-                margin: 0,
-              }}
-            >
-              {c.amount}
-            </p>
-            {c.pending !== "₹0" && (
-              <p style={{ fontSize: 11, color: "var(--amber)", margin: 0 }}>
-                {c.pending} pending
-              </p>
-            )}
-          </div>
-        </div>
-      ))}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          marginTop: 4,
-        }}
-      >
-        <Icon n="eye" size={13} color="var(--t3)" />
-        <span style={{ fontSize: 11, color: "var(--t3)" }}>
-          Preview only — unlock when available
-        </span>
-      </div>
-    </div>
-    <div
-      className="gc"
-      style={{
-        padding: "18px 20px",
-        textAlign: "center",
-        border: "1px solid rgba(99,102,241,.2)",
-        background: "var(--indigobg)",
-      }}
-    >
-      <p
-        style={{
-          fontSize: 14,
-          fontWeight: 700,
-          color: "var(--indigo)",
-          marginBottom: 6,
-        }}
-      >
-        Launching soon for Pro users
-      </p>
-      <p style={{ fontSize: 12, color: "var(--t3)", margin: 0 }}>
-        Agency Mode Pro plan subscribers ko pehle milega. Stay tuned!
-      </p>
-    </div>
-  </div>
-);
-
 export default function App() {
   // injectStyles already called at module level above
   useEffect(() => {
@@ -7668,7 +7396,6 @@ export default function App() {
     { id: "transactions", label: "Transactions", icon: "list" },
     { id: "calendar", label: "Calendar", icon: "calendar" },
     { id: "invoice", label: "Invoice", icon: "receipt" },
-    { id: "agency", label: "Agency", icon: "users", badge: "New" },
     { id: "bugreport", label: "Bug Report", icon: "alert" },
   ];
 
@@ -7677,7 +7404,6 @@ export default function App() {
     { id: "transactions", label: "Transactions", icon: "list" },
     { id: "calendar", label: "Calendar", icon: "calendar" },
     { id: "invoice", label: "Invoice", icon: "receipt" },
-    { id: "agency", label: "Agency", icon: "users", badge: "New" },
     { id: "bugreport", label: "Bug Report", icon: "alert" },
   ];
 
@@ -7719,7 +7445,6 @@ export default function App() {
         />
       )}
       {tab === "invoice" && <InvoicePage transactions={transactions} />}
-      {tab === "agency" && <AgencyMode />}
       {tab === "bugreport" && <BugReport user={user} />}
     </>
   );
@@ -8121,22 +7846,6 @@ export default function App() {
                 <Icon n={t.icon} size={14} />
               </div>
               {t.label}
-              {t.badge && (
-                <span
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 800,
-                    background:
-                      "linear-gradient(135deg,var(--indigo),var(--green))",
-                    color: "#fff",
-                    borderRadius: 99,
-                    padding: "2px 6px",
-                    marginLeft: 2,
-                  }}
-                >
-                  {t.badge}
-                </span>
-              )}
             </button>
           ))}
         </div>
@@ -8169,23 +7878,7 @@ export default function App() {
               <div className="sb-icon">
                 <Icon n={t.icon} size={16} />
               </div>
-              <span style={{ flex: 1 }}>{t.label}</span>
-              {t.badge && (
-                <span
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 800,
-                    background:
-                      "linear-gradient(135deg,var(--indigo),var(--green))",
-                    color: "#fff",
-                    borderRadius: 99,
-                    padding: "2px 7px",
-                    letterSpacing: ".04em",
-                  }}
-                >
-                  {t.badge}
-                </span>
-              )}
+              {t.label}
             </button>
           ))}
         </aside>
@@ -8249,27 +7942,8 @@ export default function App() {
             key={t.id}
             className={`mob-nav-btn ${tab === t.id ? "active" : ""}`}
             onClick={() => setTab(t.id)}
-            style={{ position: "relative" }}
           >
             <Icon n={t.icon} size={20} />
-            {t.badge && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: 6,
-                  right: "calc(50% - 18px)",
-                  fontSize: 8,
-                  fontWeight: 800,
-                  background:
-                    "linear-gradient(135deg,var(--indigo),var(--green))",
-                  color: "#fff",
-                  borderRadius: 99,
-                  padding: "1px 5px",
-                }}
-              >
-                {t.badge}
-              </span>
-            )}
             <span>{t.label}</span>
           </button>
         ))}
