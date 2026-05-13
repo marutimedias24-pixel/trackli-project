@@ -3624,9 +3624,7 @@ const StatsRow = ({ transactions }) => {
 const PendingSummary = ({ transactions }) => {
   const now = new Date();
   const currentMK = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const incTx = transactions.filter(
-    (t) => t.type === "income" && t.date.startsWith(currentMK),
-  );
+  const incTx = transactions.filter((t) => t.type === "income" && t.date.startsWith(currentMK));
   const pendTx = incTx.filter((t) => !t.paid);
   const recdTx = incTx.filter((t) => t.paid);
   const tP = pendTx.reduce((s, t) => s + t.amount, 0);
@@ -3965,8 +3963,7 @@ const ClientPanel = (props) => {
   );
 
   const monthTx = useMemo(() => {
-    if (selMonth === currentMonthKey)
-      return rangeFiltered.filter((t) => t.date.startsWith(currentMonthKey));
+    if (selMonth === currentMonthKey) return rangeFiltered.filter(t => t.date.startsWith(currentMonthKey));
     return archive[selMonth] || [];
   }, [selMonth, rangeFiltered, archive, currentMonthKey]);
 
@@ -7047,6 +7044,48 @@ const BugReport = ({ user }) => {
   );
 };
 
+/* ══════════════════════════════════════════════
+   AGENCY MODE — LOCKED / COMING SOON
+══════════════════════════════════════════════ */
+const AgencyMode = () => (
+  <div className="fu" style={{ width: "100%", maxWidth: 600, margin: "0 auto", padding: "40px 16px" }}>
+    <div style={{ textAlign: "center", marginBottom: 32 }}>
+      <div style={{ width: 64, height: 64, borderRadius: 20, margin: "0 auto 16px", background: "var(--indigobg)", border: "1px solid rgba(99,102,241,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Icon n="bolt" size={28} color="var(--indigo)" />
+      </div>
+      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "var(--amberbg)", border: "1px solid rgba(245,158,11,.25)", borderRadius: 99, padding: "5px 14px", marginBottom: 16 }}>
+        <Icon n="clock" size={12} color="var(--amber)" />
+        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--amber)" }}>Coming Soon</span>
+      </div>
+      <h2 style={{ fontSize: 24, fontWeight: 800, color: "var(--t1)", letterSpacing: "-.03em", marginBottom: 8 }}>Agency Mode</h2>
+      <p style={{ fontSize: 14, color: "var(--t2)", lineHeight: 1.6, maxWidth: 420, margin: "0 auto" }}>Manage multiple clients like a pro. Dedicated folders, bulk tracking, and agency-level insights.</p>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12, marginBottom: 28 }}>
+      {[
+        { icon: "users", title: "Client Folders", desc: "Har client ka dedicated workspace. Videos, payments — sab ek jagah.", color: "var(--indigo)" },
+        { icon: "list", title: "Video Tracker", desc: "Client ke andar har video ka record — title, date, amount, status.", color: "var(--green)" },
+        { icon: "receipt", title: "Instant Invoice", desc: "Client folder se seedha invoice generate karo. Ek click.", color: "var(--amber)" },
+        { icon: "trending", title: "Agency Analytics", desc: "Sabhi clients ka combined report — monthly, quarterly, yearly.", color: "var(--purple)" },
+      ].map((f) => (
+        <div key={f.title} className="gc" style={{ padding: "16px 18px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 9, background: `${f.color}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Icon n={f.icon} size={15} color={f.color} />
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "var(--t1)" }}>{f.title}</span>
+          </div>
+          <p style={{ fontSize: 12, color: "var(--t3)", lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+        </div>
+      ))}
+    </div>
+    <div className="gc" style={{ padding: "18px 20px", textAlign: "center", border: "1px solid rgba(99,102,241,.2)", background: "var(--indigobg)" }}>
+      <p style={{ fontSize: 14, fontWeight: 700, color: "var(--indigo)", marginBottom: 6 }}>Launching soon for Pro users</p>
+      <p style={{ fontSize: 12, color: "var(--t3)", margin: 0 }}>Pro subscribers ko pehle milega. Stay tuned!</p>
+    </div>
+  </div>
+);
+
+
 export default function App() {
   // injectStyles already called at module level above
   useEffect(() => {
@@ -7158,34 +7197,51 @@ export default function App() {
         if (gData) setGoalSt({ monthly: gData.monthly });
 
         // ── Subscription check — Supabase FIRST, localStorage fallback ──
-        const { data: subData } = await supabase
-          .from("subscriptions")
-          .select("*")
-          .eq("user_id", user.id)
-          .eq("status", "active")
-          .maybeSingle();
+        try {
+          const { data: subData } = await supabase
+            .from("subscriptions")
+            .select("*")
+            .eq("user_id", user.id)
+            .eq("status", "active")
+            .maybeSingle();
 
-        if (subData) {
-          // Supabase mein active subscription hai — unlocked!
-          const dbSub = {
-            unlocked: true,
-            unlockedAt: subData.started_at,
-            plan: subData.plan,
-          };
-          setSub(dbSub);
-          saveSub(dbSub); // sync to localStorage as well
-        } else {
-          // Supabase mein nahi — localStorage check karo (trial)
-          const s = initTrial();
-          setSub(s);
-          if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) === 0)
-            setPayw(true);
-          else if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) <= 3)
-            setPayw(true);
+          if (subData) {
+            // Supabase mein active subscription hai — unlocked!
+            const dbSub = {
+              unlocked: true,
+              unlockedAt: subData.started_at,
+              plan: subData.plan,
+              expiresAt: subData.expires_at,
+            };
+            setSub(dbSub);
+            saveSub(dbSub); // localStorage mein save karo fallback ke liye
+          } else {
+            // Supabase ne confirm kiya — active nahi hai
+            // But pehle localStorage check karo — cache mein unlocked ho sakta hai
+            const cached = loadSub();
+            if (cached?.unlocked) {
+              // Cached subscription use karo
+              setSub(cached);
+            } else {
+              const s = initTrial();
+              setSub(s);
+              if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) === 0)
+                setPayw(true);
+              else if (!DEV_SKIP_PAYWALL && !s.unlocked && getTrialDaysLeft(s) <= 3)
+                setPayw(true);
+            }
+          }
+        } catch (subErr) {
+          // Network error — localStorage se fallback lo, paywall mat dikhao
+          console.warn("Subscription check failed (offline?), using cache:", subErr.message);
+          const cached = loadSub();
+          if (cached) {
+            setSub(cached); // cached data use karo — unlocked ya trial jo bhi ho
+          } else {
+            const s = initTrial();
+            setSub(s);
+          }
         }
-      } catch (e) {
-        console.error(e);
-      }
     })();
   }, [user]);
 
@@ -7404,6 +7460,7 @@ export default function App() {
     { id: "transactions", label: "Transactions", icon: "list" },
     { id: "calendar", label: "Calendar", icon: "calendar" },
     { id: "invoice", label: "Invoice", icon: "receipt" },
+    { id: "agency", label: "Agency", icon: "users", badge: "New" },
     { id: "bugreport", label: "Bug Report", icon: "alert" },
   ];
 
@@ -7445,6 +7502,7 @@ export default function App() {
         />
       )}
       {tab === "invoice" && <InvoicePage transactions={transactions} />}
+      {tab === "agency" && <AgencyMode />}
       {tab === "bugreport" && <BugReport user={user} />}
     </>
   );
@@ -7878,7 +7936,10 @@ export default function App() {
               <div className="sb-icon">
                 <Icon n={t.icon} size={16} />
               </div>
-              {t.label}
+              <span style={{ flex: 1 }}>{t.label}</span>
+              {t.badge && (
+                <span style={{ fontSize: 9, fontWeight: 800, background: "linear-gradient(135deg,var(--indigo),var(--green))", color: "#fff", borderRadius: 99, padding: "2px 7px" }}>{t.badge}</span>
+              )}
             </button>
           ))}
         </aside>
